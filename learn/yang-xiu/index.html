@@ -98,7 +98,11 @@ function render(){
 function applyVisibility(){document.body.classList.toggle('hide-jyutping',!state.showJyutping);document.body.classList.toggle('hide-notes',!state.showNotes);}
 function clearMarks(card){card?.querySelectorAll('.sentence-span').forEach(x=>x.classList.remove('active'));card?.querySelectorAll('.word-span').forEach(x=>x.classList.remove('asr-ok','asr-miss'));}
 
-function chooseVoice(){const vs=speechSynthesis.getVoices();return vs.find(v=>/^zh[-_]HK$/i.test(v.lang))||vs.find(v=>/zh[-_]HK|yue/i.test(v.lang))||null;}
+function isCantoneseVoice(v){return /^zh[-_]HK$/i.test(v.lang)||/zh[-_]HK|yue/i.test(v.lang)||/cantonese|hong kong|sin-ji|sinji|粵|粤/i.test(v.name);}
+function chooseVoice(){
+  const vs=speechSynthesis.getVoices();
+  return vs.find(isCantoneseVoice)||null;
+}
 /* 每個短句是一個獨立 SpeechSynthesisUtterance。重複、指定起點和高亮都直接
    跟隨短句的 onstart/onend，因此不再依賴各瀏覽器精度不一的 boundary 事件。 */
 function speak(item,card){
@@ -116,11 +120,14 @@ function speak(item,card){
     if(session.cancelled)return;
     if(session.index>=segments.length){finish();return;}
     const u=new SpeechSynthesisUtterance(segments[session.index]);session.utterance=u;
-    u.lang='zh-HK';u.rate=state.rate;u.pitch=1;if(voice)u.voice=voice;
-    u.onstart=()=>{if(session.cancelled)return;sentences.forEach((s,i)=>s.classList.toggle('active',i===session.index));result.textContent=`正在朗讀第 ${session.index+1} 句（第 ${session.repeated+1}/${session.repeat} 次）`+(voice?`・${voice.name}`:'');};
-    u.onend=()=>{if(session.cancelled)return;session.repeated++;if(session.repeated>=session.repeat){session.repeated=0;session.index++;}setTimeout(playNext,90);};
+    u.lang='zh-HK';u.rate=state.rate;u.pitch=1;u.volume=1;
+    if(voice)u.voice=voice;
+    const showCurrent=()=>{sentences.forEach((s,i)=>s.classList.toggle('active',i===session.index));result.textContent=`正在朗讀第 ${session.index+1} 句（第 ${session.repeated+1}/${session.repeat} 次）`+(voice?`・${voice.name}`:'');};
+    u.onstart=()=>{if(session.cancelled)return;showCurrent();};
+    u.onend=()=>{if(session.cancelled)return;session.utterance=null;session.repeated++;if(session.repeated>=session.repeat){session.repeated=0;session.index++;}setTimeout(playNext,90);};
     u.onerror=e=>{if(!session.cancelled){session.cancelled=true;session.cleanup();state.speaking=null;result.textContent=`語音播放失敗：${e.error||'未知錯誤'}`;}};
     speechSynthesis.speak(u);
+    showCurrent();
   }
   playNext();
 }

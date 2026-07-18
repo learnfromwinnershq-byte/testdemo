@@ -30,11 +30,13 @@ test("server-renders the Cantonese Rift Tide Warfront prototype", async () => {
 
   const html = await response.text();
   assert.match(html, /<html lang="zh-Hant-HK">/i);
-  assert.match(html, /<title>裂潮戰線｜海陸即時戰爭原型<\/title>/i);
-  assert.match(html, /海陸一圖/);
-  assert.match(html, /刃鰭快艇/);
-  assert.match(html, /揀出擊單位/);
-  assert.match(html, /即刻出擊/);
+  assert.match(html, /<title>裂潮戰線｜俯視即時海戰原型<\/title>/i);
+  assert.match(html, /Mk48 式俯視海戰原型/);
+  assert.match(html, /刃鰭巡邏艇/);
+  assert.match(html, /揀出擊艦種/);
+  assert.match(html, /即刻出海/);
+  assert.match(html, /戰場粵語/);
+  assert.match(html, /滑鼠指向航行/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/i);
 });
 
@@ -45,15 +47,21 @@ test("keeps the complete Traditional Chinese product source and assets", async (
     readFile(new URL("../public/RIFT-TIDE-GDD.md", import.meta.url), "utf8"),
   ]);
 
-  assert.match(gameClient, /const UNITS/);
+  assert.match(gameClient, /const SHIPS/);
   assert.match(gameClient, /赤潮聯隊/);
   assert.match(gameClient, /藍穹同盟/);
+  assert.match(gameClient, /PHRASES/);
+  assert.match(gameClient, /開船喇，望實雷達/);
+  assert.match(gameClient, /瞄準先，唔好亂射/);
+  assert.match(gameClient, /onContextMenu/);
+  assert.match(gameClient, /右鍵/);
   assert.match(gameClient, /撳 Enter 傳送訊息/);
-  assert.match(layout, /裂潮戰線｜海陸即時戰爭原型/);
+  assert.match(layout, /裂潮戰線｜俯視即時海戰原型/);
   assert.match(layout, /zh-Hant-HK/);
   assert.match(layout, /og\.png/);
-  assert.match(gdd, /## 14\. 風險與治理/);
-  assert.ok(gdd.split("\n").length >= 190);
+  assert.match(gdd, /## 19\. 風險與治理/);
+  assert.match(gdd, /Mk48 式俯視即時海戰/);
+  assert.ok(gdd.split("\n").length >= 120);
 
   await Promise.all([
     access(new URL("../public/og.png", import.meta.url)),

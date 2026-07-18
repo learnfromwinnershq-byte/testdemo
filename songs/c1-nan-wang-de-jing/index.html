@@ -186,18 +186,12 @@ function waitForVoices(){
     speechSynthesis.addEventListener?.('voiceschanged',finish,{once:true});setTimeout(finish,600);
   });
 }
-function warmSpeech(){
-  try{
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(' ');u.volume=0;u.lang='zh-HK';speechSynthesis.speak(u);speechSynthesis.cancel();
-  }catch{}
-}
-async function speak(item,card){
+function speak(item,card){
   if(state.speaking?.card===card){stopAll();return;}
   stopAll();clearMarks(card);
   const btn=card.querySelector('.play'),result=card.querySelector('.result');
   if(!('speechSynthesis'in window)){result.textContent='此瀏覽器不支援語音合成。';return;}
-  await waitForVoices();warmSpeech();
+  if(!speechSynthesis.getVoices().length)waitForVoices();
   const lines=[...card.querySelectorAll('.lyric-line')],voice=chooseVoice(),startIndex=Number.isInteger(state.selected[item.id])?state.selected[item.id]:0;
   const session={card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat};
   state.speaking=session;btn.classList.add('playing');btn.textContent='■ 停止示範';

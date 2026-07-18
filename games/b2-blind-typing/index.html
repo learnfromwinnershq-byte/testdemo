@@ -276,6 +276,87 @@
       background: var(--panel);
     }
 
+    .hanzi-guide {
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hanzi-guide[hidden] {
+      display: none;
+    }
+
+    .hanzi-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .hanzi-heading strong {
+      font-size: 14px;
+    }
+
+    .voice-toggle {
+      min-height: 34px;
+      padding: 0 10px;
+      border-color: var(--accent);
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    .voice-toggle[aria-pressed="true"] {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .hanzi-text {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .hanzi-token {
+      display: grid;
+      place-items: center;
+      min-width: 46px;
+      min-height: 50px;
+      padding: 4px 8px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-family: "PingFang HK", "Noto Sans HK", ui-sans-serif, system-ui, sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+      transition: color .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    .hanzi-token.current {
+      border-color: var(--accent);
+      background: rgba(38, 113, 95, .12);
+    }
+
+    .hanzi-token.done {
+      border-color: var(--good);
+      background: rgba(46, 128, 102, .14);
+      color: var(--good);
+    }
+
+    .hanzi-token.wrong {
+      border-color: var(--bad);
+      background: rgba(190, 61, 61, .1);
+      color: var(--bad);
+    }
+
+    .voice-status {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     .prompt-text {
       word-break: break-word;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -330,6 +411,11 @@
       font-size: 20px;
       line-height: 1.45;
       letter-spacing: 0;
+    }
+
+    textarea.needs-correction {
+      --input: var(--bad);
+      box-shadow: 0 0 0 3px rgba(190, 61, 61, .12);
     }
 
     .action-stack {
@@ -693,6 +779,14 @@
           </div>
 
           <div class="text-board" aria-live="polite">
+            <div id="hanziGuide" class="hanzi-guide" hidden>
+              <div class="hanzi-heading">
+                <strong>《楊修之死》繁體字記憶</strong>
+                <button type="button" id="voiceBtn" class="voice-toggle" aria-pressed="true">粵語讀音：開</button>
+              </div>
+              <div id="hanziText" class="hanzi-text" aria-label="對應繁體字"></div>
+              <p id="voiceStatus" class="voice-status">每個粵拼音節輸入正確，就會讀出對應嘅字。選句取材自羅貫中《楊修之死》。</p>
+            </div>
             <div id="promptText" class="prompt-text"></div>
           </div>
 
@@ -798,19 +892,19 @@
       },
       pinyin: {
         easy: [
-          "gin6 pun2 lin6 zaap6",
-          "faai3 sou3 zeon2 kok3",
-          "sau2 zi2 gwai1 wai2"
+          { hanzi: "操屯兵日久", jyutping: "cou3 tyun4 bing1 jat6 gau2" },
+          { hanzi: "雞肋雞肋", jyutping: "gai1 lak6 gai1 lak6" },
+          { hanzi: "準備歸程", jyutping: "zeon2 bei6 gwai1 cing4" }
         ],
         normal: [
-          "ngo5 jiu3 lin6 hou2 maang4 daa2",
-          "sin1 zeon2 kok3 zoi3 gaa1 sou3",
-          "mui5 jat6 sap6 fan1 zung1"
+          { hanzi: "心中猶豫不決", jyutping: "sam1 zung1 jau4 jyu6 bat1 kyut3" },
+          { hanzi: "各收拾行裝", jyutping: "gok3 sau1 sap6 hang4 zong1" },
+          { hanzi: "食之無肉棄之有味", jyutping: "sik6 zi1 mou4 juk6 hei3 zi1 jau5 mei6" }
         ],
         hard: [
-          "sau2 zi2 m4 mong6 gin6 pun2 dou1 wan2 dou2 wai2 zi6",
-          "siu2 sam1 ngon3 gin6 bou2 ci4 zit3 zau3 wan2 ding6",
-          "gam1 jat6 bei2 cam4 jat6 do1 aam1 jat1 di1 di1"
+          { hanzi: "進不能勝退恐人恥笑", jyutping: "zeon3 bat1 nang4 sing3 teoi3 hung2 jan4 ci2 siu3" },
+          { hanzi: "在此無益不如早歸", jyutping: "zoi6 ci2 mou4 jik1 bat1 jyu4 zou2 gwai1" },
+          { hanzi: "楊修真知魏王肺腑", jyutping: "joeng4 sau1 zan1 zi1 ngai6 wong4 fai3 fu2" }
         ]
       },
       symbols: {
@@ -848,6 +942,17 @@
       bestCombo: 0,
       lastInputLength: 0,
       mistakes: {},
+      hanziTokens: [],
+      spokenTokens: new Set(),
+      voiceEnabled: true,
+      cantoneseVoice: null,
+      speechQueue: [],
+      activeUtterance: null,
+      speechTimer: 0,
+      speechGeneration: 0,
+      roundAdvancing: false,
+      roundAdvanceTimer: 0,
+      needsCorrection: false,
       best: JSON.parse(localStorage.getItem("typingCampBest") || "{\"speed\":0,\"accuracy\":0}")
     };
 
@@ -873,14 +978,53 @@
       durationSelect: document.getElementById("durationSelect"),
       targetSelect: document.getElementById("targetSelect"),
       bestSpeed: document.getElementById("bestSpeed"),
-      bestAccuracy: document.getElementById("bestAccuracy")
+      bestAccuracy: document.getElementById("bestAccuracy"),
+      hanziGuide: document.getElementById("hanziGuide"),
+      hanziText: document.getElementById("hanziText"),
+      voiceBtn: document.getElementById("voiceBtn"),
+      voiceStatus: document.getElementById("voiceStatus")
     };
 
-    function pickText() {
+    function makePinyinRound(items) {
+      const pairs = items.flatMap(item => {
+        const hanzi = [...item.hanzi];
+        const jyutping = item.jyutping.split(" ");
+        if (hanzi.length !== jyutping.length) {
+          throw new Error(`粵拼題目字音數量唔相符：${item.hanzi}`);
+        }
+        return hanzi.map((char, index) => ({ char, jyutping: jyutping[index] }));
+      });
+      let cursor = 0;
+      const tokens = pairs.map(token => {
+        const placed = {
+          ...token,
+          start: cursor,
+          end: cursor + token.jyutping.length
+        };
+        cursor = placed.end + 1;
+        return placed;
+      });
+      return {
+        text: tokens.map(token => token.jyutping).join(" "),
+        hanziTokens: tokens
+      };
+    }
+
+    function pickRound() {
       const bank = lessons[state.lesson][state.level];
-      const base = bank[Math.floor(Math.random() * bank.length)];
-      if (state.level === "hard") return `${base}  ${bank[(Math.floor(Math.random() * bank.length))]}`;
-      return base;
+      const firstIndex = Math.floor(Math.random() * bank.length);
+      const first = bank[firstIndex];
+      if (state.lesson === "pinyin") {
+        const items = [first];
+        if (state.level === "hard") {
+          items.push(bank[(firstIndex + 1 + Math.floor(Math.random() * (bank.length - 1))) % bank.length]);
+        }
+        return makePinyinRound(items);
+      }
+      const text = state.level === "hard"
+        ? `${first}  ${bank[Math.floor(Math.random() * bank.length)]}`
+        : first;
+      return { text, hanziTokens: [] };
     }
 
     function renderKeyboard() {
@@ -913,8 +1057,132 @@
         }
         els.prompt.appendChild(span);
       });
+      renderHanziGuide();
       updateNextKey();
       updateRunner();
+    }
+
+    function renderHanziGuide() {
+      const isPinyin = state.lesson === "pinyin" && state.hanziTokens.length > 0;
+      els.hanziGuide.hidden = !isPinyin;
+      if (!isPinyin) return;
+
+      const typed = els.input.value;
+      els.hanziText.innerHTML = "";
+      state.hanziTokens.forEach(token => {
+        const el = document.createElement("span");
+        el.className = "hanzi-token";
+        el.textContent = token.char;
+        const attempted = typed.slice(token.start, Math.min(typed.length, token.end));
+        const expectedPart = token.jyutping.slice(0, attempted.length);
+        if (typed.length >= token.end && typed.slice(token.start, token.end) === token.jyutping) {
+          el.classList.add("done");
+        } else if (attempted && attempted !== expectedPart) {
+          el.classList.add("wrong");
+        } else if (typed.length >= token.start && typed.length < token.end) {
+          el.classList.add("current");
+        }
+        el.title = token.jyutping;
+        els.hanziText.appendChild(el);
+      });
+      updateVoiceButton();
+    }
+
+    function findCantoneseVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      return voices.find(voice => /^yue(?:-|_)/i.test(voice.lang))
+        || voices.find(voice => /^zh(?:-|_)HK$/i.test(voice.lang))
+        || voices.find(voice => /cantonese|hong kong/i.test(`${voice.name} ${voice.lang}`))
+        || null;
+    }
+
+    function updateVoiceButton() {
+      const supported = "speechSynthesis" in window;
+      state.cantoneseVoice = state.cantoneseVoice || findCantoneseVoice();
+      const voiceReady = Boolean(state.cantoneseVoice);
+      els.voiceBtn.disabled = !supported || !voiceReady;
+      els.voiceBtn.setAttribute("aria-pressed", String(state.voiceEnabled && supported && voiceReady));
+      if (!supported) {
+        els.voiceBtn.textContent = "裝置未支援讀音";
+        els.voiceStatus.textContent = "呢部裝置未支援網頁讀音，但仍然可以照常練粵拼同繁體字。";
+      } else if (!voiceReady) {
+        els.voiceBtn.textContent = "未搵到粵語語音";
+        els.voiceStatus.textContent = "請先喺裝置加入香港粵語語音，避免系統用普通話讀錯。粵拼同繁體字練習仍然可以照常使用。";
+      } else {
+        els.voiceBtn.textContent = `粵語讀音：${state.voiceEnabled ? "開" : "關"}`;
+        els.voiceStatus.textContent = "每個粵拼音節輸入正確，就會讀出對應嘅字。選句取材自羅貫中《楊修之死》。";
+      }
+    }
+
+    function finishSpeechItem(utterance, generation) {
+      if (generation !== state.speechGeneration || state.activeUtterance !== utterance) return;
+      window.clearTimeout(state.speechTimer);
+      state.speechTimer = 0;
+      state.activeUtterance = null;
+      window.setTimeout(playSpeechQueue, 30);
+    }
+
+    function playSpeechQueue() {
+      if (state.activeUtterance || !state.speechQueue.length || !state.voiceEnabled) return;
+      if (!("speechSynthesis" in window)) return;
+      state.cantoneseVoice = state.cantoneseVoice || findCantoneseVoice();
+      if (!state.cantoneseVoice) {
+        updateVoiceButton();
+        return;
+      }
+      const char = state.speechQueue.shift();
+      const utterance = new SpeechSynthesisUtterance(char);
+      const generation = state.speechGeneration;
+      utterance.lang = state.cantoneseVoice.lang;
+      utterance.voice = state.cantoneseVoice;
+      utterance.rate = .82;
+      utterance.pitch = 1;
+      utterance.onend = () => finishSpeechItem(utterance, generation);
+      utterance.onerror = () => finishSpeechItem(utterance, generation);
+      state.activeUtterance = utterance;
+      state.speechTimer = window.setTimeout(() => {
+        if (state.activeUtterance !== utterance || generation !== state.speechGeneration) return;
+        window.speechSynthesis.cancel();
+        finishSpeechItem(utterance, generation);
+      }, 2200);
+      window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function queueHanziSpeech(char) {
+      if (!state.voiceEnabled || !("speechSynthesis" in window)) return false;
+      state.cantoneseVoice = state.cantoneseVoice || findCantoneseVoice();
+      if (!state.cantoneseVoice) {
+        updateVoiceButton();
+        return false;
+      }
+      state.speechQueue.push(char);
+      playSpeechQueue();
+      return true;
+    }
+
+    function stopSpeechQueue() {
+      state.speechGeneration += 1;
+      state.speechQueue = [];
+      state.activeUtterance = null;
+      window.clearTimeout(state.speechTimer);
+      state.speechTimer = 0;
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    }
+
+    function speakCompletedHanzi() {
+      if (state.lesson !== "pinyin") return;
+      const typed = els.input.value;
+      for (let index = 0; index < state.hanziTokens.length; index += 1) {
+        const token = state.hanziTokens[index];
+        const isCorrect = typed.length >= token.end
+          && typed.slice(token.start, token.end) === token.jyutping;
+        if (!isCorrect) break;
+        if (isCorrect && !state.spokenTokens.has(index)) {
+          if (queueHanziSpeech(token.char)) state.spokenTokens.add(index);
+        }
+      }
     }
 
     function updateNextKey() {
@@ -933,7 +1201,11 @@
       els.runner.style.setProperty("--runner-x", `${Math.max(0, track * ratio)}px`);
     }
 
-    function beginRound(keepStats = false) {
+    function beginRound(keepStats = false, preserveSpeech = false) {
+      window.clearTimeout(state.roundAdvanceTimer);
+      state.roundAdvanceTimer = 0;
+      state.roundAdvancing = false;
+      state.needsCorrection = false;
       if (!keepStats) {
         state.typedTotal = 0;
         state.correctTotal = 0;
@@ -941,15 +1213,25 @@
         state.bestCombo = 0;
         state.mistakes = {};
       }
-      state.text = pickText();
+      const round = pickRound();
+      state.text = round.text;
+      state.hanziTokens = round.hanziTokens;
+      state.spokenTokens = new Set();
+      if (!preserveSpeech) stopSpeechQueue();
       els.input.value = "";
+      els.input.disabled = false;
+      els.input.maxLength = state.text.length;
+      els.input.classList.remove("needs-correction");
+      els.input.placeholder = state.lesson === "pinyin"
+        ? "照住下面嘅粵拼輸入；每完成一個正確音節，就會讀出上面對應嘅繁體字。"
+        : "撳「開始訓練」，跟住照住上面嘅內容輸入。盡量唔好望鍵盤。";
       state.lastInputLength = 0;
       renderPrompt();
       updateMetrics();
       els.input.focus();
     }
 
-    function start() {
+    function start(preserveCurrentRound = false) {
       if (state.started) return;
       state.started = true;
       state.startedAt = Date.now();
@@ -957,13 +1239,28 @@
       els.start.textContent = "訓練中";
       els.start.disabled = true;
       els.durationSelect.disabled = true;
-      beginRound(false);
+      if (preserveCurrentRound) {
+        state.typedTotal = 0;
+        state.correctTotal = 0;
+        state.combo = 0;
+        state.bestCombo = 0;
+        state.mistakes = {};
+        state.lastInputLength = 0;
+        stopSpeechQueue();
+      } else {
+        beginRound(false);
+      }
       state.timerId = window.setInterval(tick, 250);
     }
 
     function finish(reason = "time") {
       state.started = false;
       window.clearInterval(state.timerId);
+      window.clearTimeout(state.roundAdvanceTimer);
+      state.roundAdvanceTimer = 0;
+      state.roundAdvancing = false;
+      state.needsCorrection = false;
+      els.input.disabled = false;
       els.start.textContent = "再練一輪";
       els.start.disabled = false;
       els.durationSelect.disabled = false;
@@ -1025,6 +1322,14 @@
       renderMistakes();
 
       if (!state.started) return;
+      if (state.needsCorrection) {
+        els.coach.textContent = "呢句仲有錯誤。請改啱紅色位置，完成整句先會進入下一關。";
+        return;
+      }
+      if (state.roundAdvancing) {
+        els.coach.textContent = "成句都啱晒！讀埋最後嘅字，就進入下一關。";
+        return;
+      }
       if (accuracy >= target && speed >= 60) {
         els.coach.textContent = "又快又穩！保持節奏，唔好心急搶快。";
       } else if (accuracy < target) {
@@ -1061,9 +1366,24 @@
       });
     }
 
+    function advanceAfterSpeech() {
+      if (!state.roundAdvancing) return;
+      const hasPendingSpeech = state.voiceEnabled
+        && (Boolean(state.activeUtterance) || state.speechQueue.length > 0);
+      if (hasPendingSpeech) {
+        state.roundAdvanceTimer = window.setTimeout(advanceAfterSpeech, 120);
+        return;
+      }
+      beginRound(true, true);
+    }
+
     function handleInput(event) {
-      if (!state.started) start();
-      const typed = event.target.value;
+      if (!state.started) start(true);
+      if (state.roundAdvancing) return;
+      const typed = event.target.value.slice(0, state.text.length);
+      if (event.target.value !== typed) event.target.value = typed;
+      els.input.classList.remove("needs-correction");
+      state.needsCorrection = false;
       const previousLength = state.lastInputLength;
 
       if (typed.length > previousLength) {
@@ -1084,11 +1404,20 @@
         }
       }
       state.lastInputLength = typed.length;
+      speakCompletedHanzi();
 
       if (typed.length >= state.text.length) {
         renderPrompt();
-        if (getRemaining() > 0) {
-          beginRound(true);
+        updateMetrics();
+        if (typed !== state.text) {
+          state.needsCorrection = true;
+          els.input.classList.add("needs-correction");
+          els.coach.textContent = "呢句仲有錯誤。請改啱紅色位置，完成整句先會進入下一關。";
+        } else if (getRemaining() > 0) {
+          state.roundAdvancing = true;
+          els.input.disabled = true;
+          els.coach.textContent = "成句都啱晒！讀埋最後嘅字，就進入下一關。";
+          state.roundAdvanceTimer = window.setTimeout(advanceAfterSpeech, 300);
         } else {
           finish("complete");
         }
@@ -1125,7 +1454,7 @@
       });
     }
 
-    els.start.addEventListener("click", start);
+    els.start.addEventListener("click", () => start(els.input.value.length === 0));
     els.next.addEventListener("click", () => beginRound(true));
     els.reset.addEventListener("click", () => {
       finish("time");
@@ -1145,6 +1474,12 @@
       updateMetrics();
     });
     els.targetSelect.addEventListener("change", updateMetrics);
+    els.voiceBtn.addEventListener("click", () => {
+      state.voiceEnabled = !state.voiceEnabled;
+      if (!state.voiceEnabled) stopSpeechQueue();
+      updateVoiceButton();
+      els.input.focus();
+    });
     document.querySelectorAll(".lesson").forEach(btn => {
       btn.addEventListener("click", () => setLesson(btn.dataset.lesson));
     });
@@ -1152,6 +1487,13 @@
       btn.addEventListener("click", () => setTheme(btn.dataset.theme));
     });
     window.addEventListener("resize", updateRunner);
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.addEventListener("voiceschanged", () => {
+        state.cantoneseVoice = findCantoneseVoice();
+        updateVoiceButton();
+        speakCompletedHanzi();
+      });
+    }
 
     renderKeyboard();
     beginRound(false);

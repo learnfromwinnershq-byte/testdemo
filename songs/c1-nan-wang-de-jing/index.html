@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-Hant-HK">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10233f">
+  <title>粵語正音朗讀練習站｜難忘的經</title>
+  <style>
+    :root{--navy:#10233f;--ink:#172033;--muted:#67748a;--paper:#f5f7fb;--card:#fff;--line:#dfe5ef;--blue:#246bfd;--coral:#ff665b;--green:#1b9b71;--shadow:0 14px 36px rgba(18,35,63,.10)}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.65}
+    button,input,select{font:inherit} button{touch-action:manipulation}
+    header{background:linear-gradient(135deg,#0c1c34,#173c69);color:#fff;padding:calc(18px + env(safe-area-inset-top)) max(18px,calc((100vw - 1120px)/2)) 20px;box-shadow:0 5px 20px rgba(12,28,52,.18)}
+    .head-row{display:flex;align-items:center;justify-content:space-between;gap:18px}.brand h1{font-size:clamp(1.25rem,3vw,1.8rem);margin:0}.brand p{margin:4px 0 0;color:#cbd8e9;font-size:.9rem}.home-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:9px;color:#dce9f8;text-decoration:none;font-size:.82rem;font-weight:700}.home-link:hover,.home-link:focus-visible{color:#fff;text-decoration:underline;outline:none}.scoreboard{min-width:128px;text-align:center;padding:8px 14px;border:1px solid rgba(255,255,255,.24);border-radius:14px;background:rgba(255,255,255,.09)}.scoreboard strong{display:block;font-size:1.55rem;line-height:1.2}.scoreboard span{font-size:.78rem;color:#d9e4f1}
+    main{max-width:1120px;margin:22px auto;padding:0 18px 50px}.toolbar,.pager{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.toolbar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:18px;box-shadow:0 8px 24px rgba(18,35,63,.05)}
+    .toolbar button,.toolbar select,.pager button,.action{border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:9px 13px;cursor:pointer;transition:transform .16s,background .16s,color .16s,border-color .16s,box-shadow .16s}.toolbar button:hover,.toolbar select:hover,.pager button:hover,.action:hover{border-color:#9bb7e7;box-shadow:0 5px 14px rgba(36,107,253,.12)}button:active{transform:scale(.96)}button:disabled{opacity:.48;cursor:not-allowed}.repeat-control,.rate{display:flex;align-items:center;gap:9px;font-size:.88rem}.repeat-control select{padding:7px 30px 7px 10px}.rate{margin-left:auto}.rate input{width:130px;accent-color:var(--blue)}
+    .cards{display:grid;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,30px);box-shadow:var(--shadow)}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.card h2{font-size:1.05rem;margin:0}.best{font-size:.83rem;color:var(--muted);white-space:nowrap}.best b{color:var(--green);font-size:1.15rem}
+    .reading{max-width:100%;overflow-wrap:anywhere;font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-size:clamp(1.35rem,4.4vw,2rem);line-height:2.25;letter-spacing:0}.lyric-line{display:block;position:relative;margin:.25em 0;padding:.08em .1em .08em 2.45em;border-radius:8px;cursor:pointer;transition:background .12s ease}.lyric-line:hover{background:#f3f7ff}.lyric-line.selected{background:linear-gradient(#e6efff,#e6efff) left bottom/100% 1.45em no-repeat}.lyric-line.active{background:var(--coral);color:#fff}.lyric-line:focus-visible{outline:2px solid var(--blue);outline-offset:3px}.line-no{position:absolute;left:.25em;top:.7em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.44em;color:var(--muted);letter-spacing:0}.lyric-line.active .line-no{color:#fff}.token{display:inline-block;position:relative;vertical-align:baseline;line-height:1.35}.word-span{display:inline-block;line-height:1.35;padding:0 .015em;transition:color .1s ease}.word-span.asr-ok{color:var(--green)}.word-span.asr-miss{color:#d33;background:#fff0ef}.lyric-line.active .word-span,.lyric-line.active .punct{color:#fff;background:transparent}.jyutping{display:block;color:var(--blue);background:transparent;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.45em;line-height:1;text-align:center;letter-spacing:0;margin-bottom:0;min-width:2.2em}.lyric-line.active .jyutping{color:#fff}.hide-jyutping .jyutping{display:none}.punct{color:#8390a4}.hint{margin-top:18px;padding:13px 15px;border-left:4px solid var(--blue);background:#f3f7ff;border-radius:0 10px 10px 0;color:#49566c;font-size:.93rem}
+    .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.action.primary{background:var(--blue);border-color:var(--blue);color:#fff}.action.recording{background:var(--coral);border-color:var(--coral);color:#fff;animation:pulse 1s infinite}.action.playing{background:var(--navy);border-color:var(--navy);color:#fff}.result{min-height:31px;margin-top:12px;font-size:.92rem;color:var(--muted)}.result strong{font-size:1.25rem;color:var(--green)}
+    .pager{justify-content:center;margin-top:22px}.pager span{min-width:110px;text-align:center;color:var(--muted)}.support{margin-top:18px;color:var(--muted);font-size:.8rem;text-align:center}
+    @keyframes pulse{50%{box-shadow:0 0 0 7px rgba(255,102,91,.16)}}
+    @media(max-width:760px){main{margin-top:14px;padding-inline:12px}.head-row{align-items:flex-start}.scoreboard{min-width:105px}.brand p{display:none}.toolbar{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:5;padding:10px}.repeat-control{margin-left:auto}.rate{width:100%;margin-left:0}.rate input{flex:1;min-width:80px}.card{border-radius:15px;padding:18px 14px}.reading{font-size:clamp(1.2rem,5.5vw,1.65rem);line-height:2.45}.actions{gap:8px}.action{flex:1;min-width:128px}.hint{font-size:.88rem}.pager button{min-width:92px}}
+    @media(max-width:420px){header{padding-inline:14px}.head-row{gap:10px}.brand h1{font-size:1.08rem;line-height:1.35}.scoreboard{min-width:92px;padding:7px 8px}.scoreboard strong{font-size:1.3rem}.scoreboard span{font-size:.68rem}.toolbar button{flex:1;padding:8px 7px;font-size:.84rem}.card-head{display:block}.best{display:block;margin-top:3px}.reading{font-size:clamp(1.08rem,5.7vw,1.42rem);line-height:2.55}.lyric-line{padding-left:2.15em}.line-no{font-size:.42em}.action{width:100%;flex-basis:100%}}
+    @media(min-width:761px) and (max-width:1024px){main{padding-inline:24px}.reading{font-size:clamp(1.5rem,2.7vw,1.85rem)}}
+    @media(orientation:landscape) and (max-height:520px){header{padding-block:10px}.toolbar{position:static}.card{padding-block:16px}.reading{line-height:2.15}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header><div class="head-row"><div class="brand"><a class="home-link" href="../../">← 返回椰子主頁</a><h1>粵語正音朗讀練習站</h1><p>《難忘的經》・每頁四句跟讀與朗讀測評</p></div><div class="scoreboard"><strong id="totalScore">0</strong><span>成就總積分 / 1300</span></div></div></header>
+  <main id="app">
+    <section class="toolbar" aria-label="朗讀設定">
+      <button id="toggleJyutping" aria-pressed="true">粵拼：顯示</button>
+      <label class="repeat-control">每句重複 <select id="repeatCount" aria-label="每句重複次數"><option value="1">1次</option><option value="2">2次</option><option value="3">3次</option></select></label>
+      <label class="rate">語速 <input id="rate" type="range" min="0.4" max="1" step="0.05" value="0.7"><b id="rateValue">0.70×</b></label>
+    </section>
+    <section id="cards" class="cards" aria-live="polite"></section>
+    <nav class="pager" aria-label="練習分頁"><button id="prev">上一頁</button><span id="pageLabel"></span><button id="next">下一頁</button></nav>
+    <p class="support">建議使用最新版 Chrome 或 Edge；粵語聲線及字詞邊界支援視裝置而定，錄音需授權麥克風。</p>
+  </main>
+<script>
+const lyrics=[
+ '笑你我枉花光心計，',
+ '愛競逐鏡花那美麗，',
+ '怕幸運會轉眼遠逝，',
+ '為貪嗔喜惡怒著迷，',
+ '責你我太貪功戀勢，',
+ '怪大地眾生太美麗，',
+ '悔舊日太執信約誓，',
+ '為悲歡哀怨妒著迷，',
+ '啊哈 捨不得璀璨俗世，',
+ '啊哈 躲不開癡嗔的合體，',
+ '吞風吻雨葬落日 未曾徬徨，',
+ '欺山趕海踐雪徑 也未絕望，',
+ '拈花把酒偏折煞 世人情狂，',
+ '憑這兩手 劈開生死路，',
+ '天闊闊雪漫漫 共誰同航，',
+ '這沙滾滾水皺皺 笑著浪蕩，',
+ '貪歡一餉 偏教那女兒情長埋葬，',
+ '笑你我枉花光心計，',
+ '愛競逐鏡花那美麗，',
+ '怕幸運會轉眼遠逝，',
+ '為貪嗔喜惡怒著迷，',
+ '責你我太貪功戀勢，',
+ '怪大地眾生太美麗，',
+ '悔舊日太執信約誓，',
+ '為悲歡哀怨妒著迷，',
+ '啊哈 捨不得璀璨俗世，',
+ '啊哈 躲不開癡嗔的合體，',
+ '吞風吻雨葬落日 未曾徬徨，',
+ '欺山趕海踐雪徑 也未絕望，',
+ '拈花把酒偏折煞 世人情狂，',
+ '憑這兩手 劈開生死路，',
+ '天闊闊雪漫漫 共誰同航，',
+ '這沙滾滾水皺皺 笑著浪蕩，',
+ '貪歡一餉 偏教那女兒情長埋葬，',
+ '參一生 參不透這條難題，',
+ '吞風吻雨葬落日 未曾徬徨，',
+ '欺山趕海踐雪徑 也未絕望，',
+ '拈花把酒偏折煞 世人情狂，',
+ '憑這兩手 劈開生死路，',
+ '天闊闊雪漫漫 共誰同航，',
+ '這沙滾滾水皺皺 笑著浪蕩，',
+ '貪歡一餉 偏教那女兒情長埋葬，',
+ '吞風吻雨葬落日 未曾徬徨，',
+ '欺山趕海踐雪徑 也未絕望，',
+ '拈花把酒偏折煞 世人情狂，',
+ '憑這兩手 劈開生死路。',
+ '天闊闊雪漫漫 共誰同航，',
+ '這沙滾滾水皺皺 笑著浪蕩，',
+ '貪歡一餉 偏教那女兒情長埋葬。'
+];
+const jyutping=[
+ 'siu3 nei5 ngo5 wong2 faa1 gwong1 sam1 gai3',
+ 'oi3 ging6 zuk6 geng3 faa1 naa5 mei5 lai6',
+ 'paa3 hang6 wan6 wui5 zyun2 ngaan5 jyun5 sai6',
+ 'wai6 taam1 can1 hei2 ok3 nou6 zoek6 mai4',
+ 'zaak3 nei5 ngo5 taai3 taam1 gung1 lyun2 sai3',
+ 'gwaai3 daai6 dei6 zung3 sang1 taai3 mei5 lai6',
+ 'fui3 gau6 jat6 taai3 zap1 seon3 joek3 sai6',
+ 'wai6 bei1 fun1 oi1 jyun3 dou3 zoek6 mai4',
+ 'aa3 haa1 se2 bat1 dak1 ceoi1 caan3 zuk6 sai3',
+ 'aa3 haa1 do2 bat1 hoi1 ci1 can1 dik1 hap6 tai2',
+ 'tan1 fung1 man5 jyu5 zong3 lok6 jat6 mei6 cang4 pong4 wong4',
+ 'hei1 saan1 gon2 hoi2 cin5 syut3 ging3 jaa5 mei6 zyut6 mong6',
+ 'nim1 faa1 baa2 zau2 pin1 zit3 saat3 sai3 jan4 cing4 kwong4',
+ 'pang4 ze5 loeng5 sau2 pek3 hoi1 sang1 sei2 lou6',
+ 'tin1 fut3 fut3 syut3 maan6 maan6 gung6 seoi4 tung4 hong4',
+ 'ze5 saa1 gwan2 gwan2 seoi2 zau3 zau3 siu3 zoek6 long6 dong6',
+ 'taam1 fun1 jat1 hoeng2 pin1 gaau3 naa5 neoi5 ji4 cing4 coeng4 maai4 zong3',
+ 'siu3 nei5 ngo5 wong2 faa1 gwong1 sam1 gai3',
+ 'oi3 ging6 zuk6 geng3 faa1 naa5 mei5 lai6',
+ 'paa3 hang6 wan6 wui5 zyun2 ngaan5 jyun5 sai6',
+ 'wai6 taam1 can1 hei2 ok3 nou6 zoek6 mai4',
+ 'zaak3 nei5 ngo5 taai3 taam1 gung1 lyun2 sai3',
+ 'gwaai3 daai6 dei6 zung3 sang1 taai3 mei5 lai6',
+ 'fui3 gau6 jat6 taai3 zap1 seon3 joek3 sai6',
+ 'wai6 bei1 fun1 oi1 jyun3 dou3 zoek6 mai4',
+ 'aa3 haa1 se2 bat1 dak1 ceoi1 caan3 zuk6 sai3',
+ 'aa3 haa1 do2 bat1 hoi1 ci1 can1 dik1 hap6 tai2',
+ 'tan1 fung1 man5 jyu5 zong3 lok6 jat6 mei6 cang4 pong4 wong4',
+ 'hei1 saan1 gon2 hoi2 cin5 syut3 ging3 jaa5 mei6 zyut6 mong6',
+ 'nim1 faa1 baa2 zau2 pin1 zit3 saat3 sai3 jan4 cing4 kwong4',
+ 'pang4 ze5 loeng5 sau2 pek3 hoi1 sang1 sei2 lou6',
+ 'tin1 fut3 fut3 syut3 maan6 maan6 gung6 seoi4 tung4 hong4',
+ 'ze5 saa1 gwan2 gwan2 seoi2 zau3 zau3 siu3 zoek6 long6 dong6',
+ 'taam1 fun1 jat1 hoeng2 pin1 gaau3 naa5 neoi5 ji4 cing4 coeng4 maai4 zong3',
+ 'caam1 jat1 sang1 caam1 bat1 tau3 ze5 tiu4 naan4 tai4',
+ 'tan1 fung1 man5 jyu5 zong3 lok6 jat6 mei6 cang4 pong4 wong4',
+ 'hei1 saan1 gon2 hoi2 cin5 syut3 ging3 jaa5 mei6 zyut6 mong6',
+ 'nim1 faa1 baa2 zau2 pin1 zit3 saat3 sai3 jan4 cing4 kwong4',
+ 'pang4 ze5 loeng5 sau2 pek3 hoi1 sang1 sei2 lou6',
+ 'tin1 fut3 fut3 syut3 maan6 maan6 gung6 seoi4 tung4 hong4',
+ 'ze5 saa1 gwan2 gwan2 seoi2 zau3 zau3 siu3 zoek6 long6 dong6',
+ 'taam1 fun1 jat1 hoeng2 pin1 gaau3 naa5 neoi5 ji4 cing4 coeng4 maai4 zong3',
+ 'tan1 fung1 man5 jyu5 zong3 lok6 jat6 mei6 cang4 pong4 wong4',
+ 'hei1 saan1 gon2 hoi2 cin5 syut3 ging3 jaa5 mei6 zyut6 mong6',
+ 'nim1 faa1 baa2 zau2 pin1 zit3 saat3 sai3 jan4 cing4 kwong4',
+ 'pang4 ze5 loeng5 sau2 pek3 hoi1 sang1 sei2 lou6',
+ 'tin1 fut3 fut3 syut3 maan6 maan6 gung6 seoi4 tung4 hong4',
+ 'ze5 saa1 gwan2 gwan2 seoi2 zau3 zau3 siu3 zoek6 long6 dong6',
+ 'taam1 fun1 jat1 hoeng2 pin1 gaau3 naa5 neoi5 ji4 cing4 coeng4 maai4 zong3'
+].map(line=>line.split(' '));
+const pageData=Array.from({length:Math.ceil(lyrics.length/4)},(_,page)=>{
+  const start=page*4,end=Math.min(start+4,lyrics.length);
+  return{id:`p${page+1}`,title:`第 ${page+1} 頁・第 ${start+1} 至 ${end} 句`,lines:lyrics.slice(start,end),py:jyutping.slice(start,end),start};
+});
+const savedRepeat=Number(localStorage.getItem('nanwangRepeatCount')||1);
+const state={page:0,rate:.7,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,speaking:null,recognition:null,selected:{},best:JSON.parse(localStorage.getItem('nanwangBestScores')||'{}')};
+const $=s=>document.querySelector(s);const cards=$('#cards');
+const isHan=c=>/\p{Script=Han}/u.test(c);const clean=s=>(s||'').normalize('NFKC').replace(/[^\p{Script=Han}]/gu,'');
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderLine(line,lineIndex,absoluteIndex,py){
+  let body='',pyIndex=0;
+  for(const ch of line){
+    body+=isHan(ch)?`<span class="token"><small class="jyutping">${esc(py[pyIndex]||'')}</small><span class="word-span" data-line="${lineIndex}">${ch}</span></span>`:`<span class="punct">${esc(ch)}</span>`;
+    if(isHan(ch))pyIndex++;
+  }
+  return `<span class="lyric-line" data-line="${lineIndex}" role="button" tabindex="0" aria-label="從第 ${absoluteIndex+1} 句開始朗讀"><span class="line-no">${absoluteIndex+1}</span>${body}</span>`;
+}
+function selectStart(card,item,index){
+  state.selected[item.id]=index;
+  card.querySelectorAll('.lyric-line').forEach((line,i)=>{line.classList.toggle('selected',i===index);line.setAttribute('aria-pressed',i===index?'true':'false');});
+  card.querySelector('.result').textContent=`已選擇第 ${item.start+index+1} 句；點擊「粵語示範」將由呢句開始。`;
+}
+function render(){
+  stopAll();cards.innerHTML='';const item=pageData[state.page],el=document.createElement('article');
+  el.className='card';el.dataset.id=item.id;
+  el.innerHTML=`<div class="card-head"><h2>${item.title}</h2><span class="best">最高分 <b>${state.best[item.id]||0}</b></span></div><div class="reading">${item.lines.map((line,i)=>renderLine(line,i,item.start+i,item.py[i])).join('')}</div><div class="hint">每頁只顯示四句；可點擊任一句設定示範朗讀起點，再用錄音測評練習粵語咬字。</div><div class="actions"><button class="action primary play">▶ 粵語示範</button><button class="action record">● 開始朗讀測評</button></div><div class="result" role="status">可點擊任一句選擇朗讀起點；未選擇時從本頁第一句開始。</div>`;
+  el.querySelectorAll('.lyric-line').forEach((line,index)=>{
+    const pick=()=>selectStart(el,item,index);line.onclick=pick;
+    line.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};
+  });
+  if(Number.isInteger(state.selected[item.id]))selectStart(el,item,state.selected[item.id]);
+  el.querySelector('.play').onclick=()=>speak(item,el);el.querySelector('.record').onclick=()=>assess(item,el);cards.appendChild(el);
+  applyVisibility();
+  updateScore();$('#pageLabel').textContent=`第 ${state.page+1} / ${pageData.length} 頁`;$('#prev').disabled=state.page===0;$('#next').disabled=state.page===pageData.length-1;
+}
+function applyVisibility(){document.body.classList.toggle('hide-jyutping',!state.showJyutping);}
+function clearMarks(card){card?.querySelectorAll('.lyric-line').forEach(x=>x.classList.remove('active'));card?.querySelectorAll('.word-span').forEach(x=>x.classList.remove('asr-ok','asr-miss'));}
+function chooseVoice(){const vs=speechSynthesis.getVoices();return vs.find(v=>/^zh[-_]HK$/i.test(v.lang))||vs.find(v=>/zh[-_]HK|yue/i.test(v.lang))||null;}
+function speak(item,card){
+  if(state.speaking?.card===card){stopAll();return;}
+  stopAll();clearMarks(card);
+  const btn=card.querySelector('.play'),result=card.querySelector('.result');
+  if(!('speechSynthesis'in window)){result.textContent='此瀏覽器不支援語音合成。';return;}
+  const lines=[...card.querySelectorAll('.lyric-line')],voice=chooseVoice(),startIndex=Number.isInteger(state.selected[item.id])?state.selected[item.id]:0;
+  const session={card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat};
+  state.speaking=session;btn.classList.add('playing');btn.textContent='■ 停止示範';
+  session.cleanup=()=>{lines.forEach(s=>s.classList.remove('active'));btn.classList.remove('playing');btn.textContent='▶ 粵語示範';};
+  function finish(){if(state.speaking===session)state.speaking=null;session.cleanup();result.textContent='示範朗讀完成。';}
+  function playNext(){
+    if(session.cancelled)return;
+    if(session.index>=item.lines.length){finish();return;}
+    const u=new SpeechSynthesisUtterance(item.lines[session.index]);u.lang='zh-HK';u.rate=state.rate;u.pitch=1;if(voice)u.voice=voice;
+    u.onstart=()=>{if(session.cancelled)return;lines.forEach((line,i)=>line.classList.toggle('active',i===session.index));result.textContent=`正在朗讀第 ${item.start+session.index+1} 句（第 ${session.repeated+1}/${session.repeat} 次）`+(voice?`・${voice.name}`:'');};
+    u.onend=()=>{if(session.cancelled)return;session.repeated++;if(session.repeated>=session.repeat){session.repeated=0;session.index++;}setTimeout(playNext,90);};
+    u.onerror=e=>{if(!session.cancelled){session.cancelled=true;session.cleanup();state.speaking=null;result.textContent=`語音播放失敗：${e.error||'未知錯誤'}`;}};
+    speechSynthesis.speak(u);
+  }
+  playNext();
+}
+function stopAll(){
+  if(state.speaking){const session=state.speaking;session.cancelled=true;speechSynthesis.cancel();session.cleanup?.();state.speaking=null;}
+  if(state.recognition){try{state.recognition.stop();}catch{}state.recognition=null;}
+  document.querySelectorAll('.active').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.playing').forEach(b=>{b.classList.remove('playing');b.textContent='▶ 粵語示範';});
+  document.querySelectorAll('.recording').forEach(b=>{b.classList.remove('recording');b.textContent='● 開始朗讀測評';});
+}
+function similarity(a,b){a=[...clean(a)];b=[...clean(b)];if(!a.length&&!b.length)return 100;let prev=b.map((_,j)=>j+1);for(let i=0;i<a.length;i++){const cur=[i+1];for(let j=0;j<b.length;j++)cur[j+1]=a[i]===b[j]?prev[j]:1+Math.min(prev[j],prev[j+1],cur[j]);prev=cur;}return Math.max(0,Math.round((1-prev[b.length]/Math.max(a.length,b.length,1))*100));}
+function markApprox(card,target,heard){const hs=[...clean(heard)],spans=[...card.querySelectorAll('.word-span')];spans.forEach((s,i)=>s.classList.add(hs[i]===target[i]?'asr-ok':'asr-miss'));}
+function assess(item,card){
+  stopAll();clearMarks(card);
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition,btn=card.querySelector('.record'),out=card.querySelector('.result');
+  if(!SR){out.textContent='此瀏覽器不支援 Web Speech 語音識別；請改用最新版 Chrome / Edge。';return;}
+  const r=new SR();state.recognition=r;r.lang='zh-HK';r.continuous=true;r.interimResults=true;let finalText='',interim='';
+  r.onstart=()=>{btn.classList.add('recording');btn.textContent='■ 完成並評分';out.textContent='正在聆聽……請朗讀本頁四句，完成後再按一次。';btn.onclick=()=>r.stop();};
+  r.onresult=e=>{interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;e.results[i].isFinal?finalText+=t:interim+=t;}out.textContent=`已識別：${finalText||interim}`;};
+  r.onerror=e=>{out.textContent=e.error==='not-allowed'?'未取得麥克風權限，請在瀏覽器設定中允許。':`識別失敗：${e.error}`;};
+  r.onend=()=>{state.recognition=null;btn.classList.remove('recording');btn.textContent='● 再次朗讀測評';btn.onclick=()=>assess(item,card);const heard=finalText||interim;if(!clean(heard).length){out.textContent='未識別到有效朗讀，請靠近麥克風再試。';return;}const target=item.lines.join('');const score=similarity(target,heard);markApprox(card,[...clean(target)],heard);if(score>(state.best[item.id]||0)){state.best[item.id]=score;localStorage.setItem('nanwangBestScores',JSON.stringify(state.best));card.querySelector('.best b').textContent=score;updateScore();}out.innerHTML=`本次得分：<strong>${score}</strong> / 100　<span>識別：${esc(heard)}</span>`;};
+  r.start();
+}
+function updateScore(){$('#totalScore').textContent=pageData.reduce((n,x)=>n+(state.best[x.id]||0),0);}
+$('#rate').oninput=e=>{state.rate=+e.target.value;$('#rateValue').textContent=state.rate.toFixed(2)+'×';};
+$('#repeatCount').value=String(state.repeat);
+$('#repeatCount').onchange=e=>{state.repeat=Number(e.target.value);localStorage.setItem('nanwangRepeatCount',String(state.repeat));};
+$('#toggleJyutping').onclick=e=>{state.showJyutping=!state.showJyutping;e.currentTarget.setAttribute('aria-pressed',state.showJyutping);e.currentTarget.textContent=`粵拼：${state.showJyutping?'顯示':'隱藏'}`;applyVisibility();};
+$('#prev').onclick=()=>{if(state.page>0){state.page--;render();scrollTo({top:0,behavior:'smooth'});}};
+$('#next').onclick=()=>{if(state.page<pageData.length-1){state.page++;render();scrollTo({top:0,behavior:'smooth'});}};
+speechSynthesis?.addEventListener?.('voiceschanged',()=>{});render();
+</script>
+</body>
+</html>

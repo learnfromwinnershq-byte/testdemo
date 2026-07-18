@@ -1,0 +1,14 @@
+{
+  "id": "B1",
+  "catalog_order": 1,
+  "category": "game",
+  "slug": "b1-rift-tide-warfront",
+  "name": "裂潮戰線",
+  "display_name": "1 · 裂潮戰線",
+  "status": "playable_prototype",
+  "entry": "./index.html",
+  "play_url": "https://rift-tide-warfront.learnfromwinnershq.chatgpt.site",
+  "gdd": "./docs/GDD.md",
+  "share_cover": "./assets/share-cover.png",
+  "source": "./source"
+}

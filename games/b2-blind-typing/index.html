@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="application-name" content="盲打戰神">
+  <meta name="description" content="為粵語玩家而設嘅方塊戰術盲打訓練遊戲。">
+  <meta name="product-id" content="B2">
+  <meta name="product-home-label" content="2 · 盲打戰神">
+  <title>盲打戰神｜粵語鍵盤訓練</title>
+  <style>
+    :root {
+      --bg: #f4f8fb;
+      --ink: #17212b;
+      --muted: #66717d;
+      --panel: #ffffff;
+      --panel-2: #edf6f3;
+      --line: #d7e0e5;
+      --accent: #26715f;
+      --accent-ink: #ffffff;
+      --warn: #b55a27;
+      --bad: #be3d3d;
+      --good: #2e8066;
+      --sky: #cfe8f5;
+      --grass: #5c9c62;
+      --earth: #8a6844;
+      --metal: #596b7a;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, var(--sky) 0 168px, transparent 168px),
+        repeating-linear-gradient(45deg, rgba(38, 113, 95, .06) 0 18px, transparent 18px 36px),
+        var(--bg);
+    }
+
+    button, select, textarea {
+      font: inherit;
+    }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 12px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .home-link:hover,
+    .home-link:focus-visible {
+      color: var(--accent);
+      text-decoration: underline;
+      outline: none;
+    }
+
+    button, select {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+    }
+
+    button {
+      min-height: 40px;
+      padding: 0 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    select {
+      min-height: 40px;
+      padding: 0 10px;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 24px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .badge {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(23, 33, 43, .16);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, #8bc97d 0 50%, #76583c 50% 100%);
+      box-shadow: inset 0 -7px rgba(0, 0, 0, .08);
+      color: #fff;
+      font-size: 25px;
+      font-weight: 800;
+      text-shadow: 0 1px rgba(0, 0, 0, .25);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 38px);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 3px 0 0;
+      color: #293745;
+      font-size: 14px;
+    }
+
+    .theme-switch {
+      display: inline-grid;
+      grid-template-columns: repeat(3, minmax(76px, auto));
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid rgba(23, 33, 43, .16);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .theme-switch button {
+      min-height: 34px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      padding: 0 10px;
+    }
+
+    .theme-switch button.active {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 14px 34px rgba(35, 45, 51, .08);
+    }
+
+    .practice {
+      min-width: 0;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 10px;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(238, 245, 242, .68);
+    }
+
+    .control-field {
+      display: grid;
+      gap: 5px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .arena {
+      position: relative;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .world-strip {
+      position: relative;
+      height: 82px;
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, #c8e8f8 0 58%, #70a664 58% 76%, #76583c 76% 100%);
+    }
+
+    .runner {
+      position: absolute;
+      left: 18px;
+      bottom: 19px;
+      width: 34px;
+      height: 42px;
+      transform: translateX(var(--runner-x, 0px));
+      transition: transform .18s ease;
+    }
+
+    .runner::before, .runner::after {
+      content: "";
+      position: absolute;
+      image-rendering: pixelated;
+      background: var(--accent);
+    }
+
+    .runner::before {
+      width: 26px;
+      height: 26px;
+      left: 4px;
+      top: 0;
+      border: 3px solid rgba(23, 33, 43, .35);
+    }
+
+    .runner::after {
+      width: 34px;
+      height: 13px;
+      left: 0;
+      top: 29px;
+      background:
+        linear-gradient(90deg, var(--metal) 0 38%, transparent 38% 62%, var(--metal) 62% 100%);
+    }
+
+    .target {
+      position: absolute;
+      right: 18px;
+      bottom: 21px;
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 38px;
+      border-radius: 6px;
+      background: rgba(255, 253, 248, .88);
+      border: 2px solid rgba(23, 33, 43, .22);
+      color: var(--accent);
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .text-board {
+      min-height: 138px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .prompt-text {
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.65;
+      letter-spacing: 0;
+    }
+
+    .char {
+      display: inline-block;
+      min-width: .58em;
+      border-bottom: 3px solid transparent;
+      border-radius: 3px;
+      text-align: center;
+      white-space: pre;
+    }
+
+    .char.done {
+      color: var(--good);
+      background: rgba(46, 128, 102, .1);
+    }
+
+    .char.wrong {
+      color: #fff;
+      background: var(--bad);
+    }
+
+    .char.current {
+      border-color: var(--accent);
+      background: rgba(38, 113, 95, .14);
+    }
+
+    .entry-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: start;
+      margin-top: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 88px;
+      resize: vertical;
+      padding: 13px 14px;
+      border: 1px solid var(--input, var(--line));
+      border-radius: 8px;
+      outline-color: var(--accent);
+      color: var(--ink);
+      background: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 20px;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    .action-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      min-width: 118px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .metric {
+      min-height: 82px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: clamp(22px, 3vw, 31px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .keyboard {
+      display: grid;
+      gap: 6px;
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #dfe8ee;
+    }
+
+    .key-row {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+    }
+
+    .key-row.row-2 {
+      padding-left: 4%;
+      padding-right: 4%;
+    }
+
+    .key-row.row-3 {
+      padding-left: 10%;
+      padding-right: 10%;
+    }
+
+    .key {
+      min-height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #c4d0d8;
+      border-bottom-width: 4px;
+      border-radius: 7px;
+      background: #fbfdff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700;
+      color: #27333e;
+      transition: transform .08s ease, background .12s ease, border-color .12s ease;
+    }
+
+    .key.next {
+      border-color: var(--accent);
+      background: rgba(38, 113, 95, .22);
+    }
+
+    .key.pressed {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+      background: rgba(89, 107, 122, .2);
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 14px;
+    }
+
+    .side-block {
+      padding: 14px;
+    }
+
+    .side-block h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .goal {
+      display: grid;
+      gap: 9px;
+    }
+
+    .bar {
+      height: 14px;
+      overflow: hidden;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #e5edf2;
+    }
+
+    .bar > span {
+      display: block;
+      width: var(--value, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      transition: width .2s ease;
+    }
+
+    .coach {
+      min-height: 52px;
+      padding: 10px;
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: #263742;
+      line-height: 1.45;
+    }
+
+    .mistake-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 38px;
+    }
+
+    .mistake-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700;
+    }
+
+    .lesson-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .lesson {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 44px;
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .lesson small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .lesson.active {
+      border-color: var(--accent);
+      background: rgba(38, 113, 95, .11);
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    body.tactical {
+      --bg: #f0f3f1;
+      --panel: #fbfcfa;
+      --panel-2: #e6ece7;
+      --accent: #526b49;
+      --sky: #cfd9d5;
+      --grass: #79865a;
+      --earth: #605b49;
+      --metal: #343d3a;
+    }
+
+    body.mixed {
+      --bg: #f5f2f7;
+      --panel-2: #edf1f4;
+      --accent: #315f82;
+      --sky: #d4e1ef;
+      --grass: #6aa070;
+      --earth: #7a624c;
+      --metal: #495f7a;
+    }
+
+    @media (max-width: 940px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-switch {
+        width: 100%;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .entry-row {
+        grid-template-columns: 1fr;
+      }
+
+      .action-stack {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .metrics, .sidebar {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        width: min(100% - 18px, 1180px);
+      }
+
+      .brand {
+        align-items: flex-start;
+      }
+
+      .badge {
+        width: 40px;
+        height: 40px;
+        font-size: 21px;
+      }
+
+      .controls, .metrics, .sidebar {
+        grid-template-columns: 1fr;
+      }
+
+      .arena {
+        padding: 12px;
+      }
+
+      .text-board {
+        padding: 12px;
+      }
+
+      .prompt-text {
+        font-size: 22px;
+      }
+
+      .action-stack {
+        grid-template-columns: 1fr;
+      }
+
+      .keyboard {
+        gap: 4px;
+        padding: 8px;
+      }
+
+      .key-row {
+        gap: 4px;
+      }
+
+      .key {
+        min-height: 32px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" data-product-id="B2" data-home-label="2 · 盲打戰神">
+    <a class="home-link" href="../../">← 返去椰子主頁</a>
+    <header class="topbar">
+      <div class="brand">
+        <div class="badge" aria-hidden="true">B2</div>
+        <div>
+          <h1>盲打戰神</h1>
+          <p class="subtitle">跟住方塊建造同戰術闖關嘅節奏練盲打，專心提升速度同準確度，少啲望鍵盤。</p>
+        </div>
+      </div>
+      <div class="theme-switch" aria-label="主題">
+        <button type="button" data-theme="blocks" class="active">方塊</button>
+        <button type="button" data-theme="tactical">戰術</button>
+        <button type="button" data-theme="mixed">混合</button>
+      </div>
+    </header>
+
+    <section class="main-grid">
+      <div class="panel practice">
+        <div class="controls">
+          <div class="control-field">
+            <label for="lessonSelect">課程</label>
+            <select id="lessonSelect">
+              <option value="home">基礎鍵位</option>
+              <option value="game">遊戲詞彙</option>
+              <option value="pinyin">粵拼短句</option>
+              <option value="symbols">數字符號</option>
+            </select>
+          </div>
+          <div class="control-field">
+            <label for="levelSelect">難度</label>
+            <select id="levelSelect">
+              <option value="easy">輕鬆</option>
+              <option value="normal" selected>標準</option>
+              <option value="hard">挑戰</option>
+            </select>
+          </div>
+          <div class="control-field">
+            <label for="durationSelect">時間</label>
+            <select id="durationSelect">
+              <option value="60">1 分鐘</option>
+              <option value="180" selected>3 分鐘</option>
+              <option value="300">5 分鐘</option>
+            </select>
+          </div>
+          <div class="control-field">
+            <label for="targetSelect">今日目標</label>
+            <select id="targetSelect">
+              <option value="90">準確率 90%</option>
+              <option value="95" selected>準確率 95%</option>
+              <option value="98">準確率 98%</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="arena">
+          <div class="world-strip" aria-hidden="true">
+            <div id="runner" class="runner"></div>
+            <div id="nextTarget" class="target">a</div>
+          </div>
+
+          <div class="text-board" aria-live="polite">
+            <div id="promptText" class="prompt-text"></div>
+          </div>
+
+          <div class="entry-row">
+            <textarea id="typingInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="撳「開始訓練」，跟住照住上面嘅內容輸入。盡量唔好望鍵盤。"></textarea>
+            <div class="action-stack">
+              <button type="button" id="startBtn" class="primary">開始訓練</button>
+              <button type="button" id="nextBtn">換一關</button>
+              <button type="button" id="resetBtn">清零</button>
+            </div>
+          </div>
+
+          <div class="metrics" aria-label="訓練數據">
+            <div class="metric"><strong id="speed">0</strong><span>每分鐘字元</span></div>
+            <div class="metric"><strong id="accuracy">100%</strong><span>準確率</span></div>
+            <div class="metric"><strong id="combo">0</strong><span>連續撳啱</span></div>
+            <div class="metric"><strong id="timeLeft">3:00</strong><span>剩餘時間</span></div>
+          </div>
+
+          <div id="keyboard" class="keyboard" aria-label="鍵盤提示"></div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="panel side-block">
+          <h2>今日進度</h2>
+          <div class="goal">
+            <div>
+              <label>準確率目標</label>
+              <div class="bar"><span id="accuracyGoal"></span></div>
+            </div>
+            <div>
+              <label>速度進度</label>
+              <div class="bar"><span id="speedGoal"></span></div>
+            </div>
+            <div id="coach" class="coach">準備好就開始啦。第一輪先求穩，第二輪先加速。</div>
+          </div>
+        </div>
+
+        <div class="panel side-block">
+          <h2>常錯鍵</h2>
+          <div id="mistakes" class="mistake-list"></div>
+          <p class="footer-note">撳錯得多就先慢落嚟。真正嘅盲打升級路線係：先準確、再穩定、最後先加速。</p>
+        </div>
+
+        <div class="panel side-block">
+          <h2>快速揀關</h2>
+          <div class="lesson-list">
+            <button type="button" class="lesson active" data-lesson="home"><span>主鍵位熱身</span><small>asdf jkl;</small></button>
+            <button type="button" class="lesson" data-lesson="game"><span>方塊同戰術詞</span><small>mine cover zone</small></button>
+            <button type="button" class="lesson" data-lesson="pinyin"><span>粵拼短句</span><small>gin6 pun2 fan3 lin6</small></button>
+            <button type="button" class="lesson" data-lesson="symbols"><span>數字補給箱</span><small>123 456 !?</small></button>
+          </div>
+        </div>
+
+        <div class="panel side-block">
+          <h2>上次最佳</h2>
+          <div class="metrics" style="grid-template-columns:1fr 1fr;margin-top:0">
+            <div class="metric"><strong id="bestSpeed">0</strong><span>最高速度</span></div>
+            <div class="metric"><strong id="bestAccuracy">0%</strong><span>最高準確率</span></div>
+          </div>
+          <p class="footer-note">建議每日練 10 分鐘，分做 3 輪；每輪完咗，淨係集中改善一個成日撳錯嘅鍵。</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const lessons = {
+      home: {
+        easy: [
+          "asdf jkl; asdf jkl;",
+          "fj fj dk dk sl sl a; a;",
+          "aaa sss ddd fff jjj kkk lll ;;;"
+        ],
+        normal: [
+          "ask fall dad lad sad flask",
+          "jkl; asdf jkl; asdf fast",
+          "fall ask all dad flask salad"
+        ],
+        hard: [
+          "a fast lad asks a sad flask",
+          "dad falls; lad asks; all stand",
+          "salad falls fast; ask dad"
+        ]
+      },
+      game: {
+        easy: [
+          "mine craft block build",
+          "map zone aim cover",
+          "wood stone pick axe"
+        ],
+        normal: [
+          "build shelter mine stone craft tools",
+          "find cover check map move fast",
+          "team revive zone supply safe"
+        ],
+        hard: [
+          "mine deep craft tools build a safe base",
+          "check the map find cover and move with team",
+          "collect wood stone iron and guard the base"
+        ]
+      },
+      pinyin: {
+        easy: [
+          "gin6 pun2 lin6 zaap6",
+          "faai3 sou3 zeon2 kok3",
+          "sau2 zi2 gwai1 wai2"
+        ],
+        normal: [
+          "ngo5 jiu3 lin6 hou2 maang4 daa2",
+          "sin1 zeon2 kok3 zoi3 gaa1 sou3",
+          "mui5 jat6 sap6 fan1 zung1"
+        ],
+        hard: [
+          "sau2 zi2 m4 mong6 gin6 pun2 dou1 wan2 dou2 wai2 zi6",
+          "siu2 sam1 ngon3 gin6 bou2 ci4 zit3 zau3 wan2 ding6",
+          "gam1 jat6 bei2 cam4 jat6 do1 aam1 jat1 di1 di1"
+        ]
+      },
+      symbols: {
+        easy: [
+          "123 456 789 0",
+          "11 22 33 44 55",
+          "90 80 70 60"
+        ],
+        normal: [
+          "zone 1 base 2 team 3",
+          "hp 100 ammo 45 map 8",
+          "wood 64 stone 32 iron 12"
+        ],
+        hard: [
+          "base-1: wood 64, stone 32",
+          "team@zone-3 move? yes!",
+          "aim 95% speed 42/min"
+        ]
+      }
+    };
+
+    const keys = ["qwertyuiop", "asdfghjkl;", "zxcvbnm,./"];
+    const state = {
+      theme: "blocks",
+      lesson: "home",
+      level: "normal",
+      text: "",
+      started: false,
+      startedAt: 0,
+      timerId: 0,
+      duration: 180,
+      typedTotal: 0,
+      correctTotal: 0,
+      combo: 0,
+      bestCombo: 0,
+      lastInputLength: 0,
+      mistakes: {},
+      best: JSON.parse(localStorage.getItem("typingCampBest") || "{\"speed\":0,\"accuracy\":0}")
+    };
+
+    const els = {
+      prompt: document.getElementById("promptText"),
+      input: document.getElementById("typingInput"),
+      start: document.getElementById("startBtn"),
+      next: document.getElementById("nextBtn"),
+      reset: document.getElementById("resetBtn"),
+      speed: document.getElementById("speed"),
+      accuracy: document.getElementById("accuracy"),
+      combo: document.getElementById("combo"),
+      timeLeft: document.getElementById("timeLeft"),
+      keyboard: document.getElementById("keyboard"),
+      runner: document.getElementById("runner"),
+      target: document.getElementById("nextTarget"),
+      mistakes: document.getElementById("mistakes"),
+      coach: document.getElementById("coach"),
+      accuracyGoal: document.getElementById("accuracyGoal"),
+      speedGoal: document.getElementById("speedGoal"),
+      lessonSelect: document.getElementById("lessonSelect"),
+      levelSelect: document.getElementById("levelSelect"),
+      durationSelect: document.getElementById("durationSelect"),
+      targetSelect: document.getElementById("targetSelect"),
+      bestSpeed: document.getElementById("bestSpeed"),
+      bestAccuracy: document.getElementById("bestAccuracy")
+    };
+
+    function pickText() {
+      const bank = lessons[state.lesson][state.level];
+      const base = bank[Math.floor(Math.random() * bank.length)];
+      if (state.level === "hard") return `${base}  ${bank[(Math.floor(Math.random() * bank.length))]}`;
+      return base;
+    }
+
+    function renderKeyboard() {
+      els.keyboard.innerHTML = "";
+      keys.forEach((row, rowIndex) => {
+        const rowEl = document.createElement("div");
+        rowEl.className = `key-row row-${rowIndex + 1}`;
+        row.split("").forEach(letter => {
+          const key = document.createElement("div");
+          key.className = "key";
+          key.dataset.key = letter;
+          key.textContent = letter;
+          rowEl.appendChild(key);
+        });
+        els.keyboard.appendChild(rowEl);
+      });
+    }
+
+    function renderPrompt() {
+      const typed = els.input.value;
+      els.prompt.innerHTML = "";
+      [...state.text].forEach((char, index) => {
+        const span = document.createElement("span");
+        span.className = "char";
+        span.textContent = char;
+        if (index < typed.length) {
+          span.classList.add(typed[index] === char ? "done" : "wrong");
+        } else if (index === typed.length) {
+          span.classList.add("current");
+        }
+        els.prompt.appendChild(span);
+      });
+      updateNextKey();
+      updateRunner();
+    }
+
+    function updateNextKey() {
+      document.querySelectorAll(".key").forEach(key => key.classList.remove("next"));
+      const next = state.text[els.input.value.length] || "";
+      els.target.textContent = next === " " ? "空" : next || "✓";
+      const keyValue = next.toLowerCase();
+      const target = keyValue === " " ? null : document.querySelector(`[data-key="${CSS.escape(keyValue)}"]`);
+      if (target) target.classList.add("next");
+    }
+
+    function updateRunner() {
+      const done = Math.min(els.input.value.length, state.text.length);
+      const ratio = state.text.length ? done / state.text.length : 0;
+      const track = document.querySelector(".world-strip").clientWidth - 116;
+      els.runner.style.setProperty("--runner-x", `${Math.max(0, track * ratio)}px`);
+    }
+
+    function beginRound(keepStats = false) {
+      if (!keepStats) {
+        state.typedTotal = 0;
+        state.correctTotal = 0;
+        state.combo = 0;
+        state.bestCombo = 0;
+        state.mistakes = {};
+      }
+      state.text = pickText();
+      els.input.value = "";
+      state.lastInputLength = 0;
+      renderPrompt();
+      updateMetrics();
+      els.input.focus();
+    }
+
+    function start() {
+      if (state.started) return;
+      state.started = true;
+      state.startedAt = Date.now();
+      state.duration = Number(els.durationSelect.value);
+      els.start.textContent = "訓練中";
+      els.start.disabled = true;
+      els.durationSelect.disabled = true;
+      beginRound(false);
+      state.timerId = window.setInterval(tick, 250);
+    }
+
+    function finish(reason = "time") {
+      state.started = false;
+      window.clearInterval(state.timerId);
+      els.start.textContent = "再練一輪";
+      els.start.disabled = false;
+      els.durationSelect.disabled = false;
+      const accuracy = getAccuracy();
+      const speed = getSpeed();
+      if (speed > state.best.speed || accuracy > state.best.accuracy) {
+        state.best.speed = Math.max(state.best.speed, speed);
+        state.best.accuracy = Math.max(state.best.accuracy, accuracy);
+        localStorage.setItem("typingCampBest", JSON.stringify(state.best));
+      }
+      updateBest();
+      updateMetrics();
+      els.coach.textContent = reason === "complete"
+        ? "完成呢一關喇！抖 10 秒，再挑戰下一關啦。"
+        : "時間到。睇吓邊啲鍵成日撳錯，下一輪先擺穩手指。";
+    }
+
+    function tick() {
+      const left = getRemaining();
+      if (left <= 0) finish("time");
+      updateMetrics();
+    }
+
+    function getElapsedMinutes() {
+      if (!state.startedAt) return 0;
+      return Math.max((Date.now() - state.startedAt) / 60000, 1 / 60000);
+    }
+
+    function getRemaining() {
+      if (!state.started) return state.duration;
+      return Math.max(0, state.duration - Math.floor((Date.now() - state.startedAt) / 1000));
+    }
+
+    function getAccuracy() {
+      if (!state.typedTotal) return 100;
+      return Math.round((state.correctTotal / state.typedTotal) * 100);
+    }
+
+    function getSpeed() {
+      return Math.round(state.correctTotal / getElapsedMinutes());
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = String(seconds % 60).padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function updateMetrics() {
+      const speed = getSpeed();
+      const accuracy = getAccuracy();
+      const target = Number(els.targetSelect.value);
+      els.speed.textContent = speed;
+      els.accuracy.textContent = `${accuracy}%`;
+      els.combo.textContent = state.combo;
+      els.timeLeft.textContent = formatTime(getRemaining());
+      els.accuracyGoal.style.setProperty("--value", `${Math.min(100, accuracy / target * 100)}%`);
+      els.speedGoal.style.setProperty("--value", `${Math.min(100, speed / 80 * 100)}%`);
+      renderMistakes();
+
+      if (!state.started) return;
+      if (accuracy >= target && speed >= 60) {
+        els.coach.textContent = "又快又穩！保持節奏，唔好心急搶快。";
+      } else if (accuracy < target) {
+        els.coach.textContent = "先救返準確率。撳錯鍵嗰陣停一停，先再撳。";
+      } else if (speed < 45) {
+        els.coach.textContent = "準確度好好。下一段試吓縮短手指移動嘅距離。";
+      } else {
+        els.coach.textContent = "狀態唔錯。對眼望住文字，手指記實位置。";
+      }
+    }
+
+    function updateBest() {
+      els.bestSpeed.textContent = state.best.speed;
+      els.bestAccuracy.textContent = `${state.best.accuracy}%`;
+    }
+
+    function renderMistakes() {
+      const entries = Object.entries(state.mistakes)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6);
+      els.mistakes.innerHTML = "";
+      if (!entries.length) {
+        const empty = document.createElement("span");
+        empty.className = "footer-note";
+        empty.textContent = "暫時未有明顯撳錯嘅鍵。";
+        els.mistakes.appendChild(empty);
+        return;
+      }
+      entries.forEach(([key, count]) => {
+        const pill = document.createElement("span");
+        pill.className = "mistake-pill";
+        pill.textContent = `${key === " " ? "空白鍵" : key} × ${count}`;
+        els.mistakes.appendChild(pill);
+      });
+    }
+
+    function handleInput(event) {
+      if (!state.started) start();
+      const typed = event.target.value;
+      const previousLength = state.lastInputLength;
+
+      if (typed.length > previousLength) {
+        for (let index = previousLength; index < typed.length; index += 1) {
+          const expected = state.text[index];
+          const actual = typed[index];
+          if (actual !== undefined && expected !== undefined) {
+            state.typedTotal += 1;
+            if (actual === expected) {
+              state.correctTotal += 1;
+              state.combo += 1;
+              state.bestCombo = Math.max(state.bestCombo, state.combo);
+            } else {
+              state.combo = 0;
+              state.mistakes[expected || "?"] = (state.mistakes[expected || "?"] || 0) + 1;
+            }
+          }
+        }
+      }
+      state.lastInputLength = typed.length;
+
+      if (typed.length >= state.text.length) {
+        renderPrompt();
+        if (getRemaining() > 0) {
+          beginRound(true);
+        } else {
+          finish("complete");
+        }
+        return;
+      }
+
+      renderPrompt();
+      updateMetrics();
+    }
+
+    function flashKey(key) {
+      const value = key.length === 1 ? key.toLowerCase() : "";
+      const el = value ? document.querySelector(`[data-key="${CSS.escape(value)}"]`) : null;
+      if (!el) return;
+      el.classList.add("pressed");
+      window.setTimeout(() => el.classList.remove("pressed"), 100);
+    }
+
+    function setLesson(lesson) {
+      state.lesson = lesson;
+      els.lessonSelect.value = lesson;
+      document.querySelectorAll(".lesson").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lesson === lesson);
+      });
+      beginRound(true);
+    }
+
+    function setTheme(theme) {
+      state.theme = theme;
+      document.body.classList.toggle("tactical", theme === "tactical");
+      document.body.classList.toggle("mixed", theme === "mixed");
+      document.querySelectorAll("[data-theme]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.theme === theme);
+      });
+    }
+
+    els.start.addEventListener("click", start);
+    els.next.addEventListener("click", () => beginRound(true));
+    els.reset.addEventListener("click", () => {
+      finish("time");
+      beginRound(false);
+      updateMetrics();
+    });
+    els.input.addEventListener("input", handleInput);
+    els.input.addEventListener("paste", event => event.preventDefault());
+    els.input.addEventListener("keydown", event => flashKey(event.key));
+    els.lessonSelect.addEventListener("change", event => setLesson(event.target.value));
+    els.levelSelect.addEventListener("change", event => {
+      state.level = event.target.value;
+      beginRound(true);
+    });
+    els.durationSelect.addEventListener("change", event => {
+      state.duration = Number(event.target.value);
+      updateMetrics();
+    });
+    els.targetSelect.addEventListener("change", updateMetrics);
+    document.querySelectorAll(".lesson").forEach(btn => {
+      btn.addEventListener("click", () => setLesson(btn.dataset.lesson));
+    });
+    document.querySelectorAll("[data-theme]").forEach(btn => {
+      btn.addEventListener("click", () => setTheme(btn.dataset.theme));
+    });
+    window.addEventListener("resize", updateRunner);
+
+    renderKeyboard();
+    beginRound(false);
+    updateBest();
+    updateMetrics();
+  </script>
+</body>
+</html>

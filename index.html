@@ -96,6 +96,10 @@
     .product.game .tag{color:#164a5b;background:#dceff4}
     .product.game .number{color:rgba(22,74,91,.09)}
     .product.game .arrow{background:#164a5b}
+    .product.song{background:linear-gradient(145deg,#fff 0 54%,#f7e4ef);border-color:rgba(118,45,86,.18)}
+    .product.song .tag{color:#762d56;background:#f7e4ef}
+    .product.song .number{color:rgba(118,45,86,.09)}
+    .product.song .arrow{background:#762d56}
     .product:hover,.product:focus-visible{transform:translateY(-7px) rotate(-.25deg);box-shadow:0 23px 50px rgba(35,83,68,.16);outline:3px solid rgba(35,139,98,.18);outline-offset:3px}
     .number{position:absolute;top:14px;right:22px;color:rgba(35,139,98,.09);font-family:Georgia,serif;font-size:7rem;font-weight:900;line-height:1}
     .tags{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px}
@@ -128,7 +132,7 @@
   <div class="shell">
     <header>
       <a class="brand" href="#top" aria-label="返去椰子主頁頂部"><span class="logo" aria-hidden="true">椰</span><span>椰子</span></a>
-      <nav aria-label="主頁目錄"><a href="#learn">學習</a><a href="#play">遊戲</a></nav>
+      <nav aria-label="主頁目錄"><a href="#learn">學習</a><a href="#songs">歌曲</a><a href="#play">遊戲</a></nav>
     </header>
 
     <main id="top">
@@ -156,6 +160,27 @@
           </a>
           <article class="card placeholder" aria-label="更多學習產品就快推出">
             <div class="icon" aria-hidden="true">＋</div><h3>下一次探索</h3><p>新學習產品準備緊。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="catalog" id="songs" aria-labelledby="songs-title">
+        <div class="section-head">
+          <div><p class="kicker">歌曲區</p><h2 id="songs-title">跟住歌詞練粵語</h2></div>
+          <p class="note">由熟悉旋律入手：睇粵拼、聽示範，再用自己把聲逐句挑戰。</p>
+        </div>
+        <div class="grid">
+          <a class="card product song" href="songs/c1-nan-wang-de-jing/" aria-label="入去第一個歌曲產品：難忘的經">
+            <span class="number" aria-hidden="true">1</span>
+            <div>
+              <div class="tags"><span class="tag">歌曲練習</span><span class="tag">粵拼跟讀</span><span class="tag ready">已收錄</span></div>
+              <h3>1 ·《難忘的經》</h3>
+              <p>每頁四句，配粵拼、粵語示範同錄音評分，逐段練熟成首歌。</p>
+            </div>
+            <div class="card-foot"><span>入去歌曲產品</span><span class="arrow" aria-hidden="true">→</span></div>
+          </a>
+          <article class="card placeholder" aria-label="更多歌曲產品就快推出">
+            <div class="icon" aria-hidden="true">＋</div><h3>下一首歌</h3><p>新歌曲練習準備緊。</p>
           </article>
         </div>
       </section>

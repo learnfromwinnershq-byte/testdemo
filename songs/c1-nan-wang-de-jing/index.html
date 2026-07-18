@@ -31,7 +31,7 @@
     <section class="toolbar" aria-label="朗讀設定">
       <button id="toggleJyutping" aria-pressed="true">粵拼：顯示</button>
       <label class="repeat-control">每句重複 <select id="repeatCount" aria-label="每句重複次數"><option value="1">1次</option><option value="2">2次</option><option value="3">3次</option></select></label>
-      <label class="rate">語速 <input id="rate" type="range" min="0.4" max="1" step="0.05" value="0.7"><b id="rateValue">0.70×</b></label>
+      <label class="rate">語速 <input id="rate" type="range" min="0.5" max="1.4" step="0.05" value="0.7"><b id="rateValue">0.70×</b></label>
     </section>
     <section id="cards" class="cards" aria-live="polite"></section>
     <nav class="pager" aria-label="練習分頁"><button id="prev">上一頁</button><span id="pageLabel"></span><button id="next">下一頁</button></nav>
@@ -146,7 +146,7 @@ const pageData=Array.from({length:Math.ceil(lyrics.length/4)},(_,page)=>{
 });
 const savedRepeat=Number(localStorage.getItem('nanwangRepeatCount')||1);
 localStorage.removeItem('nanwangVoiceURI');
-const state={page:0,rate:.7,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,speaking:null,recognition:null,selected:{},best:JSON.parse(localStorage.getItem('nanwangBestScores')||'{}')};
+const state={page:0,rate:.7,rateTimer:null,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,speaking:null,recognition:null,selected:{},best:JSON.parse(localStorage.getItem('nanwangBestScores')||'{}')};
 const $=s=>document.querySelector(s);const cards=$('#cards');
 const isHan=c=>/\p{Script=Han}/u.test(c);const clean=s=>(s||'').normalize('NFKC').replace(/[^\p{Script=Han}]/gu,'');
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -189,7 +189,7 @@ function speak(item,card){
   const btn=card.querySelector('.play'),result=card.querySelector('.result');
   if(!('speechSynthesis'in window)){result.textContent='此瀏覽器不支援語音合成。';return;}
   const lines=[...card.querySelectorAll('.lyric-line')],voice=chooseVoice(),startIndex=Number.isInteger(state.selected[item.id])?state.selected[item.id]:0;
-  const session={card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat,utterance:null};
+  const session={item,card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat,utterance:null};
   state.speaking=session;btn.classList.add('playing');btn.textContent='■ 停止示範';
   session.cleanup=()=>{lines.forEach(s=>s.classList.remove('active'));btn.classList.remove('playing');btn.textContent='▶ 粵語示範';};
   function finish(){if(state.speaking===session)state.speaking=null;session.cleanup();result.textContent='示範朗讀完成。';}
@@ -229,7 +229,14 @@ function assess(item,card){
   r.start();
 }
 function updateScore(){$('#totalScore').textContent=pageData.reduce((n,x)=>n+(state.best[x.id]||0),0);}
-$('#rate').oninput=e=>{state.rate=+e.target.value;$('#rateValue').textContent=state.rate.toFixed(2)+'×';};
+function restartSpeakingWithNewRate(){
+  const session=state.speaking;if(!session?.item)return;
+  const item=session.item,card=session.card;
+  state.selected[item.id]=session.index;
+  stopAll();
+  setTimeout(()=>speak(item,card),80);
+}
+$('#rate').oninput=e=>{state.rate=+e.target.value;$('#rateValue').textContent=state.rate.toFixed(2)+'×';clearTimeout(state.rateTimer);if(state.speaking)state.rateTimer=setTimeout(restartSpeakingWithNewRate,180);};
 $('#repeatCount').value=String(state.repeat);
 $('#repeatCount').onchange=e=>{state.repeat=Number(e.target.value);localStorage.setItem('nanwangRepeatCount',String(state.repeat));};
 $('#toggleJyutping').onclick=e=>{state.showJyutping=!state.showJyutping;e.currentTarget.setAttribute('aria-pressed',state.showJyutping);e.currentTarget.textContent=`粵拼：${state.showJyutping?'顯示':'隱藏'}`;applyVisibility();};

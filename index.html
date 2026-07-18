@@ -1,149 +1,173 @@
 <!doctype html>
-<html lang="zh-Hant-HK">
+<html lang="zh-Hans">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10233f">
-  <title>文言文粵語正音朗誦精讀站｜楊修之死</title>
+  <meta name="theme-color" content="#f8f8ed">
+  <meta name="description" content="椰子——一个属于13岁创造者的学习与游戏暑假项目。">
+  <title>椰子｜学习与游戏</title>
   <style>
-    :root{--navy:#10233f;--ink:#172033;--muted:#67748a;--paper:#f5f7fb;--card:#fff;--line:#dfe5ef;--blue:#246bfd;--coral:#ff665b;--green:#1b9b71;--shadow:0 14px 36px rgba(18,35,63,.10)}
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.65}
-    button,input,select{font:inherit} button{touch-action:manipulation}
-    header{background:linear-gradient(135deg,#0c1c34,#173c69);color:#fff;padding:calc(18px + env(safe-area-inset-top)) max(18px,calc((100vw - 1120px)/2)) 20px;box-shadow:0 5px 20px rgba(12,28,52,.18)}
-    .head-row{display:flex;align-items:center;justify-content:space-between;gap:18px}.brand h1{font-size:clamp(1.25rem,3vw,1.8rem);margin:0}.brand p{margin:4px 0 0;color:#cbd8e9;font-size:.9rem}.scoreboard{min-width:128px;text-align:center;padding:8px 14px;border:1px solid rgba(255,255,255,.24);border-radius:14px;background:rgba(255,255,255,.09)}.scoreboard strong{display:block;font-size:1.55rem;line-height:1.2}.scoreboard span{font-size:.78rem;color:#d9e4f1}
-    main{max-width:1120px;margin:22px auto;padding:0 18px 50px}.toolbar,.pager{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.toolbar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:18px;box-shadow:0 8px 24px rgba(18,35,63,.05)}
-    .toolbar button,.toolbar select,.pager button,.action{border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:9px 13px;cursor:pointer;transition:transform .16s,background .16s,color .16s,border-color .16s,box-shadow .16s}.toolbar button:hover,.toolbar select:hover,.pager button:hover,.action:hover{border-color:#9bb7e7;box-shadow:0 5px 14px rgba(36,107,253,.12)}button:active{transform:scale(.96)}button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}.repeat-control,.rate{display:flex;align-items:center;gap:9px;font-size:.88rem}.repeat-control select{padding:7px 30px 7px 10px}.rate{margin-left:auto}.rate input{width:130px;accent-color:var(--blue)}
-    .cards{display:grid;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,30px);box-shadow:var(--shadow)}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.card h2{font-size:1.05rem;margin:0}.best{font-size:.83rem;color:var(--muted);white-space:nowrap}.best b{color:var(--green);font-size:1.15rem}
-    .reading{max-width:100%;overflow-wrap:anywhere;font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-size:clamp(1.35rem,4.4vw,2rem);line-height:2.25;letter-spacing:.04em}.sentence-span{border-radius:8px;padding-inline:.10em;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background .1s ease;cursor:pointer}.sentence-span.selected{background:linear-gradient(#e6efff,#e6efff) left bottom/100% 1.35em no-repeat}.sentence-span.active{background:linear-gradient(var(--coral),var(--coral)) left bottom/100% 1.35em no-repeat}.sentence-span:focus-visible{outline:2px solid var(--blue);outline-offset:3px}.token{display:inline-block;position:relative;vertical-align:baseline;line-height:1.35}.word-span{display:inline-block;line-height:1.35;padding:0 .015em;transition:color .1s ease}.sentence-span.active .word-span{color:#fff;background:transparent;box-shadow:none}.sentence-span.active .punct{color:#fff}.word-span.asr-ok{color:var(--green)}.word-span.asr-miss{color:#d33;background:#fff0ef}.punct{color:#8390a4}.jyutping{display:block;color:var(--blue);background:transparent;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.45em;line-height:1;text-align:center;letter-spacing:-.02em;margin-bottom:0;min-width:2.2em}.sentence-span.active .jyutping{color:var(--blue);background:transparent}.hide-jyutping .jyutping,.hide-notes .notes{display:none}
-    .notes{margin-top:18px;padding:13px 15px;border-left:4px solid var(--blue);background:#f3f7ff;border-radius:0 10px 10px 0;color:#49566c;font-size:.93rem}.notes b{color:var(--ink)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.action.primary{background:var(--blue);border-color:var(--blue);color:#fff}.action.recording{background:var(--coral);border-color:var(--coral);color:#fff;animation:pulse 1s infinite}.action.playing{background:var(--navy);border-color:var(--navy);color:#fff}.action:disabled{opacity:.5;cursor:not-allowed}.result{min-height:31px;margin-top:12px;font-size:.92rem;color:var(--muted)}.result strong{font-size:1.25rem;color:var(--green)}
-    .pager{justify-content:center;margin-top:22px}.pager span{min-width:90px;text-align:center;color:var(--muted)}.support{margin-top:18px;color:var(--muted);font-size:.8rem;text-align:center}
-    @keyframes pulse{50%{box-shadow:0 0 0 7px rgba(255,102,91,.16)}}
-    @media(max-width:760px){main{margin-top:14px;padding-inline:12px}.head-row{align-items:flex-start}.scoreboard{min-width:105px}.brand p{display:none}.toolbar{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:5;padding:10px}.repeat-control{margin-left:auto}.rate{width:100%;margin-left:0}.rate input{flex:1;min-width:80px}.card{border-radius:15px;padding:18px 14px}.reading{font-size:clamp(1.22rem,5.5vw,1.65rem);line-height:2.45;letter-spacing:.015em}.actions{gap:8px}.action{flex:1;min-width:128px}.notes{font-size:.88rem}.pager button{min-width:92px}}
-    @media(max-width:420px){header{padding-inline:14px}.head-row{gap:10px}.brand h1{font-size:1.08rem;line-height:1.35}.scoreboard{min-width:92px;padding:7px 8px}.scoreboard strong{font-size:1.3rem}.scoreboard span{font-size:.68rem}.toolbar button{flex:1;padding:8px 7px;font-size:.84rem}.card-head{display:block}.best{display:block;margin-top:3px}.reading{font-size:clamp(1.12rem,5.7vw,1.42rem);line-height:2.55}.jyutping{font-size:.43em}.action{width:100%;flex-basis:100%}}
-    @media(min-width:761px) and (max-width:1024px){main{padding-inline:24px}.reading{font-size:clamp(1.5rem,2.7vw,1.85rem)}}
-    @media(orientation:landscape) and (max-height:520px){header{padding-block:10px}.toolbar{position:static}.card{padding-block:16px}.reading{line-height:2.15}}
-    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+    :root{
+      --ink:#173c32;
+      --muted:#60766f;
+      --paper:#faf9ed;
+      --green:#238b62;
+      --deep:#126048;
+      --mint:#dff4e5;
+      --yellow:#ffd96d;
+      --blue:#ccecf3;
+      --line:rgba(23,60,50,.13);
+      --shadow:0 20px 50px rgba(35,83,68,.12);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-width:320px;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 7% 2%,rgba(255,217,109,.34),transparent 25rem),
+        radial-gradient(circle at 96% 23%,rgba(204,236,243,.48),transparent 26rem),
+        var(--paper);
+      font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    }
+    a{color:inherit}
+    .shell{width:min(1120px,calc(100% - 40px));margin:auto}
+    header{display:flex;align-items:center;justify-content:space-between;min-height:84px;gap:20px}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:900;letter-spacing:.06em}
+    .logo{
+      position:relative;
+      display:grid;
+      width:44px;height:44px;
+      place-items:center;
+      border-radius:50%;
+      color:#fff;background:var(--green);
+      box-shadow:0 7px 0 rgba(18,96,72,.17);
+      font-size:1.3rem;
+    }
+    .logo:before,.logo:after{position:absolute;top:-8px;width:18px;height:11px;content:"";background:#5aae64;border-radius:100% 0 100% 0}
+    .logo:before{left:8px;transform:rotate(-20deg)}
+    .logo:after{right:7px;transform:scaleX(-1) rotate(-20deg)}
+    nav{display:flex;gap:6px}
+    nav a{padding:9px 14px;border-radius:999px;text-decoration:none;font-size:.92rem;font-weight:800}
+    nav a:hover,nav a:focus-visible{background:rgba(35,139,98,.1);outline:none}
+    .hero{
+      position:relative;
+      min-height:420px;
+      overflow:hidden;
+      padding:clamp(42px,7vw,76px);
+      border:1px solid var(--line);
+      border-radius:40px;
+      background:linear-gradient(135deg,#e4f7e8,#f2f7d5 55%,#fff1b5);
+      box-shadow:var(--shadow);
+      isolation:isolate;
+    }
+    .hero:before,.hero:after{position:absolute;z-index:-1;content:"";border-radius:50%}
+    .hero:before{top:-90px;right:-35px;width:310px;height:310px;border:45px solid rgba(255,255,255,.52)}
+    .hero:after{right:150px;bottom:-95px;width:190px;height:190px;background:rgba(255,151,93,.18)}
+    .eyebrow{display:inline-block;margin-bottom:22px;padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.66);color:var(--deep);font-size:.85rem;font-weight:850}
+    h1{margin:0;font-size:clamp(3.8rem,9vw,7.4rem);line-height:.9;letter-spacing:-.07em}
+    .lead{max-width:580px;margin:27px 0 0;color:#46665c;font-size:clamp(1.04rem,2vw,1.22rem);line-height:1.85}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+    .button{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 21px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.76);text-decoration:none;font-weight:900;transition:transform .16s,box-shadow .16s}
+    .button.primary{border-color:var(--green);color:#fff;background:var(--green);box-shadow:0 8px 0 var(--deep)}
+    .button:hover,.button:focus-visible{transform:translateY(-3px);outline:none}
+    section.catalog{padding-top:92px;scroll-margin-top:16px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:28px;margin-bottom:28px}
+    .kicker{margin:0 0 7px;color:var(--green);font-size:.8rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    h2{margin:0;font-size:clamp(2rem,5vw,3.35rem);letter-spacing:-.05em}
+    .note{max-width:420px;margin:0;color:var(--muted);line-height:1.75}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+    .card{
+      position:relative;
+      display:flex;
+      min-height:310px;
+      overflow:hidden;
+      flex-direction:column;
+      justify-content:space-between;
+      padding:30px;
+      border:1px solid var(--line);
+      border-radius:30px;
+      background:#fff;
+      box-shadow:0 12px 34px rgba(35,83,68,.08);
+    }
+    .product{text-decoration:none;background:linear-gradient(145deg,#fff 0 58%,var(--mint));transition:transform .18s,box-shadow .18s}
+    .product:hover,.product:focus-visible{transform:translateY(-7px) rotate(-.25deg);box-shadow:0 23px 50px rgba(35,83,68,.16);outline:3px solid rgba(35,139,98,.18);outline-offset:3px}
+    .number{position:absolute;top:14px;right:22px;color:rgba(35,139,98,.09);font-family:Georgia,serif;font-size:7rem;font-weight:900;line-height:1}
+    .tags{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px}
+    .tag{padding:7px 10px;border-radius:10px;color:var(--deep);background:var(--mint);font-size:.75rem;font-weight:900}
+    .tag.ready{color:#77471f;background:#fff0bd}
+    h3{position:relative;z-index:1;max-width:540px;margin:38px 0 14px;font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.28;letter-spacing:-.035em}
+    .card p{position:relative;z-index:1;max-width:560px;margin:0;color:var(--muted);line-height:1.75}
+    .card-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:34px;font-weight:900}
+    .arrow{display:grid;width:46px;height:46px;place-items:center;border-radius:50%;color:#fff;background:var(--green);font-size:1.35rem}
+    .placeholder{align-items:center;justify-content:center;min-height:260px;border:2px dashed rgba(23,60,50,.15);background:rgba(204,236,243,.27);text-align:center}
+    .icon{display:grid;width:70px;height:70px;place-items:center;margin-bottom:18px;border-radius:23px;background:var(--blue);font-size:2rem;transform:rotate(-5deg)}
+    .placeholder h3{margin:0 0 10px}
+    footer{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:92px;padding:30px 0 42px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+    footer strong{color:var(--ink)}
+    @media(max-width:760px){
+      .shell{width:min(100% - 24px,1120px)}
+      header{min-height:76px}
+      nav a{padding:8px 9px;font-size:.8rem}
+      .hero{min-height:0;padding:38px 24px 42px;border-radius:28px}
+      h1{font-size:clamp(3.8rem,21vw,6rem)}
+      section.catalog{padding-top:70px}
+      .section-head,footer{align-items:flex-start;flex-direction:column}
+      .grid{grid-template-columns:1fr}
+      .card{min-height:300px;padding:24px;border-radius:25px}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
   </style>
 </head>
 <body>
-  <header><div class="head-row"><div class="brand"><h1>文言文粵語正音朗誦精讀站</h1><p>《楊修之死》・繁體字逐字跟讀與正音測評</p></div><div class="scoreboard"><strong id="totalScore">0</strong><span>成就總積分 / 400</span></div></div></header>
-  <main id="app">
-    <section class="toolbar" aria-label="顯示及語速設定">
-      <button id="toggleJyutping" aria-pressed="true">粵拼：顯示</button>
-      <button id="toggleNotes" aria-pressed="true">註釋：顯示</button>
-      <label class="repeat-control">每句重複 <select id="repeatCount" aria-label="每個短句重複次數"><option value="1">1次</option><option value="2">2次</option><option value="3">3次</option></select></label>
-      <label class="rate">語速 <input id="rate" type="range" min="0.4" max="1" step="0.05" value="0.7"><b id="rateValue">0.70×</b></label>
-    </section>
-    <section id="cards" class="cards" aria-live="polite"></section>
-    <nav class="pager" aria-label="文章分頁"><button id="prev">上一頁</button><span id="pageLabel"></span><button id="next">下一頁</button></nav>
-    <p class="support">建議使用最新版 Chrome 或 Edge；粵語聲線及字詞邊界支援視裝置而定，錄音需授權麥克風。</p>
-  </main>
-<script>
-/* 每個 text 漢字依次對應 jyutping 陣列中的一項；標點不佔粵拼項。 */
-const articleData=[
- {id:'p1',title:'第一段・雞肋之令',text:'操屯兵日久，欲要進兵，又恐馬超拒守；欲收兵回，又恐蜀兵恥笑，心中猶豫不決。適庖官進雞湯。操見碗中有雞肋，因而有感於懷。正沉吟間，夏侯惇入帳，稟請夜間口號。操隨口曰：「雞肋！雞肋！」',jyutping:'cou1 tyun4 bing1 jat6 gau2 juk6 jiu3 zeon3 bing1 jau6 hung2 maa5 ciu1 keoi5 sau2 juk6 sau1 bing1 wui4 jau6 hung2 suk6 bing1 ci2 siu3 sam1 zung1 jau4 jyu6 bat1 kyut3 sik1 paau4 gun1 zeon3 gai1 tong1 cou1 gin3 wun2 zung1 jau5 gai1 lak6 jan1 ji4 jau5 gam2 jyu1 waai4 zing3 cam4 jam4 gaan1 haa6 hau4 deon6 jap6 zoeng3 ban2 cing2 je6 gaan1 hau2 hou6 cou1 ceoi4 hau2 joek6 gai1 lak6 gai1 lak6'.split(' '),note:'<b>雞肋：</b>雞的肋骨，食之無肉，棄之可惜。曹操借此暗示進退兩難。<b>庖官：</b>掌管膳食的官員。'},
- {id:'p2',title:'第二段・楊修識意',text:'行軍主簿楊修，見傳「雞肋」二字，便教隨行軍士，各收拾行裝，準備歸程。有人報知夏侯惇。惇大驚，遂請楊修至帳中問曰：「公何收拾行裝？」修曰：「以今夜號令，便知魏王不日將退兵歸也。」',jyutping:'hang4 gwan1 zyu2 bou6 joeng4 sau1 gin3 cyun4 gai1 lak6 ji6 zi6 bin6 gaau3 ceoi4 hang4 gwan1 si6 gok3 sau1 sap6 hang4 zong1 zeon2 bei6 gwai1 cing4 jau5 jan4 bou3 zi1 haa6 hau4 deon6 deon6 daai6 ging1 seoi6 cing2 joeng4 sau1 zi3 zoeng3 zung1 man6 joek6 gung1 ho4 sau1 sap6 hang4 zong1 sau1 joek6 ji5 gam1 je6 hou6 ling6 bin6 zi1 ngai6 wong4 bat1 jat6 zoeng1 teoi3 bing1 gwai1 jaa5'.split(' '),note:'<b>行軍主簿：</b>掌管軍中文書的官職。<b>不日：</b>不久，不出幾天。楊修從口號推斷曹操將退兵。'},
- {id:'p3',title:'第三段・拆解雞肋',text:'惇曰：「何以知之？」修曰：「雞肋者，食之無肉，棄之有味。今進不能勝，退恐人恥笑，在此無益，不如早歸。來日魏王必班師矣。故先收拾行裝，免得臨行慌亂。」夏侯惇曰：「公真知魏王肺腑也！」',jyutping:'deon6 joek6 ho4 ji5 zi1 zi1 sau1 joek6 gai1 lak6 ze2 sik6 zi1 mou4 juk6 hei3 zi1 jau5 mei6 gam1 zeon3 bat1 nang4 sing3 teoi3 hung2 jan4 ci2 siu3 zoi6 ci2 mou4 jik1 bat1 jyu4 zou2 gwai1 loi4 jat6 ngai6 wong4 bit1 baan1 si1 ji5 gu3 sin1 sau1 sap6 hang4 zong1 min5 dak1 lam4 hang4 fong1 lyun6 haa6 hau4 deon6 joek6 gung1 zan1 zi1 ngai6 wong4 fai3 fu2 jaa5'.split(' '),note:'<b>班師：</b>調回出征的軍隊，指退兵。<b>肺腑：</b>內心深處。這段突出楊修才思敏捷，也埋下「揣摩主意」的禍根。'},
- {id:'p4',title:'第四段・操怒斬修',text:'遂亦收拾行裝。於是寨中諸將，無不準備歸計。當夜曹操心亂，不能穩睡，遂手提鋼斧，繞寨私行。只見夏侯惇寨內軍士，各準備行裝。操大驚，急回帳召惇問其故。惇曰：「主簿楊德祖先知大王欲歸之意。」',jyutping:'seoi6 jik6 sau1 sap6 hang4 zong1 jyu1 si6 zaai6 zung1 zyu1 zoeng3 mou4 bat1 zeon2 bei6 gwai1 gai3 dong1 je6 cou1 cou1 sam1 lyun6 bat1 nang4 wan2 seoi6 seoi6 sau2 tai4 gong3 fu2 jiu2 zaai6 si1 hang4 zi2 gin3 haa6 hau4 deon6 zaai6 noi6 gwan1 si6 gok3 zeon2 bei6 hang4 zong1 cou1 daai6 ging1 gap1 wui4 zoeng3 ziu6 deon6 man6 kei4 gu3 deon6 joek6 zyu2 bou6 joeng4 dak1 zou2 sin1 zi1 daai6 wong4 juk6 gwai1 zi1 ji3'.split(' '),note:'<b>楊德祖：</b>楊修，字德祖。曹操發現全軍已準備撤退，追問消息來源；原文後續寫曹操以「造言亂軍」之名斬楊修。'}
-];
+  <div class="shell">
+    <header>
+      <a class="brand" href="#top" aria-label="返回椰子主页顶部"><span class="logo" aria-hidden="true">椰</span><span>椰子</span></a>
+      <nav aria-label="主页目录"><a href="#learn">学习</a><a href="#play">游戏</a></nav>
+    </header>
 
-const savedRepeat=Number(localStorage.getItem('yangxiuRepeatCount')||1);
-const state={page:0,perPage:2,rate:.7,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,showNotes:true,speaking:null,recognition:null,selected:{},best:JSON.parse(localStorage.getItem('yangxiuBestScores')||'{}')};
-const $=s=>document.querySelector(s); const cards=$('#cards');
-const isHan=c=>/\p{Script=Han}/u.test(c); const clean=s=>(s||'').normalize('NFKC').replace(/[^\p{Script=Han}]/gu,'');
-function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function splitSentences(text){return text.match(/[^，。；！？：]+[，。；！？：]+[」』”’]?|[^，。；！？：]+$/gu)||[text];}
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <span class="eyebrow">🌴 13 岁的暑假创造计划</span>
+        <h1 id="hero-title">椰子</h1>
+        <p class="lead">一边学新知识，一边玩出新点子。这里收藏这个暑假完成的每一次探索、挑战和作品。</p>
+        <div class="actions"><a class="button primary" href="#learn">开始学习</a><a class="button" href="#play">看看游戏</a></div>
+      </section>
 
-/* 句級 DOM 拆解 + UTF-16 索引映射：
-   1. 以逗號、句號、分號、冒號、問號、感嘆號切分短句；結尾引號歸入前句。
-   2. 每個漢字仍保留獨立 word-span，供粵拼和 ASR 結果逐字標記。
-   3. indexMap 將 SpeechSynthesis 的 charIndex 直接映射到 sentence-span。 */
-function tokenize(item){
-  const segments=splitSentences(item.text);
-  let html='',py=0,utf16=0;const indexMap=[],sentenceUnits=[];
-  segments.forEach((segment,sentenceIndex)=>{
-    let body='',hanCount=0;
-    for(const ch of segment){
-      const len=ch.length;
-      for(let i=0;i<len;i++)indexMap[utf16+i]=sentenceIndex;
-      if(isHan(ch)){const id=`${item.id}-w-${py}`;body+=`<span class="token"><small class="jyutping">${esc(item.jyutping[py]||'')}</small><span class="word-span" id="${id}" data-word="${py}">${ch}</span></span>`;py++;hanCount++;}
-      else body+=`<span class="punct">${esc(ch)}</span>`;
-      utf16+=len;
-    }
-    sentenceUnits.push(Math.max(1,hanCount));
-    html+=`<span class="sentence-span" id="${item.id}-s-${sentenceIndex}" data-sentence="${sentenceIndex}" role="button" tabindex="0" aria-label="從第 ${sentenceIndex+1} 句開始朗讀">${body}</span>`;
-  });
-  return{html,indexMap,wordCount:py,sentenceUnits,segments};
-}
-function selectStart(card,item,index){
-  state.selected[item.id]=index;
-  card.querySelectorAll('.sentence-span').forEach((s,i)=>{s.classList.toggle('selected',i===index);s.setAttribute('aria-pressed',i===index?'true':'false');});
-  card.querySelector('.result').textContent=`已選擇第 ${index+1} 句；點擊「粵語示範」將從這一句開始。`;
-}
-function render(){
-  stopAll();cards.innerHTML='';const start=state.page*state.perPage;
-  articleData.slice(start,start+state.perPage).forEach(item=>{
-    const tok=tokenize(item),el=document.createElement('article');
-    el.className='card';el.dataset.id=item.id;el._map=tok.indexMap;el._words=tok.wordCount;el._sentenceUnits=tok.sentenceUnits;el._segments=tok.segments;
-    el.innerHTML=`<div class="card-head"><h2>${item.title}</h2><span class="best">最高分 <b>${state.best[item.id]||0}</b></span></div><div class="reading">${tok.html}</div><div class="notes">${item.note}</div><div class="actions"><button class="action primary play">▶ 粵語示範</button><button class="action record">● 開始朗讀測評</button></div><div class="result" role="status">可點擊任意短句選擇朗讀起點；未選擇時從頭開始。</div>`;
-    el.querySelectorAll('.sentence-span').forEach((sentence,index)=>{
-      const pick=()=>selectStart(el,item,index);sentence.onclick=pick;
-      sentence.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};
-    });
-    if(Number.isInteger(state.selected[item.id]))selectStart(el,item,state.selected[item.id]);
-    el.querySelector('.play').onclick=()=>speak(item,el);el.querySelector('.record').onclick=()=>assess(item,el);cards.appendChild(el);
-  });
-  applyVisibility();updateScore();$('#pageLabel').textContent=`第 ${state.page+1} / ${Math.ceil(articleData.length/state.perPage)} 頁`;$('#prev').disabled=state.page===0;$('#next').disabled=(state.page+1)*state.perPage>=articleData.length;
-}
-function applyVisibility(){document.body.classList.toggle('hide-jyutping',!state.showJyutping);document.body.classList.toggle('hide-notes',!state.showNotes);}
-function clearMarks(card){card?.querySelectorAll('.sentence-span').forEach(x=>x.classList.remove('active'));card?.querySelectorAll('.word-span').forEach(x=>x.classList.remove('asr-ok','asr-miss'));}
+      <section class="catalog" id="learn" aria-labelledby="learn-title">
+        <div class="section-head">
+          <div><p class="kicker">Learn · 学习区</p><h2 id="learn-title">今天想学什么？</h2></div>
+          <p class="note">从一篇文章、一个声音开始，把难懂的知识变成可以亲自探索的旅程。</p>
+        </div>
+        <div class="grid">
+          <a class="card product" href="learn/yang-xiu/" aria-label="进入第一个学习产品：中一粤语《杨修之死》">
+            <span class="number" aria-hidden="true">1</span>
+            <div>
+              <div class="tags"><span class="tag">中一语文</span><span class="tag">粤语朗读</span><span class="tag ready">可以体验</span></div>
+              <h3>1 · 中一粤语<br>《杨修之死》</h3>
+              <p>跟读、正音、精读，一步步走进杨修与曹操的故事。</p>
+            </div>
+            <div class="card-foot"><span>进入学习产品</span><span class="arrow" aria-hidden="true">→</span></div>
+          </a>
+          <article class="card placeholder" aria-label="更多学习产品即将推出">
+            <div class="icon" aria-hidden="true">＋</div><h3>下一次探索</h3><p>新的学习产品正在准备中。</p>
+          </article>
+        </div>
+      </section>
 
-function chooseVoice(){const vs=speechSynthesis.getVoices();return vs.find(v=>/^zh[-_]HK$/i.test(v.lang))||vs.find(v=>/zh[-_]HK|yue/i.test(v.lang))||null;}
-/* 每個短句是一個獨立 SpeechSynthesisUtterance。重複、指定起點和高亮都直接
-   跟隨短句的 onstart/onend，因此不再依賴各瀏覽器精度不一的 boundary 事件。 */
-function speak(item,card){
-  if(state.speaking?.card===card){stopAll();return;}
-  stopAll();clearMarks(card);
-  const btn=card.querySelector('.play'),result=card.querySelector('.result');
-  if(!('speechSynthesis'in window)){result.textContent='此瀏覽器不支援語音合成。';return;}
-  const sentences=[...card.querySelectorAll('.sentence-span')],segments=card._segments;
-  const voice=chooseVoice(),startIndex=Number.isInteger(state.selected[item.id])?state.selected[item.id]:0;
-  const session={card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat,utterance:null};
-  state.speaking=session;btn.classList.add('playing');btn.textContent='■ 停止示範';
-  session.cleanup=()=>{sentences.forEach(s=>s.classList.remove('active'));btn.classList.remove('playing');btn.textContent='▶ 粵語示範';};
-  function finish(){if(state.speaking===session)state.speaking=null;session.cleanup();result.textContent='示範朗讀完成。';}
-  function playNext(){
-    if(session.cancelled)return;
-    if(session.index>=segments.length){finish();return;}
-    const u=new SpeechSynthesisUtterance(segments[session.index]);session.utterance=u;
-    u.lang='zh-HK';u.rate=state.rate;u.pitch=1;if(voice)u.voice=voice;
-    u.onstart=()=>{if(session.cancelled)return;sentences.forEach((s,i)=>s.classList.toggle('active',i===session.index));result.textContent=`正在朗讀第 ${session.index+1} 句（第 ${session.repeated+1}/${session.repeat} 次）`+(voice?`・${voice.name}`:'');};
-    u.onend=()=>{if(session.cancelled)return;session.repeated++;if(session.repeated>=session.repeat){session.repeated=0;session.index++;}setTimeout(playNext,90);};
-    u.onerror=e=>{if(!session.cancelled){session.cancelled=true;session.cleanup();state.speaking=null;result.textContent=`語音播放失敗：${e.error||'未知錯誤'}`;}};
-    speechSynthesis.speak(u);
-  }
-  playNext();
-}
-function stopAll(){
-  if(state.speaking){const session=state.speaking;session.cancelled=true;speechSynthesis.cancel();session.cleanup?.();state.speaking=null;}
-  if(state.recognition){try{state.recognition.stop();}catch{}state.recognition=null;}
-  document.querySelectorAll('.active').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.playing').forEach(b=>{b.classList.remove('playing');b.textContent='▶ 粵語示範';});
-  document.querySelectorAll('.recording').forEach(b=>{b.classList.remove('recording');b.textContent='● 開始朗讀測評';});
-}
+      <section class="catalog" id="play" aria-labelledby="play-title">
+        <div class="section-head">
+          <div><p class="kicker">Play · 游戏区</p><h2 id="play-title">玩点有趣的！</h2></div>
+          <p class="note">小游戏会陆续入住这里：可以挑战、发现，也可以从失败中重新出发。</p>
+        </div>
+        <article class="card placeholder">
+          <div class="icon" aria-hidden="true">🎮</div><h3>第一款游戏，开发中</h3><p>很快回来看看，也许下一次就能按下“开始游戏”了。</p>
+        </article>
+      </section>
+    </main>
 
-/* Levenshtein 編輯距離：先移除標點，再按漢字比較。分數 = 1 - 編輯距離 / 較長字串。 */
-function similarity(a,b){a=[...clean(a)];b=[...clean(b)];if(!a.length&&!b.length)return 100;let prev=b.map((_,j)=>j+1);for(let i=0;i<a.length;i++){const cur=[i+1];for(let j=0;j<b.length;j++)cur[j+1]=a[i]===b[j]?prev[j]:1+Math.min(prev[j],prev[j+1],cur[j]);prev=cur;}return Math.max(0,Math.round((1-prev[b.length]/Math.max(a.length,b.length,1))*100));}
-function markApprox(card,target,heard){const hs=[...clean(heard)],spans=[...card.querySelectorAll('.word-span')];spans.forEach((s,i)=>s.classList.add(hs[i]===target[i]?'asr-ok':'asr-miss'));}
-function assess(item,card){stopAll();clearMarks(card);const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const btn=card.querySelector('.record'),out=card.querySelector('.result');if(!SR){out.textContent='此瀏覽器不支援 Web Speech 語音識別；請改用最新版 Chrome / Edge。';return;}const r=new SR();state.recognition=r;r.lang='zh-HK';r.continuous=true;r.interimResults=true;let finalText='',interim='';r.onstart=()=>{btn.classList.add('recording');btn.textContent='■ 完成並評分';out.textContent='正在聆聽……請朗讀整段，完成後再按一次。';btn.onclick=()=>r.stop();};r.onresult=e=>{interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;e.results[i].isFinal?finalText+=t:interim+=t;}out.textContent=`已識別：${finalText||interim}`;};r.onerror=e=>{out.textContent=e.error==='not-allowed'?'未取得麥克風權限，請在瀏覽器設定中允許。':`識別失敗：${e.error}`;};r.onend=()=>{state.recognition=null;btn.classList.remove('recording');btn.textContent='● 再次朗讀測評';btn.onclick=()=>assess(item,card);const heard=finalText||interim;if(!clean(heard).length){out.textContent='未識別到有效朗讀，請靠近麥克風再試。';return;}const score=similarity(item.text,heard);markApprox(card,[...clean(item.text)],heard);if(score>(state.best[item.id]||0)){state.best[item.id]=score;localStorage.setItem('yangxiuBestScores',JSON.stringify(state.best));card.querySelector('.best b').textContent=score;updateScore();}out.innerHTML=`本次得分：<strong>${score}</strong> / 100　<span>識別：${esc(heard)}</span>`;};r.start();}
-function updateScore(){$('#totalScore').textContent=articleData.reduce((n,x)=>n+(state.best[x.id]||0),0);}
-$('#rate').oninput=e=>{state.rate=+e.target.value;$('#rateValue').textContent=state.rate.toFixed(2)+'×';};
-$('#repeatCount').value=String(state.repeat);
-$('#repeatCount').onchange=e=>{state.repeat=Number(e.target.value);localStorage.setItem('yangxiuRepeatCount',String(state.repeat));};
-$('#toggleJyutping').onclick=e=>{state.showJyutping=!state.showJyutping;e.currentTarget.setAttribute('aria-pressed',state.showJyutping);e.currentTarget.textContent=`粵拼：${state.showJyutping?'顯示':'隱藏'}`;applyVisibility();};
-$('#toggleNotes').onclick=e=>{state.showNotes=!state.showNotes;e.currentTarget.setAttribute('aria-pressed',state.showNotes);e.currentTarget.textContent=`註釋：${state.showNotes?'顯示':'隱藏'}`;applyVisibility();};
-$('#prev').onclick=()=>{if(state.page>0){state.page--;render();scrollTo({top:0,behavior:'smooth'});}};$('#next').onclick=()=>{if((state.page+1)*state.perPage<articleData.length){state.page++;render();scrollTo({top:0,behavior:'smooth'});}};
-speechSynthesis?.addEventListener?.('voiceschanged',()=>{});render();
-</script>
+    <footer><strong>椰子 · 学习与游戏</strong><span>一个属于 13 岁创造者的暑假项目</span></footer>
+  </div>
 </body>
 </html>

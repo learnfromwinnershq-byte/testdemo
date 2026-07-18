@@ -1,219 +1,498 @@
 <!doctype html>
-<html lang="zh-Hant-HK">
+<html lang="zh-HK" data-theme="coconut">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f8f8ed">
-  <meta name="description" content="椰子——一個屬於 13 歲創作者嘅學習同遊戲暑假項目。">
-  <title>椰子｜學習同遊戲</title>
+  <meta name="theme-color" content="#f7f5e8">
+  <meta name="description" content="椰子係一個由十三歲創作者喺暑假製作嘅學習、遊戲同歌曲練習作品集。">
+  <title>椰子｜學習、遊戲、歌曲</title>
   <style>
-    :root{
-      --ink:#173c32;
-      --muted:#60766f;
-      --paper:#faf9ed;
-      --green:#238b62;
-      --deep:#126048;
-      --mint:#dff4e5;
-      --yellow:#ffd96d;
-      --blue:#ccecf3;
-      --line:rgba(23,60,50,.13);
-      --shadow:0 20px 50px rgba(35,83,68,.12);
+    :root {
+      color-scheme: light;
+      --bg: #f7f5e8;
+      --bg-soft: #eef6df;
+      --panel: rgba(255,255,255,.88);
+      --panel-solid: #fffef8;
+      --ink: #183d33;
+      --muted: #62766f;
+      --accent: #248660;
+      --accent-ink: #fff;
+      --accent-2: #f0b73a;
+      --line: rgba(24,61,51,.14);
+      --hero-a: #dff3d9;
+      --hero-b: #fff0b8;
+      --glow-a: rgba(62,166,112,.24);
+      --glow-b: rgba(255,196,74,.25);
+      --shadow: 0 24px 70px rgba(37,80,66,.13);
+      --radius: 30px;
     }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      min-width:320px;
-      color:var(--ink);
+
+    html[data-theme="neon"] {
+      color-scheme: dark;
+      --bg: #070a16;
+      --bg-soft: #101833;
+      --panel: rgba(15,20,42,.88);
+      --panel-solid: #11162c;
+      --ink: #eef5ff;
+      --muted: #9caccc;
+      --accent: #54e7d5;
+      --accent-ink: #041411;
+      --accent-2: #ff5fb2;
+      --line: rgba(142,171,255,.2);
+      --hero-a: #121c43;
+      --hero-b: #281334;
+      --glow-a: rgba(57,234,218,.28);
+      --glow-b: rgba(255,70,167,.22);
+      --shadow: 0 26px 80px rgba(0,0,0,.42);
+    }
+
+    html[data-theme="ink"] {
+      color-scheme: light;
+      --bg: #efe9da;
+      --bg-soft: #e4dfd0;
+      --panel: rgba(250,247,239,.9);
+      --panel-solid: #fbf8ef;
+      --ink: #252a31;
+      --muted: #696960;
+      --accent: #1e5360;
+      --accent-ink: #fff;
+      --accent-2: #a15d35;
+      --line: rgba(37,42,49,.16);
+      --hero-a: #dce2dc;
+      --hero-b: #e9d5b6;
+      --glow-a: rgba(40,83,93,.2);
+      --glow-b: rgba(145,88,54,.2);
+      --shadow: 0 24px 64px rgba(48,43,35,.16);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
       background:
-        radial-gradient(circle at 7% 2%,rgba(255,217,109,.34),transparent 25rem),
-        radial-gradient(circle at 96% 23%,rgba(204,236,243,.48),transparent 26rem),
-        var(--paper);
-      font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;
+        radial-gradient(circle at 8% 0%, var(--glow-b), transparent 26rem),
+        radial-gradient(circle at 96% 20%, var(--glow-a), transparent 29rem),
+        var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang HK", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      transition: color .28s ease, background-color .28s ease;
     }
-    a{color:inherit}
-    .shell{width:min(1120px,calc(100% - 40px));margin:auto}
-    header{display:flex;align-items:center;justify-content:space-between;min-height:84px;gap:20px}
-    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:900;letter-spacing:.06em}
-    .logo{
-      position:relative;
-      display:grid;
-      width:44px;height:44px;
-      place-items:center;
-      border-radius:50%;
-      color:#fff;background:var(--green);
-      box-shadow:0 7px 0 rgba(18,96,72,.17);
-      font-size:1.3rem;
+
+    a { color: inherit; }
+    button, select { font: inherit; }
+    .shell { width: min(1160px, calc(100% - 40px)); margin: auto; }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 88px;
+      gap: 24px;
     }
-    .logo:before,.logo:after{position:absolute;top:-8px;width:18px;height:11px;content:"";background:#5aae64;border-radius:100% 0 100% 0}
-    .logo:before{left:8px;transform:rotate(-20deg)}
-    .logo:after{right:7px;transform:scaleX(-1) rotate(-20deg)}
-    nav{display:flex;gap:6px}
-    nav a{padding:9px 14px;border-radius:999px;text-decoration:none;font-size:.92rem;font-weight:800}
-    nav a:hover,nav a:focus-visible{background:rgba(35,139,98,.1);outline:none}
-    .hero{
-      position:relative;
-      min-height:420px;
-      overflow:hidden;
-      padding:clamp(42px,7vw,76px);
-      border:1px solid var(--line);
-      border-radius:40px;
-      background:linear-gradient(135deg,#e4f7e8,#f2f7d5 55%,#fff1b5);
-      box-shadow:var(--shadow);
-      isolation:isolate;
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-weight: 950;
+      letter-spacing: .08em;
     }
-    .hero:before,.hero:after{position:absolute;z-index:-1;content:"";border-radius:50%}
-    .hero:before{top:-90px;right:-35px;width:310px;height:310px;border:45px solid rgba(255,255,255,.52)}
-    .hero:after{right:150px;bottom:-95px;width:190px;height:190px;background:rgba(255,151,93,.18)}
-    .eyebrow{display:inline-block;margin-bottom:22px;padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.66);color:var(--deep);font-size:.85rem;font-weight:850}
-    h1{margin:0;font-size:clamp(3.8rem,9vw,7.4rem);line-height:.9;letter-spacing:-.07em}
-    .lead{max-width:580px;margin:27px 0 0;color:#46665c;font-size:clamp(1.04rem,2vw,1.22rem);line-height:1.85}
-    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
-    .button{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 21px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.76);text-decoration:none;font-weight:900;transition:transform .16s,box-shadow .16s}
-    .button.primary{border-color:var(--green);color:#fff;background:var(--green);box-shadow:0 8px 0 var(--deep)}
-    .button:hover,.button:focus-visible{transform:translateY(-3px);outline:none}
-    section.catalog{padding-top:92px;scroll-margin-top:16px}
-    .section-head{display:flex;align-items:end;justify-content:space-between;gap:28px;margin-bottom:28px}
-    .kicker{margin:0 0 7px;color:var(--green);font-size:.8rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
-    h2{margin:0;font-size:clamp(2rem,5vw,3.35rem);letter-spacing:-.05em}
-    .note{max-width:420px;margin:0;color:var(--muted);line-height:1.75}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-    .card{
-      position:relative;
-      display:flex;
-      min-height:310px;
-      overflow:hidden;
-      flex-direction:column;
-      justify-content:space-between;
-      padding:30px;
-      border:1px solid var(--line);
-      border-radius:30px;
-      background:#fff;
-      box-shadow:0 12px 34px rgba(35,83,68,.08);
+
+    .brand-mark {
+      position: relative;
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--accent-ink);
+      background: var(--accent);
+      box-shadow: 0 7px 0 color-mix(in srgb, var(--accent) 45%, transparent);
+      font-size: 1.25rem;
     }
-    .product{text-decoration:none;background:linear-gradient(145deg,#fff 0 58%,var(--mint));transition:transform .18s,box-shadow .18s}
-    .product.game{background:linear-gradient(145deg,#fff 0 54%,#dceff4);border-color:rgba(22,74,91,.18)}
-    .product.game .tag{color:#164a5b;background:#dceff4}
-    .product.game .number{color:rgba(22,74,91,.09)}
-    .product.game .arrow{background:#164a5b}
-    .product.song{background:linear-gradient(145deg,#fff 0 54%,#f7e4ef);border-color:rgba(118,45,86,.18)}
-    .product.song .tag{color:#762d56;background:#f7e4ef}
-    .product.song .number{color:rgba(118,45,86,.09)}
-    .product.song .arrow{background:#762d56}
-    .product:hover,.product:focus-visible{transform:translateY(-7px) rotate(-.25deg);box-shadow:0 23px 50px rgba(35,83,68,.16);outline:3px solid rgba(35,139,98,.18);outline-offset:3px}
-    .number{position:absolute;top:14px;right:22px;color:rgba(35,139,98,.09);font-family:Georgia,serif;font-size:7rem;font-weight:900;line-height:1}
-    .tags{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px}
-    .tag{padding:7px 10px;border-radius:10px;color:var(--deep);background:var(--mint);font-size:.75rem;font-weight:900}
-    .tag.ready{color:#77471f;background:#fff0bd}
-    h3{position:relative;z-index:1;max-width:540px;margin:38px 0 14px;font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.28;letter-spacing:-.035em}
-    .card p{position:relative;z-index:1;max-width:560px;margin:0;color:var(--muted);line-height:1.75}
-    .card-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:34px;font-weight:900}
-    .arrow{display:grid;width:46px;height:46px;place-items:center;border-radius:50%;color:#fff;background:var(--green);font-size:1.35rem}
-    .placeholder{align-items:center;justify-content:center;min-height:260px;border:2px dashed rgba(23,60,50,.15);background:rgba(204,236,243,.27);text-align:center}
-    .icon{display:grid;width:70px;height:70px;place-items:center;margin-bottom:18px;border-radius:23px;background:var(--blue);font-size:2rem;transform:rotate(-5deg)}
-    .placeholder h3{margin:0 0 10px}
-    footer{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:92px;padding:30px 0 42px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
-    footer strong{color:var(--ink)}
-    @media(max-width:760px){
-      .shell{width:min(100% - 24px,1120px)}
-      header{min-height:76px}
-      nav a{padding:8px 9px;font-size:.8rem}
-      .hero{min-height:0;padding:38px 24px 42px;border-radius:28px}
-      h1{font-size:clamp(3.8rem,21vw,6rem)}
-      section.catalog{padding-top:70px}
-      .section-head,footer{align-items:flex-start;flex-direction:column}
-      .grid{grid-template-columns:1fr}
-      .card{min-height:300px;padding:24px;border-radius:25px}
+
+    .brand-mark::before,
+    .brand-mark::after {
+      position: absolute;
+      top: -8px;
+      width: 18px;
+      height: 11px;
+      content: "";
+      background: color-mix(in srgb, var(--accent) 72%, #8fd466);
+      border-radius: 100% 0 100% 0;
     }
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+
+    .brand-mark::before { left: 8px; transform: rotate(-20deg); }
+    .brand-mark::after { right: 7px; transform: scaleX(-1) rotate(-20deg); }
+
+    .header-right { display: flex; align-items: center; gap: 13px; }
+    .main-nav { display: flex; gap: 4px; }
+    .main-nav a { padding: 9px 12px; border-radius: 999px; text-decoration: none; font-size: .88rem; font-weight: 850; }
+    .main-nav a:hover, .main-nav a:focus-visible { background: color-mix(in srgb, var(--accent) 11%, transparent); outline: none; }
+
+    .preferences { display: flex; align-items: center; gap: 8px; }
+    .theme-field { position: relative; }
+    .theme-field select {
+      min-height: 40px;
+      padding: 0 34px 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: var(--panel-solid);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .language-switch {
+      display: inline-flex;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-solid);
+    }
+
+    .language-switch button {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: .78rem;
+      font-weight: 900;
+    }
+
+    .language-switch button[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 46px;
+      align-items: end;
+      min-height: 460px;
+      overflow: hidden;
+      padding: clamp(42px, 7vw, 78px);
+      border: 1px solid var(--line);
+      border-radius: 42px;
+      background: linear-gradient(135deg, var(--hero-a), var(--hero-b));
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+
+    .hero::before,
+    .hero::after {
+      position: absolute;
+      z-index: -1;
+      content: "";
+      border-radius: 50%;
+    }
+
+    .hero::before { top: -140px; right: -75px; width: 390px; height: 390px; border: 55px solid color-mix(in srgb, var(--panel-solid) 42%, transparent); }
+    .hero::after { right: 260px; bottom: -120px; width: 230px; height: 230px; background: color-mix(in srgb, var(--accent-2) 18%, transparent); }
+    .hero-copy { max-width: 750px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 22px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--panel-solid) 65%, transparent); color: var(--accent); font-size: .82rem; font-weight: 900; letter-spacing: .08em; }
+    h1 { margin: 0; font-size: clamp(3.1rem, 7.8vw, 7rem); line-height: .96; letter-spacing: -.065em; }
+    .hero-lead { max-width: 660px; margin: 26px 0 0; color: var(--muted); font-size: clamp(1.03rem, 1.8vw, 1.2rem); line-height: 1.85; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 20px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      color: var(--ink);
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      text-decoration: none;
+      font-weight: 900;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+
+    .button.primary { border-color: var(--accent); color: var(--accent-ink); background: var(--accent); box-shadow: 0 7px 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+    .button:hover, .button:focus-visible { transform: translateY(-3px); outline: none; }
+
+    .hero-stats { display: grid; gap: 10px; min-width: 150px; }
+    .stat { padding: 16px 18px; border: 1px solid var(--line); border-radius: 18px; background: color-mix(in srgb, var(--panel-solid) 62%, transparent); backdrop-filter: blur(10px); }
+    .stat strong { display: block; font-size: 1.65rem; line-height: 1; }
+    .stat span { display: block; margin-top: 6px; color: var(--muted); font-size: .76rem; font-weight: 800; }
+
+    .catalog { padding-top: 96px; scroll-margin-top: 18px; }
+    .section-head { display: grid; grid-template-columns: 84px minmax(0, 1fr) minmax(250px, 420px); gap: 22px; align-items: end; margin-bottom: 28px; }
+    .section-code { color: var(--accent); font: 950 .86rem ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; }
+    h2 { margin: 0; font-size: clamp(2rem, 4.8vw, 3.45rem); letter-spacing: -.05em; }
+    .section-note { margin: 0; color: var(--muted); line-height: 1.75; }
+    .products { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+    .products.one { grid-template-columns: minmax(0, 820px); }
+
+    .product-card {
+      --card-accent: var(--accent);
+      position: relative;
+      display: flex;
+      min-height: 320px;
+      overflow: hidden;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, var(--panel-solid), color-mix(in srgb, var(--card-accent) 10%, var(--panel-solid)));
+      box-shadow: 0 14px 38px color-mix(in srgb, var(--ink) 8%, transparent);
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .product-card:hover,
+    .product-card:focus-visible { transform: translateY(-7px); border-color: color-mix(in srgb, var(--card-accent) 48%, var(--line)); box-shadow: 0 24px 58px color-mix(in srgb, var(--ink) 15%, transparent); outline: none; }
+    .product-card.game-one { --card-accent: #24aab8; }
+    .product-card.game-two { --card-accent: #8d77e9; }
+    .product-card.song { --card-accent: #be784b; }
+    .card-number { position: absolute; top: 10px; right: 22px; color: color-mix(in srgb, var(--card-accent) 13%, transparent); font: 950 7rem/1 Georgia, serif; }
+    .card-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .product-code { padding: 7px 10px; border: 1px solid color-mix(in srgb, var(--card-accent) 30%, var(--line)); border-radius: 10px; color: var(--card-accent); background: color-mix(in srgb, var(--card-accent) 8%, var(--panel-solid)); font: 900 .76rem ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; }
+    .status { color: var(--muted); font-size: .76rem; font-weight: 850; }
+    .product-card h3 { position: relative; z-index: 1; max-width: 560px; margin: 44px 0 14px; font-size: clamp(1.65rem, 3.2vw, 2.45rem); line-height: 1.25; letter-spacing: -.04em; }
+    .product-card p { position: relative; z-index: 1; max-width: 610px; margin: 0; color: var(--muted); line-height: 1.75; }
+    .tags { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 7px; margin-top: 22px; }
+    .tag { padding: 6px 9px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: color-mix(in srgb, var(--panel-solid) 70%, transparent); font-size: .72rem; font-weight: 800; }
+    .card-foot { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 30px; color: var(--card-accent); font-weight: 950; }
+    .arrow { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--accent-ink); background: var(--card-accent); font-size: 1.25rem; }
+
+    footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 100px; padding: 30px 0 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
+    footer strong { color: var(--ink); }
+
+    @media (max-width: 980px) {
+      .main-nav { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(3, 1fr); }
+      .section-head { grid-template-columns: 62px 1fr; }
+      .section-note { grid-column: 2; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 24px, 1160px); }
+      .site-header { align-items: flex-start; flex-direction: column; padding: 16px 0 18px; }
+      .header-right { width: 100%; justify-content: space-between; }
+      .preferences { width: 100%; }
+      .theme-field { flex: 1; }
+      .theme-field select { width: 100%; }
+      .hero { min-height: 0; gap: 28px; padding: 38px 24px 42px; border-radius: 28px; }
+      h1 { font-size: clamp(3.2rem, 16vw, 5rem); }
+      .hero-stats { min-width: 0; }
+      .stat { padding: 13px 11px; }
+      .catalog { padding-top: 72px; }
+      .section-head { grid-template-columns: 1fr; gap: 8px; }
+      .section-note { grid-column: auto; margin-top: 8px; }
+      .products, .products.one { grid-template-columns: 1fr; }
+      .product-card { min-height: 300px; padding: 24px; border-radius: 24px; }
+      footer { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (max-width: 430px) {
+      .brand > span:last-child { display: none; }
+      .language-switch button { padding: 0 8px; }
+      .hero-stats { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
   </style>
 </head>
 <body>
   <div class="shell">
-    <header>
-      <a class="brand" href="#top" aria-label="返去椰子主頁頂部"><span class="logo" aria-hidden="true">椰</span><span>椰子</span></a>
-      <nav aria-label="主頁目錄"><a href="#learn">學習</a><a href="#songs">歌曲</a><a href="#play">遊戲</a></nav>
+    <header class="site-header">
+      <a class="brand" href="#top" data-aria-zh="返去椰子主頁頂部" data-aria-en="Back to the top of Coconut Project">
+        <span class="brand-mark" aria-hidden="true">椰</span>
+        <span data-zh="椰子計劃" data-en="Coconut Project">椰子計劃</span>
+      </a>
+      <div class="header-right">
+        <nav class="main-nav" aria-label="主頁目錄" data-aria-zh="主頁目錄" data-aria-en="Main navigation">
+          <a href="#learn" data-zh="學習" data-en="Learn">學習</a>
+          <a href="#games" data-zh="遊戲" data-en="Games">遊戲</a>
+          <a href="#songs" data-zh="歌曲" data-en="Songs">歌曲</a>
+        </nav>
+        <div class="preferences">
+          <label class="theme-field">
+            <span class="sr-only" hidden data-zh="頁面風格" data-en="Page style">頁面風格</span>
+            <select id="themeSelect" aria-label="頁面風格" data-aria-zh="頁面風格" data-aria-en="Page style">
+              <option value="coconut" data-zh="椰林日光" data-en="Coconut Daylight">椰林日光</option>
+              <option value="neon" data-zh="霓虹夜戰" data-en="Neon Night Ops">霓虹夜戰</option>
+              <option value="ink" data-zh="墨韻書房" data-en="Ink Study">墨韻書房</option>
+            </select>
+          </label>
+          <div class="language-switch" role="group" aria-label="語言／Language">
+            <button type="button" data-lang="zh" aria-pressed="true">粵語</button>
+            <button type="button" data-lang="en" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </div>
     </header>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <span class="eyebrow">🌴 13 歲嘅暑假創作計劃</span>
-        <h1 id="hero-title">椰子</h1>
-        <p class="lead">一邊學新知識，一邊玩出新諗法。呢度收藏住今個暑假每一次探索、挑戰同作品。</p>
-        <div class="actions"><a class="button primary" href="#learn">開始學嘢</a><a class="button" href="#songs">聽歌學粵語</a><a class="button" href="#play">睇下遊戲</a></div>
+        <div class="hero-copy">
+          <p class="eyebrow"><span aria-hidden="true">🌴</span><span data-zh="13 歲創作者 · 暑假作品集" data-en="Age 13 creator · Summer collection">13 歲創作者 · 暑假作品集</span></p>
+          <h1 id="hero-title"><span data-zh="學得入腦，" data-en="Learn deeply.">學得入腦，</span><br><span data-zh="玩得盡興。" data-en="Play boldly.">玩得盡興。</span></h1>
+          <p class="hero-lead" data-zh="呢度收錄咗我喺暑假整嘅學習工具、原創遊戲同歌曲練習。每一個入口都係可以親手試、親自玩嘅作品。" data-en="A summer collection of learning tools, original games, and song practice. Every entry is a real project you can open, try, and play.">呢度收錄咗我喺暑假整嘅學習工具、原創遊戲同歌曲練習。每一個入口都係可以親手試、親自玩嘅作品。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#learn" data-zh="開始探索" data-en="Start exploring">開始探索</a>
+            <a class="button" href="#songs" data-zh="聽歌學粵語" data-en="Learn with songs">聽歌學粵語</a>
+            <a class="button" href="#games" data-zh="即刻玩遊戲" data-en="Play the games">即刻玩遊戲</a>
+          </div>
+        </div>
+        <div class="hero-stats" aria-label="項目概要" data-aria-zh="項目概要" data-aria-en="Project overview">
+          <div class="stat"><strong>4</strong><span data-zh="個正式產品" data-en="live products">個正式產品</span></div>
+          <div class="stat"><strong>3</strong><span data-zh="個作品區域" data-en="project areas">個作品區域</span></div>
+          <div class="stat"><strong>2</strong><span data-zh="種介面語言" data-en="interface languages">種介面語言</span></div>
+        </div>
       </section>
 
       <section class="catalog" id="learn" aria-labelledby="learn-title">
         <div class="section-head">
-          <div><p class="kicker">學習區</p><h2 id="learn-title">今日想學啲咩？</h2></div>
-          <p class="note">由一篇文章、一把聲音開始，將難明嘅知識變成可以親自探索嘅旅程。</p>
+          <span class="section-code">A · LEARN</span>
+          <h2 id="learn-title" data-zh="學習區" data-en="Learning">學習區</h2>
+          <p class="section-note" data-zh="用聲音、粵拼同即時回饋，將課文由「睇得明」變成「讀得準」。" data-en="Turn reading into confident speaking with audio, Jyutping, and instant feedback.">用聲音、粵拼同即時回饋，將課文由「睇得明」變成「讀得準」。</p>
         </div>
-        <div class="grid">
-          <a class="card product" href="learn/yang-xiu/" aria-label="入去第一個學習產品：中一粵語《楊修之死》">
-            <span class="number" aria-hidden="true">1</span>
+        <div class="products one">
+          <a class="product-card" href="learn/yang-xiu/" data-aria-zh="進入 A1 中一粵語《楊修之死》" data-aria-en="Open A1 Form 1 Cantonese: The Death of Yang Xiu">
+            <span class="card-number" aria-hidden="true">1</span>
             <div>
-              <div class="tags"><span class="tag">中一語文</span><span class="tag">粵語朗讀</span><span class="tag ready">即刻體驗</span></div>
-              <h3>1 · 中一粵語<br>《楊修之死》</h3>
-              <p>一齊跟讀、正音同精讀，一步步行入楊修同曹操嘅故事。</p>
+              <div class="card-top"><span class="product-code">A1</span><span class="status" data-zh="已收錄" data-en="Available">已收錄</span></div>
+              <h3 data-zh="中一粵語《楊修之死》" data-en="Form 1 Cantonese: The Death of Yang Xiu">中一粵語《楊修之死》</h3>
+              <p data-zh="逐字粵拼、分句示範、錄音評分，逐步讀通《楊修之死》。" data-en="Word-by-word Jyutping, sentence playback, and voice scoring for a guided reading of the classical text.">逐字粵拼、分句示範、錄音評分，逐步讀通《楊修之死》。</p>
+              <div class="tags"><span class="tag" data-zh="中一粵語" data-en="Form 1 Cantonese">中一粵語</span><span class="tag" data-zh="朗讀評分" data-en="Voice scoring">朗讀評分</span><span class="tag" data-zh="逐字粵拼" data-en="Jyutping">逐字粵拼</span></div>
             </div>
-            <div class="card-foot"><span>入去學習產品</span><span class="arrow" aria-hidden="true">→</span></div>
+            <div class="card-foot"><span data-zh="進入學習產品" data-en="Open learning project">進入學習產品</span><span class="arrow" aria-hidden="true">→</span></div>
           </a>
-          <article class="card placeholder" aria-label="更多學習產品就快推出">
-            <div class="icon" aria-hidden="true">＋</div><h3>下一次探索</h3><p>新學習產品準備緊。</p>
-          </article>
+        </div>
+      </section>
+
+      <section class="catalog" id="games" aria-labelledby="games-title">
+        <div class="section-head">
+          <span class="section-code">B · GAMES</span>
+          <h2 id="games-title" data-zh="遊戲區" data-en="Games">遊戲區</h2>
+          <p class="section-note" data-zh="一個練戰術，一個練手速；兩款都係可以即刻落場嘅互動作品。" data-en="One trains strategy, the other trains speed. Both are interactive projects ready to play.">一個練戰術，一個練手速；兩款都係可以即刻落場嘅互動作品。</p>
+        </div>
+        <div class="products">
+          <a class="product-card game-one" href="games/b1-rift-tide-warfront/" data-aria-zh="進入 B1 裂潮戰線" data-aria-en="Open B1 Rift Tide Warfront">
+            <span class="card-number" aria-hidden="true">1</span>
+            <div>
+              <div class="card-top"><span class="product-code">B1</span><span class="status" data-zh="已收錄" data-en="Available">已收錄</span></div>
+              <h3 data-zh="裂潮戰線" data-en="Rift Tide Warfront">裂潮戰線</h3>
+              <p data-zh="Mk48 式即入即玩海戰：揸住一艘艦出海，食補給箱、開雷達、擊沉對手，順手學粵語現場講法。" data-en="A fast Mk48-style naval battle: command one ship, collect supplies, scan with radar, sink rivals, and pick up live Cantonese phrases while playing.">Mk48 式即入即玩海戰：揸住一艘艦出海，食補給箱、開雷達、擊沉對手，順手學粵語現場講法。</p>
+              <div class="tags"><span class="tag" data-zh="俯視海戰" data-en="Top-down naval battle">俯視海戰</span><span class="tag" data-zh="戰場粵語" data-en="Battlefield Cantonese">戰場粵語</span><span class="tag" data-zh="可試玩" data-en="Playable">可試玩</span></div>
+            </div>
+            <div class="card-foot"><span data-zh="進入遊戲產品" data-en="Open game project">進入遊戲產品</span><span class="arrow" aria-hidden="true">→</span></div>
+          </a>
+
+          <a class="product-card game-two" href="games/b2-blind-typing/" data-aria-zh="進入 B2 盲打戰神" data-aria-en="Open B2 Typing Warlord">
+            <span class="card-number" aria-hidden="true">2</span>
+            <div>
+              <div class="card-top"><span class="product-code">B2</span><span class="status" data-zh="已收錄" data-en="Available">已收錄</span></div>
+              <h3 data-zh="盲打戰神" data-en="Typing Warlord">盲打戰神</h3>
+              <p data-zh="用方塊建造同戰術闖關嘅節奏，練速度、準確度同盲打手感。" data-en="Build speed, accuracy, and touch-typing confidence through block-building and tactical challenges.">用方塊建造同戰術闖關嘅節奏，練速度、準確度同盲打手感。</p>
+              <div class="tags"><span class="tag" data-zh="盲打訓練" data-en="Touch typing">盲打訓練</span><span class="tag" data-zh="粵拼題庫" data-en="Jyutping drills">粵拼題庫</span><span class="tag" data-zh="本機紀錄" data-en="Local records">本機紀錄</span></div>
+            </div>
+            <div class="card-foot"><span data-zh="進入遊戲產品" data-en="Open game project">進入遊戲產品</span><span class="arrow" aria-hidden="true">→</span></div>
+          </a>
         </div>
       </section>
 
       <section class="catalog" id="songs" aria-labelledby="songs-title">
         <div class="section-head">
-          <div><p class="kicker">歌曲區</p><h2 id="songs-title">跟住歌詞練粵語</h2></div>
-          <p class="note">由熟悉旋律入手：睇粵拼、聽示範，再用自己把聲逐句挑戰。</p>
+          <span class="section-code">C · SONGS</span>
+          <h2 id="songs-title" data-zh="歌曲區" data-en="Songs">歌曲區</h2>
+          <p class="section-note" data-zh="由歌詞入手練粵語：睇粵拼、聽示範，再用自己把聲逐句挑戰。" data-en="Practise Cantonese through songs with Jyutping, audio examples, and line-by-line voice challenges.">由歌詞入手練粵語：睇粵拼、聽示範，再用自己把聲逐句挑戰。</p>
         </div>
-        <div class="grid">
-          <a class="card product song" href="songs/c1-nan-wang-de-jing/" aria-label="入去第一個歌曲產品：難忘的經">
-            <span class="number" aria-hidden="true">1</span>
+        <div class="products one">
+          <a class="product-card song" href="songs/c1-nan-wang-de-jing/" data-aria-zh="進入 C1《難忘的經》" data-aria-en="Open C1 The Unforgettable Sutra">
+            <span class="card-number" aria-hidden="true">1</span>
             <div>
-              <div class="tags"><span class="tag">歌曲練習</span><span class="tag">粵拼跟讀</span><span class="tag ready">已收錄</span></div>
-              <h3>1 ·《難忘的經》</h3>
-              <p>每頁四句，配粵拼、粵語示範同錄音評分，逐段練熟成首歌。</p>
+              <div class="card-top"><span class="product-code">C1</span><span class="status" data-zh="已收錄" data-en="Available">已收錄</span></div>
+              <h3 data-zh="《難忘的經》" data-en="The Unforgettable Sutra">《難忘的經》</h3>
+              <p data-zh="每頁四句，配粵拼、粵語示範同錄音評分，逐段練熟成首歌。" data-en="Four lines per page with Jyutping, Cantonese playback, and voice scoring for steady song practice.">每頁四句，配粵拼、粵語示範同錄音評分，逐段練熟成首歌。</p>
+              <div class="tags"><span class="tag" data-zh="歌曲練習" data-en="Song practice">歌曲練習</span><span class="tag" data-zh="49 句" data-en="49 lines">49 句</span><span class="tag" data-zh="粵拼跟讀" data-en="Jyutping reading">粵拼跟讀</span></div>
             </div>
-            <div class="card-foot"><span>入去歌曲產品</span><span class="arrow" aria-hidden="true">→</span></div>
-          </a>
-          <article class="card placeholder" aria-label="更多歌曲產品就快推出">
-            <div class="icon" aria-hidden="true">＋</div><h3>下一首歌</h3><p>新歌曲練習準備緊。</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="catalog" id="play" aria-labelledby="play-title">
-        <div class="section-head">
-          <div><p class="kicker">遊戲區</p><h2 id="play-title">玩啲好玩嘅！</h2></div>
-          <p class="note">小遊戲會陸續搬入嚟：可以挑戰、發現，輸咗都可以再出發。</p>
-        </div>
-        <div class="grid">
-          <a class="card product game" href="games/b1-rift-tide-warfront/" aria-label="入去第一個遊戲產品：裂潮戰線">
-            <span class="number" aria-hidden="true">1</span>
-            <div>
-              <div class="tags"><span class="tag">俯視海戰</span><span class="tag">戰場粵語</span><span class="tag ready">即刻試玩</span></div>
-              <h3>1 · 裂潮戰線</h3>
-              <p>Mk48 式即入即玩海戰：揸住一艘艦出海，食補給箱、開雷達、擊沉對手，順手學粵語現場講法。</p>
-            </div>
-            <div class="card-foot"><span>入去遊戲產品</span><span class="arrow" aria-hidden="true">→</span></div>
-          </a>
-          <a class="card product game" href="games/b2-blind-typing/" aria-label="入去第二個遊戲產品：盲打戰神">
-            <span class="number" aria-hidden="true">2</span>
-            <div>
-              <div class="tags"><span class="tag">盲打訓練</span><span class="tag">粵拼讀音</span><span class="tag ready">即刻試玩</span></div>
-              <h3>2 · 盲打戰神</h3>
-              <p>用方塊建造同戰術闖關嘅節奏練盲打；輸入《楊修之死》粵拼，仲可以同步認繁體字、聽粵語讀音。</p>
-            </div>
-            <div class="card-foot"><span>入去遊戲產品</span><span class="arrow" aria-hidden="true">→</span></div>
+            <div class="card-foot"><span data-zh="進入歌曲產品" data-en="Open song project">進入歌曲產品</span><span class="arrow" aria-hidden="true">→</span></div>
           </a>
         </div>
       </section>
     </main>
 
-    <footer><strong>椰子 · 學習同遊戲</strong><span>一個屬於 13 歲創作者嘅暑假項目</span></footer>
+    <footer>
+      <strong data-zh="椰子 · 暑假創作計劃" data-en="Coconut · Summer Creator Project">椰子 · 暑假創作計劃</strong>
+      <span data-zh="A 學習 · B 遊戲 · C 歌曲" data-en="A Learning · B Games · C Songs">A 學習 · B 遊戲 · C 歌曲</span>
+    </footer>
   </div>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const themeSelect = document.querySelector('#themeSelect');
+      const languageButtons = [...document.querySelectorAll('[data-lang]')];
+      const metaDescription = document.querySelector('meta[name="description"]');
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      const titles = {
+        zh: '椰子｜學習、遊戲、歌曲',
+        en: 'Coconut Project | Learning, Games, Songs'
+      };
+      const descriptions = {
+        zh: '椰子係一個由十三歲創作者喺暑假製作嘅學習、遊戲同歌曲練習作品集。',
+        en: 'Coconut Project is a summer collection of learning tools, original games, and song practice made by a 13-year-old creator.'
+      };
+      const themeColours = { coconut: '#f7f5e8', neon: '#070a16', ink: '#efe9da' };
+
+      const readSaved = (key, fallback) => {
+        try { return localStorage.getItem(key) || fallback; }
+        catch { return fallback; }
+      };
+
+      const save = (key, value) => {
+        try { localStorage.setItem(key, value); }
+        catch {}
+      };
+
+      const setTheme = (theme) => {
+        const next = ['coconut', 'neon', 'ink'].includes(theme) ? theme : 'coconut';
+        root.dataset.theme = next;
+        themeSelect.value = next;
+        themeMeta.setAttribute('content', themeColours[next]);
+        save('coconutTheme', next);
+      };
+
+      const setLanguage = (language) => {
+        const next = language === 'en' ? 'en' : 'zh';
+        root.lang = next === 'zh' ? 'zh-HK' : 'en';
+        document.querySelectorAll('[data-zh][data-en]').forEach((element) => {
+          element.textContent = element.dataset[next];
+        });
+        document.querySelectorAll('[data-aria-zh][data-aria-en]').forEach((element) => {
+          element.setAttribute('aria-label', element.dataset[next === 'zh' ? 'ariaZh' : 'ariaEn']);
+        });
+        themeSelect.querySelectorAll('option').forEach((option) => {
+          option.textContent = option.dataset[next];
+        });
+        languageButtons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.lang === next));
+        });
+        document.title = titles[next];
+        metaDescription.setAttribute('content', descriptions[next]);
+        save('coconutLanguage', next);
+      };
+
+      themeSelect.addEventListener('change', (event) => setTheme(event.target.value));
+      languageButtons.forEach((button) => button.addEventListener('click', () => setLanguage(button.dataset.lang)));
+      setTheme(readSaved('coconutTheme', 'coconut'));
+      setLanguage(readSaved('coconutLanguage', 'zh'));
+    })();
+  </script>
 </body>
 </html>

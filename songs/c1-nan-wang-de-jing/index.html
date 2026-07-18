@@ -177,25 +177,42 @@ function render(){
 }
 function applyVisibility(){document.body.classList.toggle('hide-jyutping',!state.showJyutping);}
 function clearMarks(card){card?.querySelectorAll('.lyric-line').forEach(x=>x.classList.remove('active'));card?.querySelectorAll('.word-span').forEach(x=>x.classList.remove('asr-ok','asr-miss'));}
-function chooseVoice(){const vs=speechSynthesis.getVoices();return vs.find(v=>/^zh[-_]HK$/i.test(v.lang))||vs.find(v=>/zh[-_]HK|yue/i.test(v.lang))||null;}
-function speak(item,card){
+function chooseVoice(){const vs=speechSynthesis.getVoices();return vs.find(v=>/^zh[-_]HK$/i.test(v.lang))||vs.find(v=>/zh[-_]HK|yue/i.test(v.lang))||vs.find(v=>/^zh[-_]TW$/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null;}
+function waitForVoices(){
+  if(!('speechSynthesis'in window))return Promise.resolve([]);
+  const ready=speechSynthesis.getVoices();if(ready.length)return Promise.resolve(ready);
+  return new Promise(resolve=>{
+    let done=false;const finish=()=>{if(done)return;done=true;resolve(speechSynthesis.getVoices());};
+    speechSynthesis.addEventListener?.('voiceschanged',finish,{once:true});setTimeout(finish,600);
+  });
+}
+function warmSpeech(){
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(' ');u.volume=0;u.lang='zh-HK';speechSynthesis.speak(u);speechSynthesis.cancel();
+  }catch{}
+}
+async function speak(item,card){
   if(state.speaking?.card===card){stopAll();return;}
   stopAll();clearMarks(card);
   const btn=card.querySelector('.play'),result=card.querySelector('.result');
   if(!('speechSynthesis'in window)){result.textContent='此瀏覽器不支援語音合成。';return;}
+  await waitForVoices();warmSpeech();
   const lines=[...card.querySelectorAll('.lyric-line')],voice=chooseVoice(),startIndex=Number.isInteger(state.selected[item.id])?state.selected[item.id]:0;
   const session={card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat};
   state.speaking=session;btn.classList.add('playing');btn.textContent='■ 停止示範';
   session.cleanup=()=>{lines.forEach(s=>s.classList.remove('active'));btn.classList.remove('playing');btn.textContent='▶ 粵語示範';};
   function finish(){if(state.speaking===session)state.speaking=null;session.cleanup();result.textContent='示範朗讀完成。';}
+  function showCurrent(){lines.forEach((line,i)=>line.classList.toggle('active',i===session.index));result.textContent=`正在朗讀第 ${item.start+session.index+1} 句（第 ${session.repeated+1}/${session.repeat} 次）`+(voice?`・${voice.name}`:'・使用系統中文聲線');}
   function playNext(){
     if(session.cancelled)return;
     if(session.index>=item.lines.length){finish();return;}
+    showCurrent();
     const u=new SpeechSynthesisUtterance(item.lines[session.index]);u.lang='zh-HK';u.rate=state.rate;u.pitch=1;if(voice)u.voice=voice;
-    u.onstart=()=>{if(session.cancelled)return;lines.forEach((line,i)=>line.classList.toggle('active',i===session.index));result.textContent=`正在朗讀第 ${item.start+session.index+1} 句（第 ${session.repeated+1}/${session.repeat} 次）`+(voice?`・${voice.name}`:'');};
+    u.onstart=()=>{if(session.cancelled)return;showCurrent();};
     u.onend=()=>{if(session.cancelled)return;session.repeated++;if(session.repeated>=session.repeat){session.repeated=0;session.index++;}setTimeout(playNext,90);};
     u.onerror=e=>{if(!session.cancelled){session.cancelled=true;session.cleanup();state.speaking=null;result.textContent=`語音播放失敗：${e.error||'未知錯誤'}`;}};
-    speechSynthesis.speak(u);
+    speechSynthesis.speak(u);setTimeout(()=>{if(!session.cancelled&&speechSynthesis.paused)try{speechSynthesis.resume();}catch{}},120);
   }
   playNext();
 }

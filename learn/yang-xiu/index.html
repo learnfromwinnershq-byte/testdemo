@@ -32,12 +32,14 @@
       <button id="toggleJyutping" aria-pressed="true">粵拼：顯示</button>
       <button id="toggleNotes" aria-pressed="true">註釋：顯示</button>
       <label class="repeat-control">每句重複 <select id="repeatCount" aria-label="每個短句重複次數"><option value="1">1次</option><option value="2">2次</option><option value="3">3次</option></select></label>
-      <label class="rate">語速 <input id="rate" type="range" min="0.4" max="1" step="0.05" value="0.7"><b id="rateValue">0.70×</b></label>
+      <label class="rate">語速 <input id="rate" type="range" min="0.5" max="1.4" step="0.05" value="0.7"><b id="rateValue">0.70×</b></label>
     </section>
     <section id="cards" class="cards" aria-live="polite"></section>
     <nav class="pager" aria-label="文章分頁"><button id="prev">上一頁</button><span id="pageLabel"></span><button id="next">下一頁</button></nav>
     <p class="support">建議使用最新版 Chrome 或 Edge；粵語聲線及字詞邊界支援視裝置而定，錄音需授權麥克風。</p>
   </main>
+<!-- ToJyutping 3.1.1（BSD-2-Clause）將 ASR 漢字轉為帶聲調粵拼。 -->
+<script src="https://unpkg.com/to-jyutping@3.1.1"></script>
 <script>
 /* 每個 text 漢字依次對應 jyutping 陣列中的一項；標點不佔粵拼項。 */
 const articleData=[
@@ -48,7 +50,7 @@ const articleData=[
 ];
 
 const savedRepeat=Number(localStorage.getItem('yangxiuRepeatCount')||1);
-const state={page:0,perPage:2,rate:.7,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,showNotes:true,speaking:null,recognition:null,selected:{},best:JSON.parse(localStorage.getItem('yangxiuBestScores')||'{}')};
+const state={page:0,perPage:2,rate:.7,rateTimer:null,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,showNotes:true,speaking:null,recognition:null,selected:{},best:JSON.parse(localStorage.getItem('yangxiuBestScores')||'{}')};
 const $=s=>document.querySelector(s); const cards=$('#cards');
 const isHan=c=>/\p{Script=Han}/u.test(c); const clean=s=>(s||'').normalize('NFKC').replace(/[^\p{Script=Han}]/gu,'');
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -112,7 +114,7 @@ function speak(item,card){
   if(!('speechSynthesis'in window)){result.textContent='此瀏覽器不支援語音合成。';return;}
   const sentences=[...card.querySelectorAll('.sentence-span')],segments=card._segments;
   const voice=chooseVoice(),startIndex=Number.isInteger(state.selected[item.id])?state.selected[item.id]:0;
-  const session={card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat,utterance:null};
+  const session={item,card,btn,cancelled:false,index:startIndex,repeated:0,repeat:state.repeat,utterance:null};
   state.speaking=session;btn.classList.add('playing');btn.textContent='■ 停止示範';
   session.cleanup=()=>{sentences.forEach(s=>s.classList.remove('active'));btn.classList.remove('playing');btn.textContent='▶ 粵語示範';};
   function finish(){if(state.speaking===session)state.speaking=null;session.cleanup();result.textContent='示範朗讀完成。';}
@@ -139,12 +141,85 @@ function stopAll(){
   document.querySelectorAll('.recording').forEach(b=>{b.classList.remove('recording');b.textContent='● 開始朗讀測評';});
 }
 
-/* Levenshtein 編輯距離：先移除標點，再按漢字比較。分數 = 1 - 編輯距離 / 較長字串。 */
-function similarity(a,b){a=[...clean(a)];b=[...clean(b)];if(!a.length&&!b.length)return 100;let prev=b.map((_,j)=>j+1);for(let i=0;i<a.length;i++){const cur=[i+1];for(let j=0;j<b.length;j++)cur[j+1]=a[i]===b[j]?prev[j]:1+Math.min(prev[j],prev[j+1],cur[j]);prev=cur;}return Math.max(0,Math.round((1-prev[b.length]/Math.max(a.length,b.length,1))*100));}
-function markApprox(card,target,heard){const hs=[...clean(heard)],spans=[...card.querySelectorAll('.word-span')];spans.forEach((s,i)=>s.classList.add(hs[i]===target[i]?'asr-ok':'asr-miss'));}
-function assess(item,card){stopAll();clearMarks(card);const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const btn=card.querySelector('.record'),out=card.querySelector('.result');if(!SR){out.textContent='此瀏覽器不支援 Web Speech 語音識別；請改用最新版 Chrome / Edge。';return;}const r=new SR();state.recognition=r;r.lang='zh-HK';r.continuous=true;r.interimResults=true;let finalText='',interim='';r.onstart=()=>{btn.classList.add('recording');btn.textContent='■ 完成並評分';out.textContent='正在聆聽……請朗讀整段，完成後再按一次。';btn.onclick=()=>r.stop();};r.onresult=e=>{interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;e.results[i].isFinal?finalText+=t:interim+=t;}out.textContent=`已識別：${finalText||interim}`;};r.onerror=e=>{out.textContent=e.error==='not-allowed'?'未取得麥克風權限，請在瀏覽器設定中允許。':`識別失敗：${e.error}`;};r.onend=()=>{state.recognition=null;btn.classList.remove('recording');btn.textContent='● 再次朗讀測評';btn.onclick=()=>assess(item,card);const heard=finalText||interim;if(!clean(heard).length){out.textContent='未識別到有效朗讀，請靠近麥克風再試。';return;}const score=similarity(item.text,heard);markApprox(card,[...clean(item.text)],heard);if(score>(state.best[item.id]||0)){state.best[item.id]=score;localStorage.setItem('yangxiuBestScores',JSON.stringify(state.best));card.querySelector('.best b').textContent=score;updateScore();}out.innerHTML=`本次得分：<strong>${score}</strong> / 100　<span>識別：${esc(heard)}</span>`;};r.start();}
+/* 評測比較完整粵拼音節（聲母、韻母、聲調），不再比較 ASR 返回的漢字字形。 */
+function normalizeJyutping(value){return (value||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function targetPronunciation(item){
+  const chars=[...clean(item.text)];
+  if(chars.length!==item.jyutping.length)return null;
+  return chars.map((char,index)=>({char,jyutping:normalizeJyutping(item.jyutping[index])}));
+}
+function heardPronunciation(text){
+  const converter=window.ToJyutping?.getJyutpingList;
+  if(typeof converter!=='function')return null;
+  const pairs=converter(clean(text));
+  if(!Array.isArray(pairs))return null;
+  return pairs.filter(([char])=>isHan(char)).map(([char,jyutping])=>({char,jyutping:normalizeJyutping(jyutping)}));
+}
+function samePronunciation(target,heard){
+  if(target.jyutping&&heard.jyutping)return target.jyutping===heard.jyutping;
+  return target.char===heard.char;
+}
+/* 音節級 Levenshtein 對齊：同音異字成本為 0，錯音、漏讀、加字成本為 1。 */
+function comparePronunciation(target,heard){
+  const rows=target.length+1,cols=heard.length+1;
+  const distance=Array.from({length:rows},()=>Array(cols).fill(0));
+  const trace=Array.from({length:rows},()=>Array(cols).fill(''));
+  for(let i=1;i<rows;i++){distance[i][0]=i;trace[i][0]='delete';}
+  for(let j=1;j<cols;j++){distance[0][j]=j;trace[0][j]='insert';}
+  for(let i=1;i<rows;i++)for(let j=1;j<cols;j++){
+    const equal=samePronunciation(target[i-1],heard[j-1]);
+    const diagonal=distance[i-1][j-1]+(equal?0:1);
+    const deletion=distance[i-1][j]+1,insertion=distance[i][j-1]+1;
+    if(diagonal<=deletion&&diagonal<=insertion){distance[i][j]=diagonal;trace[i][j]=equal?'match':'replace';}
+    else if(deletion<=insertion){distance[i][j]=deletion;trace[i][j]='delete';}
+    else{distance[i][j]=insertion;trace[i][j]='insert';}
+  }
+  const correct=Array(target.length).fill(false);let i=target.length,j=heard.length;
+  while(i>0||j>0){
+    const action=trace[i][j];
+    if(action==='match'||action==='replace'){if(action==='match')correct[i-1]=true;i--;j--;}
+    else if(action==='delete')i--;
+    else if(action==='insert')j--;
+    else break;
+  }
+  const maximum=Math.max(target.length,heard.length,1);
+  return{score:Math.max(0,Math.round((1-distance[target.length][heard.length]/maximum)*100)),correct};
+}
+function markPronunciation(card,correct){
+  card.querySelectorAll('.word-span').forEach((span,index)=>span.classList.add(correct[index]?'asr-ok':'asr-miss'));
+}
+function assess(item,card){
+  stopAll();clearMarks(card);
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const btn=card.querySelector('.record'),out=card.querySelector('.result');
+  if(!SR){out.textContent='此瀏覽器不支援 Web Speech 語音識別；請改用最新版 Chrome / Edge。';return;}
+  if(typeof window.ToJyutping?.getJyutpingList!=='function'){out.textContent='粵音字典未能載入，本次不計分。請連線後重新整理頁面再試。';return;}
+  const r=new SR();state.recognition=r;r.lang='zh-HK';r.continuous=true;r.interimResults=true;r.maxAlternatives=5;
+  let finalText='',interim='';
+  r.onstart=()=>{btn.classList.add('recording');btn.textContent='■ 完成並評分';out.textContent='正在聆聽……請朗讀整段，完成後再按一次。';btn.onclick=()=>r.stop();};
+  r.onresult=e=>{interim='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;e.results[i].isFinal?finalText+=t:interim+=t;}out.textContent=`已識別：${finalText||interim}`;};
+  r.onerror=e=>{out.textContent=e.error==='not-allowed'?'未取得麥克風權限，請在瀏覽器設定中允許。':`識別失敗：${e.error}`;};
+  r.onend=()=>{
+    state.recognition=null;btn.classList.remove('recording');btn.textContent='● 再次朗讀測評';btn.onclick=()=>assess(item,card);
+    const heardText=finalText||interim;if(!clean(heardText).length){out.textContent='未識別到有效朗讀，請靠近麥克風再試。';return;}
+    const target=targetPronunciation(item),heard=heardPronunciation(heardText);
+    if(!target||!heard){out.textContent='粵音轉換失敗，本次不計分。請重新整理頁面再試。';return;}
+    const result=comparePronunciation(target,heard),score=result.score;markPronunciation(card,result.correct);
+    if(score>(state.best[item.id]||0)){state.best[item.id]=score;localStorage.setItem('yangxiuBestScores',JSON.stringify(state.best));card.querySelector('.best b').textContent=score;updateScore();}
+    const unknown=heard.filter(token=>!token.jyutping).length;
+    out.innerHTML=`本次發音得分：<strong>${score}</strong> / 100　<span>識別：${esc(heardText)}</span>${unknown?`　<span>（${unknown} 字未收錄粵音）</span>`:''}`;
+  };
+  r.start();
+}
 function updateScore(){$('#totalScore').textContent=articleData.reduce((n,x)=>n+(state.best[x.id]||0),0);}
-$('#rate').oninput=e=>{state.rate=+e.target.value;$('#rateValue').textContent=state.rate.toFixed(2)+'×';};
+function restartSpeakingWithNewRate(){
+  const session=state.speaking;if(!session?.item)return;
+  const item=session.item,card=session.card;
+  state.selected[item.id]=session.index;
+  stopAll();
+  setTimeout(()=>speak(item,card),80);
+}
+$('#rate').oninput=e=>{state.rate=+e.target.value;$('#rateValue').textContent=state.rate.toFixed(2)+'×';clearTimeout(state.rateTimer);if(state.speaking)state.rateTimer=setTimeout(restartSpeakingWithNewRate,180);};
 $('#repeatCount').value=String(state.repeat);
 $('#repeatCount').onchange=e=>{state.repeat=Number(e.target.value);localStorage.setItem('yangxiuRepeatCount',String(state.repeat));};
 $('#toggleJyutping').onclick=e=>{state.showJyutping=!state.showJyutping;e.currentTarget.setAttribute('aria-pressed',state.showJyutping);e.currentTarget.textContent=`粵拼：${state.showJyutping?'顯示':'隱藏'}`;applyVisibility();};

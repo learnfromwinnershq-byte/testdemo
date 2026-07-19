@@ -141,8 +141,14 @@ function stopAll(){
   document.querySelectorAll('.recording').forEach(b=>{b.classList.remove('recording');b.textContent='● 開始朗讀測評';});
 }
 
-/* 評測比較完整粵拼音節（聲母、韻母、聲調），不再比較 ASR 返回的漢字字形。 */
+/* 評測以粵拼為基礎，拆成聲母、韻母、聲調三個維度，不再比較 ASR 返回的漢字字形。 */
 function normalizeJyutping(value){return (value||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function splitJyutping(value){
+  const normalized=normalizeJyutping(value),tone=(normalized.match(/[1-6]$/)||[''])[0];
+  const body=tone?normalized.slice(0,-1):normalized;
+  const initial=(['gw','kw','ng','b','p','m','f','d','t','n','l','g','k','h','z','c','s','j','w'].find(prefix=>body.startsWith(prefix)))||'';
+  return{initial,final:body.slice(initial.length),tone};
+}
 const fallbackJyutping=(()=>{
   const map=new Map();
   articleData.forEach(item=>{
@@ -168,10 +174,19 @@ function heardPronunciation(text){
   return [...cleaned].map(char=>({char,jyutping:fallbackJyutping.get(char)||''}));
 }
 function samePronunciation(target,heard){
-  if(target.jyutping&&heard.jyutping)return target.jyutping===heard.jyutping;
+  if(target.jyutping&&heard.jyutping){
+    const a=splitJyutping(target.jyutping),b=splitJyutping(heard.jyutping);
+    return a.initial===b.initial&&a.final===b.final&&a.tone===b.tone;
+  }
   return target.char===heard.char;
 }
-/* 音節級 Levenshtein 對齊：同音異字成本為 0，錯音、漏讀、加字成本為 1。 */
+function componentMatches(target,heard){
+  if(!target?.jyutping||!heard?.jyutping)return {initial:false,final:false,tone:false,total:0};
+  const a=splitJyutping(target.jyutping),b=splitJyutping(heard.jyutping);
+  const initial=a.initial===b.initial,final=a.final===b.final,tone=a.tone===b.tone;
+  return{initial,final,tone,total:Number(initial)+Number(final)+Number(tone)};
+}
+/* 音節級 Levenshtein 對齊：同音異字成本為 0，聲母/韻母/聲調錯得越多，成本越高。 */
 function comparePronunciation(target,heard){
   const rows=target.length+1,cols=heard.length+1;
   const distance=Array.from({length:rows},()=>Array(cols).fill(0));
@@ -179,23 +194,29 @@ function comparePronunciation(target,heard){
   for(let i=1;i<rows;i++){distance[i][0]=i;trace[i][0]='delete';}
   for(let j=1;j<cols;j++){distance[0][j]=j;trace[0][j]='insert';}
   for(let i=1;i<rows;i++)for(let j=1;j<cols;j++){
-    const equal=samePronunciation(target[i-1],heard[j-1]);
-    const diagonal=distance[i-1][j-1]+(equal?0:1);
+    const matches=componentMatches(target[i-1],heard[j-1]);
+    const equal=matches.total===3;
+    const diagonal=distance[i-1][j-1]+(1-matches.total/3);
     const deletion=distance[i-1][j]+1,insertion=distance[i][j-1]+1;
     if(diagonal<=deletion&&diagonal<=insertion){distance[i][j]=diagonal;trace[i][j]=equal?'match':'replace';}
     else if(deletion<=insertion){distance[i][j]=deletion;trace[i][j]='delete';}
     else{distance[i][j]=insertion;trace[i][j]='insert';}
   }
-  const correct=Array(target.length).fill(false);let i=target.length,j=heard.length;
+  const correct=Array(target.length).fill(false),stats={initial:0,final:0,tone:0,syllables:target.length};let i=target.length,j=heard.length;
   while(i>0||j>0){
     const action=trace[i][j];
-    if(action==='match'||action==='replace'){if(action==='match')correct[i-1]=true;i--;j--;}
+    if(action==='match'||action==='replace'){
+      const matches=componentMatches(target[i-1],heard[j-1]);
+      stats.initial+=Number(matches.initial);stats.final+=Number(matches.final);stats.tone+=Number(matches.tone);
+      if(action==='match')correct[i-1]=true;i--;j--;
+    }
     else if(action==='delete')i--;
     else if(action==='insert')j--;
     else break;
   }
-  const maximum=Math.max(target.length,heard.length,1);
-  return{score:Math.max(0,Math.round((1-distance[target.length][heard.length]/maximum)*100)),correct};
+  const maximum=Math.max(target.length,heard.length,1),score=Math.max(0,Math.round((1-distance[target.length][heard.length]/maximum)*100));
+  const denom=Math.max(stats.syllables,1);
+  return{score,correct,stats:{initial:Math.round(stats.initial/denom*100),final:Math.round(stats.final/denom*100),tone:Math.round(stats.tone/denom*100)}};
 }
 function markPronunciation(card,correct){
   card.querySelectorAll('.word-span').forEach((span,index)=>span.classList.add(correct[index]?'asr-ok':'asr-miss'));
@@ -218,7 +239,7 @@ function assess(item,card){
     const result=comparePronunciation(target,heard),score=result.score;markPronunciation(card,result.correct);
     if(score>(state.best[item.id]||0)){state.best[item.id]=score;localStorage.setItem('yangxiuBestScores',JSON.stringify(state.best));card.querySelector('.best b').textContent=score;updateScore();}
     const unknown=heard.filter(token=>!token.jyutping).length;
-    out.innerHTML=`本次發音得分：<strong>${score}</strong> / 100　<span>識別：${esc(heardText)}</span>${unknown?`　<span>（${unknown} 字未收錄粵音）</span>`:''}`;
+    out.innerHTML=`本次發音得分：<strong>${score}</strong> / 100　<span>聲母 ${result.stats.initial}%・韻母 ${result.stats.final}%・聲調 ${result.stats.tone}%</span>　<span>識別：${esc(heardText)}</span>${unknown?`　<span>（${unknown} 字未收錄粵音）</span>`:''}`;
   };
   r.start();
 }

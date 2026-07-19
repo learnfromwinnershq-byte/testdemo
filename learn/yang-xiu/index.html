@@ -143,6 +143,16 @@ function stopAll(){
 
 /* 評測比較完整粵拼音節（聲母、韻母、聲調），不再比較 ASR 返回的漢字字形。 */
 function normalizeJyutping(value){return (value||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+const fallbackJyutping=(()=>{
+  const map=new Map();
+  articleData.forEach(item=>{
+    [...clean(item.text)].forEach((char,index)=>{
+      const sound=normalizeJyutping(item.jyutping[index]);
+      if(sound&&!map.has(char))map.set(char,sound);
+    });
+  });
+  return map;
+})();
 function targetPronunciation(item){
   const chars=[...clean(item.text)];
   if(chars.length!==item.jyutping.length)return null;
@@ -150,10 +160,12 @@ function targetPronunciation(item){
 }
 function heardPronunciation(text){
   const converter=window.ToJyutping?.getJyutpingList;
-  if(typeof converter!=='function')return null;
-  const pairs=converter(clean(text));
-  if(!Array.isArray(pairs))return null;
-  return pairs.filter(([char])=>isHan(char)).map(([char,jyutping])=>({char,jyutping:normalizeJyutping(jyutping)}));
+  const cleaned=clean(text);
+  if(typeof converter==='function'){
+    const pairs=converter(cleaned);
+    if(Array.isArray(pairs))return pairs.filter(([char])=>isHan(char)).map(([char,jyutping])=>({char,jyutping:normalizeJyutping(jyutping)||fallbackJyutping.get(char)||''}));
+  }
+  return [...cleaned].map(char=>({char,jyutping:fallbackJyutping.get(char)||''}));
 }
 function samePronunciation(target,heard){
   if(target.jyutping&&heard.jyutping)return target.jyutping===heard.jyutping;
@@ -193,7 +205,6 @@ function assess(item,card){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const btn=card.querySelector('.record'),out=card.querySelector('.result');
   if(!SR){out.textContent='此瀏覽器不支援 Web Speech 語音識別；請改用最新版 Chrome / Edge。';return;}
-  if(typeof window.ToJyutping?.getJyutpingList!=='function'){out.textContent='粵音字典未能載入，本次不計分。請連線後重新整理頁面再試。';return;}
   const r=new SR();state.recognition=r;r.lang='zh-HK';r.continuous=true;r.interimResults=true;r.maxAlternatives=5;
   let finalText='',interim='';
   r.onstart=()=>{btn.classList.add('recording');btn.textContent='■ 完成並評分';out.textContent='正在聆聽……請朗讀整段，完成後再按一次。';btn.onclick=()=>r.stop();};

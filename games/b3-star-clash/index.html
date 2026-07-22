@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星球争霸</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-user-select:none; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#05060f; font-family:"PingFang SC","Microsoft YaHei",sans-serif; color:#dfe6ff; }
+  #game { display:block; width:100%; height:100%; }
+
+  /* ---------- HUD ---------- */
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; }
+  .panel { background:rgba(10,14,32,.78); border:1px solid rgba(120,150,255,.25); border-radius:10px; backdrop-filter:blur(6px); }
+
+  #topbar { position:absolute; top:12px; left:50%; transform:translateX(-50%); display:flex; gap:18px; align-items:center; padding:10px 22px; pointer-events:auto; white-space:nowrap; }
+  #topbar .stat { display:flex; align-items:center; gap:6px; font-size:14px; }
+  #topbar .stat b { color:#ffd76a; font-size:16px; }
+  #topbar .stat.income b { color:#7dffb0; }
+
+  #hpwrap { width:180px; }
+  #hpbar { height:10px; border-radius:5px; background:rgba(255,255,255,.1); overflow:hidden; }
+  #hpfill { height:100%; width:100%; background:linear-gradient(90deg,#ff5b6a,#ffb45b); transition:width .2s; }
+  #hptext { font-size:11px; color:#aab4dd; margin-top:2px; text-align:right; }
+
+  /* ---------- Build bar ---------- */
+  #buildbar { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; gap:10px; padding:12px 16px; pointer-events:auto; max-width:96vw; }
+  .shipbtn { position:relative; width:118px; padding:9px 10px 7px; border-radius:10px; border:1px solid rgba(120,150,255,.3); background:rgba(18,24,52,.9); cursor:pointer; transition:.15s; text-align:left; }
+  .shipbtn:hover { border-color:#7da2ff; background:rgba(30,40,80,.95); transform:translateY(-2px); }
+  .shipbtn.disabled { opacity:.45; cursor:not-allowed; transform:none; }
+  .shipbtn .name { font-size:14px; font-weight:600; }
+  .shipbtn .desc { font-size:11px; color:#93a0cf; margin:3px 0 5px; line-height:1.35; }
+  .shipbtn .cost { font-size:12px; color:#ffd76a; }
+  .shipbtn .cnt { position:absolute; top:8px; right:10px; font-size:12px; color:#7dffb0; }
+  .shipbtn .key { position:absolute; bottom:6px; right:10px; font-size:10px; color:#5b6694; }
+
+  #capacity { position:absolute; bottom:14px; right:16px; padding:10px 14px; font-size:13px; color:#aab4dd; pointer-events:auto; }
+  #capacity b { color:#7da2ff; }
+
+  #targetinfo { position:absolute; top:12px; right:16px; padding:10px 16px; font-size:13px; min-width:170px; pointer-events:auto; }
+  #targetinfo .t { color:#93a0cf; font-size:11px; margin-bottom:4px; }
+  #targetinfo .n { font-size:15px; font-weight:600; }
+  #targetbar { height:6px; border-radius:3px; background:rgba(255,255,255,.1); margin-top:6px; overflow:hidden; }
+  #targetfill { height:100%; width:100%; background:#ff5b6a; }
+
+  #superbar { position:absolute; bottom:14px; left:16px; display:flex; gap:10px; align-items:center; padding:10px 12px; pointer-events:auto; }
+  .superbtn { position:relative; width:104px; padding:8px 10px 6px; border-radius:10px; border:1px solid rgba(255,120,90,.4); background:rgba(52,20,24,.9); cursor:pointer; transition:.15s; text-align:left; }
+  .superbtn:hover { border-color:#ff8a6a; transform:translateY(-2px); }
+  .superbtn.disabled { opacity:.45; cursor:not-allowed; transform:none; }
+  .superbtn.armed { border-color:#ffd76a; box-shadow:0 0 14px rgba(255,215,106,.6); animation:pulse .6s infinite alternate; }
+  @keyframes pulse { from { background:rgba(52,20,24,.9);} to { background:rgba(90,50,20,.95);} }
+  .superbtn .name { font-size:13px; font-weight:600; }
+  .superbtn .desc { font-size:10px; color:#d8a0a0; margin:2px 0 3px; }
+  .superbtn .cost { font-size:12px; color:#ffd76a; }
+  .superbtn .key { position:absolute; bottom:5px; right:8px; font-size:10px; color:#8a6a6a; }
+  #suptip { font-size:10px; color:#93a0cf; line-height:1.5; padding:0 4px; }
+
+  #hint { position:absolute; bottom:110px; left:50%; transform:translateX(-50%); font-size:13px; color:#7dffb0; text-shadow:0 0 8px rgba(0,0,0,.8); opacity:0; transition:opacity .3s; }
+
+  /* ---------- Overlays ---------- */
+  .overlay { position:fixed; inset:0; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; background:radial-gradient(ellipse at center, rgba(10,14,34,.88), rgba(3,4,10,.97)); }
+  .overlay h1 { font-size:56px; letter-spacing:12px; background:linear-gradient(180deg,#fff,#7da2ff 60%,#3a55c8); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 40px rgba(100,140,255,.25); margin-bottom:10px; }
+  .overlay h2 { font-size:20px; color:#93a0cf; font-weight:400; margin-bottom:34px; letter-spacing:4px; }
+  .rules { width:520px; max-width:88vw; padding:22px 28px; margin-bottom:34px; font-size:14px; line-height:2; color:#c4cdee; }
+  .rules .em { color:#ffd76a; }
+  .bigbtn { pointer-events:auto; padding:14px 64px; font-size:20px; letter-spacing:6px; color:#05060f; font-weight:700; border:none; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#9db8ff,#5a7df0); box-shadow:0 0 30px rgba(110,145,255,.5); transition:.15s; }
+  .bigbtn:hover { transform:scale(1.05); box-shadow:0 0 46px rgba(110,145,255,.8); }
+  #win h1 { background:linear-gradient(180deg,#fff,#ffd76a 60%,#c8863a); -webkit-background-clip:text; background-clip:text; }
+  #lose h1 { background:linear-gradient(180deg,#fff,#ff5b6a 60%,#8a1f2e); -webkit-background-clip:text; background-clip:text; }
+  .hidden { display:none !important; }
+  #endstats { font-size:15px; color:#aab4dd; margin-bottom:30px; line-height:2; text-align:center; }
+  #endstats b { color:#ffd76a; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="topbar" class="panel">
+    <div class="stat">✦ 星尘 <b id="stardust">0</b></div>
+    <div class="stat income">⚡ <b id="income">0</b>/秒</div>
+    <div class="stat">🪐 星球规模 <b id="scale">1.0</b></div>
+    <div id="hpwrap">
+      <div id="hpbar"><div id="hpfill"></div></div>
+      <div id="hptext">100 / 100</div>
+    </div>
+    <div class="stat">👾 剩余敌星 <b id="foes">0</b></div>
+  </div>
+
+  <div id="targetinfo" class="panel">
+    <div class="t">当前攻击目标（点击敌星切换）</div>
+    <div class="n" id="tname">未选定</div>
+    <div id="targetbar"><div id="targetfill"></div></div>
+  </div>
+
+  <div id="buildbar" class="panel">
+    <div class="shipbtn" id="btn0">
+      <div class="name">探测舰</div>
+      <div class="desc">极速侦察，瘫痪敌星炮塔，顺便拾荒</div>
+      <div class="cost">✦ 25</div><div class="cnt" id="cnt0">×0</div><div class="key">键1 · 机位1</div>
+    </div>
+    <div class="shipbtn" id="btn1">
+      <div class="name">蜂群战斗机</div>
+      <div class="desc">便宜快速的炮灰，成群结队撕咬敌人</div>
+      <div class="cost">✦ 25</div><div class="cnt" id="cnt1">×0</div><div class="key">键2 · 机位1</div>
+    </div>
+    <div class="shipbtn" id="btn2">
+      <div class="name">巡洋舰</div>
+      <div class="desc">均衡的主力舰，火力与装甲兼备</div>
+      <div class="cost">✦ 70</div><div class="cnt" id="cnt2">×0</div><div class="key">键3 · 机位3</div>
+    </div>
+    <div class="shipbtn" id="btn3">
+      <div class="name">核裂变战舰</div>
+      <div class="desc">裂变重锤，中程压制，越级挑战的底气</div>
+      <div class="cost">✦ 75</div><div class="cnt" id="cnt3">×0</div><div class="key">键4 · 机位4</div>
+    </div>
+    <div class="shipbtn" id="btn4">
+      <div class="name">核聚变战舰</div>
+      <div class="desc">聚变之心，攻守兼备的舰队核心</div>
+      <div class="cost">✦ 125</div><div class="cnt" id="cnt4">×0</div><div class="key">键5 · 机位5</div>
+    </div>
+    <div class="shipbtn" id="btn5">
+      <div class="name">反物质战舰</div>
+      <div class="desc">湮灭炮远程狙杀，敌方舰队的噩梦</div>
+      <div class="cost">✦ 200</div><div class="cnt" id="cnt5">×0</div><div class="key">键6 · 机位7</div>
+    </div>
+    <div class="shipbtn" id="btn6">
+      <div class="name">毁灭者母舰</div>
+      <div class="desc">缓慢而致命的终极兵器，一炮入魂</div>
+      <div class="cost">✦ 180</div><div class="cnt" id="cnt6">×0</div><div class="key">键7 · 机位8</div>
+    </div>
+  </div>
+
+  <div id="capacity" class="panel">机库容量 <b id="capused">0</b> / <span id="capmax">0</span></div>
+
+  <div id="superbar" class="panel">
+    <div class="superbtn" id="btnNuke">
+      <div class="name">☢ 核弹</div>
+      <div class="desc">小范围高爆</div>
+      <div class="cost">✦ 500</div>
+      <div class="key">键 8</div>
+    </div>
+    <div class="superbtn" id="btnCounter">
+      <div class="name">☠ 反制炸弹</div>
+      <div class="desc">大范围湮灭</div>
+      <div class="cost">✦ 1000</div>
+      <div class="key">键 9</div>
+    </div>
+    <div id="suptip">发射后点击落点<br>3~6 秒后爆炸</div>
+    <div class="superbtn" id="btnSpeed" style="border-color:rgba(125,255,176,.4); background:rgba(16,44,30,.9);">
+      <div class="name">⚙ 生产提速</div>
+      <div class="desc">生产间隔 -5%</div>
+      <div class="cost">✦ 125</div>
+      <div class="key">键 0 · <span id="speedlv">Lv.0</span></div>
+    </div>
+  </div>
+  <div id="hint"></div>
+</div>
+
+<div id="start" class="overlay">
+  <h1>星球争霸</h1>
+  <h2>PLANET CONQUEST</h2>
+  <div class="rules panel">
+    你是一颗<span class="em">普通的小星球</span>，漂浮在危机四伏的星域中。<br>
+    ・ 星球会持续产出 <span class="em">✦ 星尘</span>，用来建造飞船舰队<br>
+    ・ <span class="em">点击敌方星球</span>选定目标，舰队将倾巢而出；<span class="em">再点一次</span>取消攻击，进入和平模式<br>
+    ・ 击毁敌星后<span class="em">吞噬其质量</span>：体型、血量、产能、机库全面提升<br>
+    ・ <span class="em">敌军之间也会互相开战</span>——坐山观虎斗，或趁虚而入<br>
+    ・ 敌人也会派舰队反扑，小心你的星球血量<br>
+    ・ 共 7 种飞船可建造（快捷键 1~7），合理搭配舰队<br>
+    ・ 救场神器：<span class="em">核弹（8，500✦）</span>与<span class="em">反制炸弹（9，1000✦）</span>，从母星发射、点击落点、延时引爆——注意弹片不分敌我，敌军也会发射<br>
+    ・ <span class="em">生产提速（0，125✦）</span>：每级使生产间隔 -5%，可无限叠加，种田流核心科技<br>
+    ・ <span class="em">消灭星域内全部敌星</span>，即可称霸这片宇宙！
+  </div>
+  <button class="bigbtn" id="startbtn">开 战</button>
+</div>
+
+<div id="win" class="overlay hidden">
+  <h1>制霸星域</h1>
+  <h2>所有敌星已被歼灭，你就是宇宙唯一的王</h2>
+  <div id="endstats" class="panel" style="padding:18px 40px;"></div>
+  <button class="bigbtn" onclick="location.reload()">再 来 一 局</button>
+</div>
+
+<div id="lose" class="overlay hidden">
+  <h1>星球陨落</h1>
+  <h2>你的星球在炮火中化为尘埃……</h2>
+  <div id="endstats2" class="panel" style="padding:18px 40px;"></div>
+  <button class="bigbtn" onclick="location.reload()">重 新 挑 战</button>
+</div>
+
+<script>
+(() => {
+"use strict";
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+addEventListener('resize', resize); resize();
+
+// ================= 音效（极简合成器） =================
+let AC = null;
+function beep(freq, dur, type, vol){
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type||'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol||0.08, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + dur);
+    o.connect(g); g.connect(AC.destination);
+    o.start(); o.stop(AC.currentTime + dur);
+  }catch(e){}
+}
+const sfx = {
+  shoot : () => beep(880 + Math.random()*200, .06, 'square', .02),
+  boom  : () => { beep(120, .4, 'sawtooth', .12); beep(60, .6, 'triangle', .1); },
+  build : () => beep(520, .12, 'triangle', .07),
+  error : () => beep(160, .2, 'square', .06),
+  hit   : () => beep(240, .08, 'sawtooth', .04),
+  win   : () => { [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.35,'triangle',.1), i*160)); },
+  lose  : () => { [400,300,200,120].forEach((f,i)=>setTimeout(()=>beep(f,.4,'sawtooth',.09), i*200)); }
+};
+
+// ================= 星空背景 =================
+const stars = [];
+for(let i=0;i<260;i++) stars.push({ x:Math.random(), y:Math.random(), r:Math.random()*1.6+0.3, tw:Math.random()*Math.PI*2, sp:Math.random()*0.4+0.1 });
+
+// ================= 飞船类型 =================
+const SHIPS = [
+  { name:'探测舰',     cost:25,  cap:1, hp:14,  dmg:1,    speed:5.2, fireGap:1.6,  size:3,  color:'#5be3e3', orbit:10, scout:true },
+  { name:'蜂群战斗机', cost:25,  cap:1, hp:26,  dmg:3.2,  speed:3.4, fireGap:0.55, size:4,  color:'#7dffb0', orbit:16 },
+  { name:'巡洋舰',     cost:70,  cap:3, hp:95,  dmg:9.5,  speed:2.5, fireGap:0.75, size:7,  color:'#7da2ff', orbit:24 },
+  { name:'核裂变战舰', cost:75,  cap:4, hp:150, dmg:14,   speed:2.2, fireGap:0.8,  size:9,  color:'#ffe14d', orbit:26 },
+  { name:'核聚变战舰', cost:125, cap:5, hp:230, dmg:21,   speed:2.0, fireGap:0.8,  size:11, color:'#c78bff', orbit:28 },
+  { name:'反物质战舰', cost:200, cap:7, hp:260, dmg:38,   speed:1.7, fireGap:1.2,  size:12, color:'#ff5be3', orbit:34, antiShip:3 },
+  { name:'毁灭者母舰', cost:180, cap:8, hp:320, dmg:30,   speed:1.5, fireGap:1.15, size:12, color:'#ff9d5b', orbit:30 }
+];
+
+// ================= 救场神器 =================
+const MISSILES = {
+  nuke:    { name:'核弹',     cost:500,  radius:80,  dmgShip:150, dmgPlanet:120, color:'#ffd76a' },
+  counter: { name:'反制炸弹', cost:1000, radius:140, dmgShip:400, dmgPlanet:300, color:'#ff5be3' }
+};
+let missiles = [];   // { x,y, tx,ty, t, fuse, def, friendly }
+let armedType = null; // 玩家已上膛、等待点击落点的导弹类型
+
+function launchMissile(type, fromX, fromY, tx, ty, friendly){
+  const def = MISSILES[type];
+  missiles.push({
+    x: fromX, y: fromY, tx, ty,
+    t: 0, fuse: 3 + Math.random()*3, // 3~6 秒后爆炸
+    def, type, friendly
+  });
+  beep(200, .3, 'sawtooth', .06);
+}
+
+function armMissile(type){
+  const def = MISSILES[type];
+  if(armedType === type){ armedType = null; showHint('已取消发射'); return; }
+  if(player.stardust < def.cost){ showHint('星尘不足，无法发射' + def.name + '！'); sfx.error(); return; }
+  armedType = type;
+  sfx.build();
+  showHint(def.name + '已上膛！点击战场任意位置选定落点（再按一次取消）');
+}
+
+function explodeMissile(m){
+  const def = m.def;
+  sfx.boom();
+  explode(m.tx, m.ty, def.color, 70, 6);
+  explode(m.tx, m.ty, '#ffffff', 30, 4);
+  // 冲击波视觉
+  parts.push({ x:m.tx, y:m.ty, vx:0, vy:0, life:1, decay:0.03, color:def.color, r:def.radius, ring:true });
+  const R = def.radius;
+  if(m.friendly){
+    for(const s of eships) if(!s.friendly && Math.hypot(s.x-m.tx, s.y-m.ty) < R) s.hp -= def.dmgShip;
+    for(const s of ships) if(Math.hypot(s.x-m.tx, s.y-m.ty) < R) s.hp -= def.dmgShip; // 不分敌我！
+    for(const e of enemies){
+      if(e.alive && Math.hypot(e.x-m.tx, e.y-m.ty) < R + e.r){
+        e.hp -= def.dmgPlanet;
+        if(e.hp <= 0) destroyEnemy(e);
+      }
+    }
+    if(Math.hypot(player.x-m.tx, player.y-m.ty) < R + player.r){
+      player.hp -= def.dmgPlanet;
+      if(player.hp <= 0){ player.hp = 0; explode(player.x, player.y, '#ffb45b', 90, 6); endGame(false); }
+    }
+    floater(m.tx, m.ty, def.name + '引爆！', def.color);
+  } else {
+    for(const s of ships) if(Math.hypot(s.x-m.tx, s.y-m.ty) < R) s.hp -= def.dmgShip;
+    for(const s of eships) if(!s.friendly && Math.hypot(s.x-m.tx, s.y-m.ty) < R) s.hp -= def.dmgShip;
+    if(Math.hypot(player.x-m.tx, player.y-m.ty) < R + player.r){
+      player.hp -= def.dmgPlanet;
+      sfx.hit();
+      if(player.hp <= 0){ player.hp = 0; explode(player.x, player.y, '#ffb45b', 90, 6); endGame(false); }
+    }
+    for(const e of enemies){
+      if(e.alive && Math.hypot(e.x-m.tx, e.y-m.ty) < R + e.r){
+        e.hp -= def.dmgPlanet;
+        if(e.hp <= 0) destroyEnemy(e, false);
+      }
+    }
+    floater(m.tx, m.ty, '敌方' + def.name + '引爆！', '#ff5b6a');
+  }
+}
+
+// ================= 游戏状态 =================
+const ENEMY_DEFS = [
+  { name:'锈蚀行星',   x:0.78, y:0.22, r:22, hp:220,  color:'#b08968', turretDmg:6,  turretGap:1.0, waveGap:15, waveSize:3 },
+  { name:'幽蓝海星',   x:0.86, y:0.62, r:26, hp:320,  color:'#4aa8dd', turretDmg:7,  turretGap:0.9, waveGap:13, waveSize:3 },
+  { name:'猩红要塞',   x:0.62, y:0.82, r:30, hp:480,  color:'#d64550', turretDmg:9,  turretGap:0.85, waveGap:11, waveSize:4 },
+  { name:'翡翠巨子',   x:0.45, y:0.12, r:26, hp:400,  color:'#4ecf7e', turretDmg:8,  turretGap:0.9, waveGap:12, waveSize:4 },
+  { name:'暗影母星',   x:0.28, y:0.78, r:34, hp:680,  color:'#8e6fd8', turretDmg:12, turretGap:0.75, waveGap:9,  waveSize:4 },
+  { name:'泰坦王座',   x:0.12, y:0.25, r:44, hp:1150, color:'#e8b23a', turretDmg:16, turretGap:0.65, waveGap:8,  waveSize:5 }
+];
+
+let player, enemies, ships, eships, shots, parts, floaters;
+let running = false, gameTime = 0, lastTs = 0, kills = 0, built = 0, mouseX = 0, mouseY = 0;
+
+function initGame(){
+  player = {
+    x: W*0.5, y: H*0.52, r: 20,
+    hp: 100, maxHp: 100,
+    stardust: 60,
+    target: null,
+    defCd: 0,
+    speedLv: 0,      // 生产提速等级
+    prodTimer: 0     // 生产计时器
+  };
+  enemies = ENEMY_DEFS.map(d => ({
+    ...d, x: d.x*W, y: d.y*H,
+    maxHp: d.hp, alive: true,
+    turretCd: Math.random()*1.5,
+    waveCd: d.waveGap*(0.5+Math.random()*0.5),
+    rot: Math.random()*Math.PI*2,
+    missileCd: 40 + Math.random()*30
+  }));
+  ships = []; eships = []; shots = []; parts = []; floaters = [];
+  missiles = []; armedType = null;
+  gameTime = 0; kills = 0; built = 0;
+  autoTarget();
+}
+
+function autoTarget(){
+  const alive = enemies.filter(e => e.alive);
+  if(!alive.length){ player.target = null; return; }
+  if(player.manualPeace) return; // 玩家主动取消目标后，保持和平模式，不再自动选目标
+  if(player.target && player.target.alive) return;
+  // 默认选最近的
+  alive.sort((a,b) => dist(a,player) - dist(b,player));
+  player.target = alive[0];
+}
+
+function dist(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+
+// ================= 经济 & 建造 =================
+const SPEED_COST = 125;
+const BASE_PROD_GAP = 1.0; // 基础生产间隔（秒）
+function prodGap(){ return Math.max(0.35, BASE_PROD_GAP * Math.pow(0.95, player.speedLv)); }
+function incomePerSec(){ return (2 + (player.r - 20) * 0.35) / prodGap(); }
+function buySpeed(){
+  if(player.stardust < SPEED_COST){ showHint('星尘不足！'); sfx.error(); return; }
+  player.stardust -= SPEED_COST;
+  player.speedLv++;
+  sfx.build();
+  showHint(`生产提速 Lv.${player.speedLv}：生产间隔 -5%（当前 ${prodGap().toFixed(2)} 秒/轮）`);
+}
+function capMax(){ return 8 + Math.floor((player.r - 20) * 0.8); }
+function capUsed(){ return ships.reduce((s,sh) => s + sh.def.cap, 0); }
+
+// ================= 敌军混战 =================
+let warTimer = 15;
+function pickWarTarget(e, alive){
+  let best = null, bestScore = -1;
+  for(const o of alive){
+    if(o === e) continue;
+    let sc = Math.random();
+    if(o.hp < e.hp) sc += 1.2;   // 趁虚而入
+    if(e.hp < o.maxHp * 0.6) sc -= 0.5; // 残血避战
+    if(sc > bestScore){ bestScore = sc; best = o; }
+  }
+  return bestScore > 0.55 ? best : null;
+}
+function enemyWar(dt){
+  warTimer -= dt;
+  if(warTimer > 0) return;
+  warTimer = 8 + Math.random()*7;
+  const alive = enemies.filter(e => e.alive);
+  if(alive.length < 2) return;
+  const e = alive[Math.floor(Math.random()*alive.length)];
+  const tgt = pickWarTarget(e, alive);
+  if(!tgt) return;
+  floater(e.x, e.y - e.r - 22, '⚔ 对 ' + tgt.name + ' 宣战', '#ff5b6a');
+  showHint('【' + e.name + '】向【' + tgt.name + '】发起了进攻！');
+  for(let k = 0; k < e.waveSize; k++){
+    eships.push({
+      x: e.x + (Math.random()-0.5)*24, y: e.y + (Math.random()-0.5)*24,
+      hp: 20 + e.r*0.5, dmg: 5 + e.r*0.12,
+      speed: 2.2 + Math.random()*0.6, fireCd: Math.random(),
+      orbitA: Math.random()*Math.PI*2,
+      home: e, targetPlanet: tgt
+    });
+  }
+}
+
+function buildShip(i){
+  const def = SHIPS[i];
+  if(player.stardust < def.cost){ showHint('星尘不足！'); sfx.error(); return; }
+  if(capUsed() + def.cap > capMax()){ showHint('机库容量不足，击毁敌星吞噬质量可扩容'); sfx.error(); return; }
+  player.stardust -= def.cost;
+  built++;
+  const a = Math.random()*Math.PI*2;
+  ships.push({
+    def, x: player.x + Math.cos(a)*(player.r+10), y: player.y + Math.sin(a)*(player.r+10),
+    hp: def.hp, state:'launch', orbitA: a, fireCd: 0, vx:0, vy:0
+  });
+  sfx.build();
+  showHint(def.name + ' 已出厂！');
+}
+
+let hintTimer = null;
+function showHint(t){
+  const el = document.getElementById('hint');
+  el.textContent = t; el.style.opacity = 1;
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(()=> el.style.opacity = 0, 1800);
+}
+
+// ================= 战斗逻辑 =================
+function spawnShot(x, y, tx, ty, dmg, color, speed, friendly){
+  const a = Math.atan2(ty-y, tx-x);
+  shots.push({ x, y, vx:Math.cos(a)*speed, vy:Math.sin(a)*speed, dmg, color, friendly, life: 2.2 });
+}
+
+function explode(x, y, color, n, power){
+  for(let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2, sp = (Math.random()*0.7+0.3)*(power||3);
+    parts.push({ x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:1, decay:Math.random()*0.02+0.012, color, r:Math.random()*3+1 });
+  }
+}
+
+function floater(x, y, text, color){
+  floaters.push({ x, y, text, color, life: 1.6 });
+}
+
+function destroyEnemy(e, devoured){
+  e.alive = false;
+  kills++;
+  sfx.boom();
+  explode(e.x, e.y, e.color, 60, 5);
+  explode(e.x, e.y, '#ffffff', 25, 3);
+  if(devoured === false){
+    // 被其他敌星击毁：玩家无法吞噬，只回收少量残骸
+    player.stardust += 30;
+    floater(e.x, e.y, '敌星同归于尽 +30✦ 残骸', '#aab4dd');
+    showHint(`【${e.name}】在敌军内战中被摧毁了！`);
+  } else {
+    // 吞噬质量
+    const growR = e.r * 0.16;
+    const growHp = Math.round(e.maxHp * 0.3);
+    const reward = Math.round(e.maxHp * 0.45);
+    player.r = Math.min(64, player.r + growR);
+    player.maxHp += growHp;
+    player.hp = Math.min(player.maxHp, player.hp + growHp);
+    player.stardust += reward;
+    floater(player.x, player.y - player.r - 14, `吞噬 +${growHp} 血量上限`, '#7dffb0');
+    floater(e.x, e.y, `+${reward} ✦`, '#ffd76a');
+    showHint(`击毁【${e.name}】！星球规模扩大，机库扩容！`);
+  }
+  autoTarget();
+  if(!enemies.some(x => x.alive)) endGame(true);
+}
+
+function endGame(winFlag){
+  running = false;
+  const mins = Math.floor(gameTime/60), secs = Math.floor(gameTime%60);
+  const stats = `用时 <b>${mins}分${secs}秒</b> ・ 击毁敌星 <b>${kills}</b> 颗<br>建造飞船 <b>${built}</b> 艘 ・ 最终星球规模 <b>${(player.r/20).toFixed(1)}</b>`;
+  document.getElementById(winFlag ? 'endstats' : 'endstats2').innerHTML = stats;
+  document.getElementById(winFlag ? 'win' : 'lose').classList.remove('hidden');
+  document.getElementById('hud').classList.add('hidden');
+  winFlag ? sfx.win() : sfx.lose();
+}
+
+// ================= 更新 =================
+function update(dt){
+  gameTime += dt;
+  player.prodTimer += dt;
+  const gap = prodGap();
+  while(player.prodTimer >= gap){
+    player.prodTimer -= gap;
+    player.stardust += 2 + (player.r - 20) * 0.35;
+  }
+  player.defCd -= dt;
+  enemyWar(dt);
+
+  // ---- 我方飞船 ----
+  for(let i = ships.length-1; i >= 0; i--){
+    const s = ships[i];
+    if(s.hp <= 0){
+      explode(s.x, s.y, s.def.color, 16, 2.5);
+      ships.splice(i,1); continue;
+    }
+    // 反物质战舰：优先狙杀附近的敌方飞船
+    let shipTarget = null;
+    if(s.def.antiShip){
+      shipTarget = eships.find(es => dist(es, s) < 150);
+    }
+    const tgt = player.target;
+    if(!tgt || !tgt.alive){
+      if(shipTarget){
+        const d0 = dist(s, shipTarget);
+        if(d0 > 60){
+          const a0 = Math.atan2(shipTarget.y - s.y, shipTarget.x - s.x);
+          s.x += Math.cos(a0) * s.def.speed;
+          s.y += Math.sin(a0) * s.def.speed;
+        }
+        s.fireCd -= dt;
+        if(s.fireCd <= 0){
+          s.fireCd = s.def.fireGap;
+          spawnShot(s.x, s.y, shipTarget.x, shipTarget.y, s.def.dmg * s.def.antiShip, s.def.color, 9, true);
+        }
+        continue;
+      }
+      // 无目标：绕母星盘旋
+      s.orbitA += dt * 1.2;
+      const ox = player.x + Math.cos(s.orbitA)*(player.r + 26);
+      const oy = player.y + Math.sin(s.orbitA)*(player.r + 26);
+      s.x += (ox - s.x) * Math.min(1, dt*4);
+      s.y += (oy - s.y) * Math.min(1, dt*4);
+      continue;
+    }
+    const d = dist(s, tgt);
+    const orbitDist = tgt.r + s.def.orbit;
+    if(d > orbitDist + 6){
+      const a = Math.atan2(tgt.y - s.y, tgt.x - s.x);
+      s.x += Math.cos(a) * s.def.speed;
+      s.y += Math.sin(a) * s.def.speed;
+    } else {
+      if(s.def.scout){
+        // 探测舰：快速掠过，瘫痪炮塔并拾荒星尘
+        s.orbitA += dt * 3.2;
+        const ox = tgt.x + Math.cos(s.orbitA)*orbitDist;
+        const oy = tgt.y + Math.sin(s.orbitA)*orbitDist;
+        s.x += (ox - s.x) * Math.min(1, dt*6);
+        s.y += (oy - s.y) * Math.min(1, dt*6);
+        if(!s.scanDone){
+          s.scanDone = true;
+          tgt.turretCd += 6;
+          player.stardust += 10;
+          explode(s.x, s.y, s.def.color, 8, 1.5);
+          floater(tgt.x, tgt.y - tgt.r - 12, '扫描完成：炮塔瘫痪 +10✦', s.def.color);
+        }
+      } else {
+        s.orbitA += dt * (s.def.speed / orbitDist) * 18;
+        const ox = tgt.x + Math.cos(s.orbitA)*orbitDist;
+        const oy = tgt.y + Math.sin(s.orbitA)*orbitDist;
+        s.x += (ox - s.x) * Math.min(1, dt*3);
+        s.y += (oy - s.y) * Math.min(1, dt*3);
+        s.fireCd -= dt;
+        if(s.fireCd <= 0){
+          s.fireCd = s.def.fireGap;
+          if(shipTarget){
+            spawnShot(s.x, s.y, shipTarget.x, shipTarget.y, s.def.dmg * s.def.antiShip, s.def.color, 9, true);
+          } else {
+            spawnShot(s.x, s.y, tgt.x + (Math.random()-0.5)*tgt.r, tgt.y + (Math.random()-0.5)*tgt.r, s.def.dmg, s.def.color, 7, true);
+            if(Math.random() < 0.4) sfx.shoot();
+          }
+        }
+      }
+    }
+  }
+
+  // ---- 敌方炮塔 ----
+  for(const e of enemies){
+    if(!e.alive) continue;
+    e.rot += dt * 0.3;
+    e.turretCd -= dt;
+    if(e.turretCd <= 0){
+      const range = 190;
+      const inRange = ships.filter(s => dist(s, e) < range);
+      if(inRange.length){
+        e.turretCd = e.turretGap;
+        const s = inRange[Math.floor(Math.random()*inRange.length)];
+        spawnShot(e.x + Math.cos(e.rot)*e.r*0.7, e.y + Math.sin(e.rot)*e.r*0.7, s.x, s.y, e.turretDmg, '#ff5b6a', 5.5, false);
+      } else {
+        // 敌军混战：炮塔也会拦截入侵的敌舰
+        const invaders = eships.filter(s => !s.friendly && s.targetPlanet === e && dist(s, e) < range);
+        if(invaders.length){
+          e.turretCd = e.turretGap;
+          const s = invaders[Math.floor(Math.random()*invaders.length)];
+          spawnShot(e.x + Math.cos(e.rot)*e.r*0.7, e.y + Math.sin(e.rot)*e.r*0.7, s.x, s.y, e.turretDmg, '#ff5b6a', 5.5, false);
+        } else {
+          e.turretCd = 0.3;
+        }
+      }
+    }
+    // ---- 敌方进攻波（目标：玩家） ----
+    e.waveCd -= dt;
+    if(e.waveCd <= 0){
+      e.waveCd = e.waveGap * (0.85 + Math.random()*0.3);
+      for(let k=0;k<e.waveSize;k++){
+        eships.push({
+          x: e.x + (Math.random()-0.5)*20, y: e.y + (Math.random()-0.5)*20,
+          hp: 20 + e.r*0.5, dmg: 5 + e.r*0.12,
+          speed: 2.2 + Math.random()*0.6, fireCd: Math.random(),
+          orbitA: Math.random()*Math.PI*2, home: e, targetPlanet: player
+        });
+      }
+      if(dist(e, player) < Math.max(W,H)*0.9) showHint(`【${e.name}】派出了进攻舰队！`);
+    }
+    // ---- 敌方发射导弹 ----
+    e.missileCd -= dt;
+    if(e.missileCd <= 0){
+      e.missileCd = 40 + Math.random()*30;
+      const type = (e.r >= 30 && Math.random() < 0.4) ? 'counter' : 'nuke';
+      const tx = player.x + (Math.random()-0.5)*player.r*4;
+      const ty = player.y + (Math.random()-0.5)*player.r*4;
+      launchMissile(type, e.x, e.y, tx, ty, false);
+      showHint(`⚠ 【${e.name}】发射了${MISSILES[type].name}！注意躲避！`);
+      floater(e.x, e.y - e.r - 22, '☢ 导弹发射！', '#ff5b6a');
+    }
+  }
+
+  // ---- 敌方飞船（可能攻击玩家，也可能攻击其他敌星） ----
+  for(let i = eships.length-1; i >= 0; i--){
+    const s = eships[i];
+    if(s.hp <= 0){
+      explode(s.x, s.y, '#ff5b6a', 12, 2);
+      player.stardust += 4;
+      eships.splice(i,1); continue;
+    }
+    // 攻击玩家的敌舰母星已毁 → 倒戈
+    if(s.targetPlanet === player && s.home && !s.home.alive){
+      s.friendly = true;
+    }
+    if(s.targetPlanet && s.targetPlanet !== player && !s.targetPlanet.alive){
+      s.targetPlanet = player; // 敌星已毁，转头扑向玩家
+    }
+    const tp = s.targetPlanet || player;
+    const d = dist(s, tp);
+    const od = tp.r + 30;
+    if(d > od + 4){
+      const a = Math.atan2(tp.y - s.y, tp.x - s.x);
+      s.x += Math.cos(a)*s.speed; s.y += Math.sin(a)*s.speed;
+    } else {
+      s.orbitA += dt * 1.6;
+      s.x += (tp.x + Math.cos(s.orbitA)*od - s.x) * Math.min(1, dt*3);
+      s.y += (tp.y + Math.sin(s.orbitA)*od - s.y) * Math.min(1, dt*3);
+      s.fireCd -= dt;
+      if(s.fireCd <= 0){
+        s.fireCd = 0.9;
+        spawnShot(s.x, s.y, tp.x, tp.y, s.dmg, '#ff5b6a', 6, s.friendly ? true : false);
+      }
+    }
+  }
+
+  // ---- 我方行星防御炮 ----
+  if(player.defCd <= 0 && eships.length){
+    const range = player.r * 4 + 90;
+    const inRange = eships.filter(s => dist(s, player) < range);
+    if(inRange.length){
+      player.defCd = 0.5;
+      const s = inRange[Math.floor(Math.random()*inRange.length)];
+      spawnShot(player.x, player.y - player.r*0.6, s.x, s.y, 6 + (player.r-20)*0.35, '#7dffb0', 8, true);
+    }
+  }
+
+  // ---- 导弹 ----
+  for(let i = missiles.length-1; i >= 0; i--){
+    const m = missiles[i];
+    m.t += dt;
+    if(m.t >= m.fuse){
+      explodeMissile(m);
+      missiles.splice(i,1);
+      continue;
+    }
+    // 飞行：前 70% 时间飞向落点，之后悬停待命
+    const flyTime = m.fuse * 0.7;
+    if(m.t < flyTime){
+      const k = m.t / flyTime;
+      const ease = 1 - Math.pow(1-k, 2);
+      m.curX = m.x + (m.tx - m.x) * ease;
+      m.curY = m.y + (m.ty - m.y) * ease - Math.sin(k*Math.PI) * 60; // 弧线
+    } else {
+      m.curX = m.tx; m.curY = m.ty;
+    }
+  }
+
+  // ---- 弹道 ----
+  for(let i = shots.length-1; i >= 0; i--){
+    const p = shots[i];
+    p.x += p.vx; p.y += p.vy; p.life -= dt;
+    let hit = false;
+    if(p.friendly){
+      for(const e of enemies){
+        if(e.alive && Math.hypot(p.x-e.x, p.y-e.y) < e.r){
+          e.hp -= p.dmg; hit = true;
+          explode(p.x, p.y, p.color, 2, 1);
+          if(e.hp <= 0) destroyEnemy(e);
+          break;
+        }
+      }
+      if(!hit) for(const s of eships){
+        if(s.friendly) continue;
+        if(Math.hypot(p.x-s.x, p.y-s.y) < 8){ s.hp -= p.dmg; hit = true; explode(p.x,p.y,p.color,2,1); break; }
+      }
+    } else {
+      if(Math.hypot(p.x-player.x, p.y-player.y) < player.r){
+        player.hp -= p.dmg; hit = true;
+        explode(p.x, p.y, '#ff5b6a', 3, 1.2);
+        sfx.hit();
+        if(player.hp <= 0){ player.hp = 0; explode(player.x, player.y, '#ffb45b', 90, 6); endGame(false); }
+      } else {
+        for(const s of ships){
+          if(Math.hypot(p.x-s.x, p.y-s.y) < s.def.size + 3){ s.hp -= p.dmg; hit = true; explode(p.x,p.y,'#ff5b6a',2,1); break; }
+        }
+        // 敌军混战：弹丸命中其他敌舰
+        if(!hit) for(const s of eships){
+          if(s.friendly) continue;
+          if(Math.hypot(p.x-s.x, p.y-s.y) < 8){ s.hp -= p.dmg; hit = true; explode(p.x,p.y,'#ff5b6a',2,1); break; }
+        }
+        // 敌军混战：弹丸命中其他敌星
+        if(!hit) for(const e of enemies){
+          if(e.alive && Math.hypot(p.x-e.x, p.y-e.y) < e.r){
+            e.hp -= p.dmg; hit = true;
+            explode(p.x, p.y, '#ff5b6a', 2, 1);
+            if(e.hp <= 0) destroyEnemy(e, false);
+            break;
+          }
+        }
+      }
+    }
+    if(hit || p.life <= 0) shots.splice(i,1);
+  }
+
+  // ---- 粒子 / 浮字 ----
+  for(let i = parts.length-1; i >= 0; i--){
+    const p = parts[i];
+    p.x += p.vx; p.y += p.vy; p.vx *= 0.98; p.vy *= 0.98; p.life -= p.decay;
+    if(p.life <= 0) parts.splice(i,1);
+  }
+  for(let i = floaters.length-1; i >= 0; i--){
+    const f = floaters[i];
+    f.y -= dt*22; f.life -= dt;
+    if(f.life <= 0) floaters.splice(i,1);
+  }
+}
+
+// ================= 渲染 =================
+function drawPlanet(x, y, r, color, rot, glow){
+  const g = ctx.createRadialGradient(x - r*0.35, y - r*0.35, r*0.1, x, y, r);
+  g.addColorStop(0, '#ffffff');
+  g.addColorStop(0.25, color);
+  g.addColorStop(1, '#0a0c1c');
+  ctx.save();
+  if(glow){ ctx.shadowColor = color; ctx.shadowBlur = glow; }
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  // 表面纹理
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.strokeStyle = '#000';
+  ctx.beginPath(); ctx.arc(x, y, r*0.72, rot, rot + Math.PI*1.2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x, y, r*0.45, rot*1.7, rot*1.7 + Math.PI); ctx.stroke();
+  ctx.restore();
+}
+
+function render(){
+  // 背景
+  ctx.fillStyle = '#05060f';
+  ctx.fillRect(0, 0, W, H);
+  const t = performance.now()/1000;
+  for(const s of stars){
+    const a = 0.35 + 0.65*Math.abs(Math.sin(t*s.sp + s.tw));
+    ctx.globalAlpha = a;
+    ctx.fillStyle = '#cdd6ff';
+    ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  if(!player) return;
+
+  // 目标连线
+  if(player.target && player.target.alive){
+    ctx.save();
+    ctx.setLineDash([6, 10]);
+    ctx.strokeStyle = 'rgba(255,215,106,.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(player.x, player.y); ctx.lineTo(player.target.x, player.target.y); ctx.stroke();
+    ctx.restore();
+  }
+
+  // 敌方星球
+  for(const e of enemies){
+    if(!e.alive) continue;
+    drawPlanet(e.x, e.y, e.r, e.color, e.rot, 18);
+    // 选中圈
+    if(player.target === e){
+      ctx.save();
+      ctx.strokeStyle = '#ffd76a';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.r + 10, t*1.5, t*1.5 + Math.PI*2); ctx.stroke();
+      ctx.restore();
+    }
+    // 血条
+    if(e.hp < e.maxHp){
+      const w = e.r*2;
+      ctx.fillStyle = 'rgba(0,0,0,.5)';
+      ctx.fillRect(e.x - w/2, e.y - e.r - 14, w, 5);
+      ctx.fillStyle = '#ff5b6a';
+      ctx.fillRect(e.x - w/2, e.y - e.r - 14, w * Math.max(0, e.hp/e.maxHp), 5);
+    }
+    // 名字
+    ctx.fillStyle = 'rgba(200,210,255,.75)';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(e.name, e.x, e.y + e.r + 18);
+  }
+
+  // 我方星球
+  drawPlanet(player.x, player.y, player.r, '#5b8cff', t*0.2, 26);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(125,255,176,.25)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(player.x, player.y, player.r*4 + 90, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle = 'rgba(200,210,255,.85)';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('你的星球', player.x, player.y + player.r + 20);
+
+  // 我方飞船
+  for(const s of ships){
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.shadowColor = s.def.color; ctx.shadowBlur = 8;
+    ctx.fillStyle = s.def.color;
+    const a = player.target && player.target.alive ? Math.atan2(player.target.y - s.y, player.target.x - s.x) : s.orbitA;
+    ctx.rotate(a);
+    const z = s.def.size;
+    ctx.beginPath();
+    ctx.moveTo(z, 0); ctx.lineTo(-z*0.7, z*0.6); ctx.lineTo(-z*0.35, 0); ctx.lineTo(-z*0.7, -z*0.6);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  // 敌方飞船
+  for(const s of eships){
+    const tp = s.targetPlanet || player;
+    const col = s.friendly ? '#7dffb0' : '#ff5b6a';
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.shadowColor = col; ctx.shadowBlur = 8;
+    ctx.fillStyle = col;
+    ctx.rotate(Math.atan2(tp.y - s.y, tp.x - s.x));
+    ctx.beginPath();
+    ctx.moveTo(6, 0); ctx.lineTo(-5, 4); ctx.lineTo(-2, 0); ctx.lineTo(-5, -4);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  // 弹道
+  for(const p of shots){
+    ctx.save();
+    ctx.shadowColor = p.color; ctx.shadowBlur = 6;
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  // 粒子
+  for(const p of parts){
+    ctx.globalAlpha = Math.max(0, p.life);
+    if(p.ring){
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1 - p.life*0.5), 0, Math.PI*2); ctx.stroke();
+    } else {
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  // 导弹
+  const tt = performance.now()/300;
+  for(const m of missiles){
+    const mx2 = m.curX !== undefined ? m.curX : m.x;
+    const my2 = m.curY !== undefined ? m.curY : m.y;
+    // 落点预警圈
+    ctx.save();
+    ctx.globalAlpha = 0.5 + 0.3*Math.sin(tt*2);
+    ctx.strokeStyle = m.friendly ? m.def.color : '#ff5b6a';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6,6]);
+    ctx.beginPath(); ctx.arc(m.tx, m.ty, m.def.radius, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+    // 倒计时
+    ctx.fillStyle = m.friendly ? m.def.color : '#ff5b6a';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(Math.max(0, m.fuse - m.t).toFixed(1) + 's', m.tx, m.ty + 4);
+    // 弹体
+    ctx.save();
+    ctx.translate(mx2, my2);
+    ctx.shadowColor = m.def.color; ctx.shadowBlur = 12;
+    ctx.fillStyle = m.friendly ? m.def.color : '#ff5b6a';
+    ctx.rotate(Math.atan2(m.ty - m.y, m.tx - m.x));
+    ctx.beginPath();
+    ctx.moveTo(8, 0); ctx.lineTo(-6, 3.5); ctx.lineTo(-6, -3.5);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  // 上膛状态：鼠标处的落点预览
+  if(armedType && running){
+    const def = MISSILES[armedType];
+    ctx.save();
+    ctx.strokeStyle = def.color;
+    ctx.globalAlpha = 0.7;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5,5]);
+    ctx.beginPath(); ctx.arc(mouseX, mouseY, def.radius, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(mouseX-8, mouseY); ctx.lineTo(mouseX+8, mouseY);
+    ctx.moveTo(mouseX, mouseY-8); ctx.lineTo(mouseX, mouseY+8);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // 浮字
+  ctx.textAlign = 'center';
+  for(const f of floaters){
+    ctx.globalAlpha = Math.min(1, f.life);
+    ctx.fillStyle = f.color;
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText(f.text, f.x, f.y);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ================= HUD 刷新 =================
+const $ = id => document.getElementById(id);
+function refreshHud(){
+  $('stardust').textContent = Math.floor(player.stardust);
+  $('income').textContent = incomePerSec().toFixed(1);
+  $('scale').textContent = (player.r/20).toFixed(1);
+  $('hpfill').style.width = Math.max(0, player.hp/player.maxHp*100) + '%';
+  $('hptext').textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
+  $('foes').textContent = enemies.filter(e=>e.alive).length;
+  $('capused').textContent = capUsed();
+  $('capmax').textContent = capMax();
+
+  SHIPS.forEach((d,i) => {
+    $('cnt'+i).textContent = '×' + ships.filter(s=>s.def===d).length;
+    const can = player.stardust >= d.cost && capUsed()+d.cap <= capMax();
+    $('btn'+i).classList.toggle('disabled', !can);
+  });
+
+  $('btnNuke').classList.toggle('disabled', player.stardust < MISSILES.nuke.cost);
+  $('btnNuke').classList.toggle('armed', armedType === 'nuke');
+  $('btnCounter').classList.toggle('disabled', player.stardust < MISSILES.counter.cost);
+  $('btnCounter').classList.toggle('armed', armedType === 'counter');
+  $('btnSpeed').classList.toggle('disabled', player.stardust < SPEED_COST);
+  $('speedlv').textContent = 'Lv.' + player.speedLv;
+
+  const tgt = player.target;
+  if(tgt && tgt.alive){
+    $('tname').textContent = tgt.name;
+    $('targetfill').style.width = Math.max(0, tgt.hp/tgt.maxHp*100) + '%';
+  } else {
+    $('tname').textContent = player.manualPeace ? '和平模式（不主动攻击）' : '未选定';
+    $('targetfill').style.width = '0%';
+  }
+}
+
+// ================= 主循环 =================
+function loop(ts){
+  const dt = Math.min(0.05, (ts - lastTs)/1000 || 0.016);
+  lastTs = ts;
+  if(running){ update(dt); refreshHud(); }
+  render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// ================= 输入 =================
+canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+canvas.addEventListener('click', e => {
+  if(!running) return;
+  const mx = e.clientX, my = e.clientY;
+  // 导弹已上膛 → 此次点击为选定落点
+  if(armedType){
+    const def = MISSILES[armedType];
+    player.stardust -= def.cost;
+    launchMissile(armedType, player.x, player.y, mx, my, true);
+    showHint(def.name + '已发射，3~6 秒后引爆！');
+    armedType = null;
+    return;
+  }
+  for(const en of enemies){
+    if(en.alive && Math.hypot(mx-en.x, my-en.y) < en.r + 14){
+      if(player.target === en){
+        // 再点一次已选中的星球 → 取消攻击，进入和平模式
+        player.target = null;
+        player.manualPeace = true;
+        sfx.build();
+        showHint('已取消攻击目标：舰队回防母星，进入和平模式');
+      } else {
+        player.target = en;
+        player.manualPeace = false;
+        sfx.build();
+        showHint('全体舰队，进攻【' + en.name + '】！');
+      }
+      return;
+    }
+  }
+});
+
+SHIPS.forEach((d,i) => $('btn'+i).addEventListener('click', () => buildShip(i)));
+$('btnNuke').addEventListener('click', () => running && armMissile('nuke'));
+$('btnCounter').addEventListener('click', () => running && armMissile('counter'));
+$('btnSpeed').addEventListener('click', () => running && buySpeed());
+addEventListener('keydown', e => {
+  if(!running) return;
+  if(e.key === '8'){ armMissile('nuke'); return; }
+  if(e.key === '9'){ armMissile('counter'); return; }
+  if(e.key === '0'){ buySpeed(); return; }
+  const n = parseInt(e.key, 10);
+  if(n >= 1 && n <= SHIPS.length) buildShip(n - 1);
+});
+
+$('startbtn').addEventListener('click', () => {
+  initGame();
+  $('start').classList.add('hidden');
+  $('hud').classList.remove('hidden');
+  running = true;
+  showHint('点击敌方星球选定攻击目标');
+});
+})();
+</script>
+</body>
+</html>

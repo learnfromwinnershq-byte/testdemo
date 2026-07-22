@@ -55,6 +55,24 @@
   .superbtn .key { position:absolute; bottom:5px; right:8px; font-size:10px; color:#8a6a6a; }
   #suptip { font-size:10px; color:#93a0cf; line-height:1.5; padding:0 4px; }
 
+  /* ---------- 技能栏 ---------- */
+  #skillbar { position:absolute; bottom:200px; left:16px; display:flex; flex-direction:column; gap:8px; padding:10px; pointer-events:auto; }
+  #skillbar .energywrap { margin-bottom:4px; }
+  #skillbar .energylabel { font-size:10px; color:#93a0cf; margin-bottom:3px; display:flex; justify-content:space-between; }
+  #energybar { height:8px; border-radius:4px; background:rgba(255,255,255,.1); overflow:hidden; width:150px; }
+  #energyfill { height:100%; width:100%; background:linear-gradient(90deg,#5be3e3,#7da2ff); transition:width .2s; }
+  .skill { position:relative; width:150px; padding:8px 10px 6px; border-radius:10px; border:1px solid rgba(91,227,227,.35); background:rgba(14,36,44,.9); cursor:pointer; transition:.15s; text-align:left; }
+  .skill:hover { border-color:#5be3e3; transform:translateX(2px); }
+  .skill.disabled { opacity:.4; cursor:not-allowed; transform:none; }
+  .skill.locked { opacity:.3; filter:grayscale(1); }
+  .skill.armed { border-color:#ffd76a; box-shadow:0 0 14px rgba(255,215,106,.6); }
+  .skill .name { font-size:12px; font-weight:600; }
+  .skill .desc { font-size:10px; color:#8fd8d8; margin:2px 0 3px; line-height:1.3; }
+  .skill .cost { font-size:11px; color:#5be3e3; }
+  .skill .key { position:absolute; top:8px; right:10px; font-size:11px; color:#ffd76a; font-weight:700; }
+  .skill .cdmask { position:absolute; inset:0; border-radius:10px; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#ffd76a; }
+  .skill .unlocktip { font-size:9px; color:#8a6a6a; margin-top:2px; }
+
   #hint { position:absolute; bottom:110px; left:50%; transform:translateX(-50%); font-size:13px; color:#7dffb0; text-shadow:0 0 8px rgba(0,0,0,.8); opacity:0; transition:opacity .3s; }
 
   /* ---------- Overlays ---------- */
@@ -154,6 +172,37 @@
       <div class="key">键 0 · <span id="speedlv">Lv.0</span></div>
     </div>
   </div>
+
+  <div id="skillbar" class="panel">
+    <div class="energywrap">
+      <div class="energylabel"><span>⚡ 星球能量</span><span id="energytext">100 / 100</span></div>
+      <div id="energybar"><div id="energyfill"></div></div>
+    </div>
+    <div class="skill" id="skillQ">
+      <div class="name">轨道打击</div>
+      <div class="desc">点击落点，天降 6 发轨道炮</div>
+      <div class="cost">⚡40 · CD 12s</div>
+      <div class="key">Q</div>
+      <div class="unlocktip hidden">吞噬 1 颗敌星解锁</div>
+      <div class="cdmask hidden" id="cdQ">12</div>
+    </div>
+    <div class="skill" id="skillW">
+      <div class="name">引力护盾</div>
+      <div class="desc">8 秒内母星受伤 -75%</div>
+      <div class="cost">⚡50 · CD 20s</div>
+      <div class="key">W</div>
+      <div class="unlocktip hidden">吞噬 2 颗敌星解锁</div>
+      <div class="cdmask hidden" id="cdW">20</div>
+    </div>
+    <div class="skill" id="skillE">
+      <div class="name">超频生产</div>
+      <div class="desc">15 秒内星尘产出 ×3</div>
+      <div class="cost">⚡35 · CD 25s</div>
+      <div class="key">E</div>
+      <div class="unlocktip hidden">吞噬 3 颗敌星解锁</div>
+      <div class="cdmask hidden" id="cdE">25</div>
+    </div>
+  </div>
   <div id="hint"></div>
 </div>
 
@@ -170,6 +219,7 @@
     ・ 共 7 种飞船可建造（快捷键 1~7），合理搭配舰队<br>
     ・ 救场神器：<span class="em">核弹（8，500✦）</span>与<span class="em">反制炸弹（9，1000✦）</span>，从母星发射、点击落点、延时引爆——注意弹片不分敌我，敌军也会发射<br>
     ・ <span class="em">生产提速（0，125✦）</span>：每级使生产间隔 -5%，可无限叠加，种田流核心科技<br>
+    ・ 吞噬 1/2/3 颗敌星后觉醒<span class="em">星球技能</span>：Q 轨道打击 · W 引力护盾 · E 超频生产（消耗星球能量，自动回蓝）<br>
     ・ <span class="em">消灭星域内全部敌星</span>，即可称霸这片宇宙！
   </div>
   <button class="bigbtn" id="startbtn">开 战</button>
@@ -281,7 +331,7 @@ function explodeMissile(m){
       }
     }
     if(Math.hypot(player.x-m.tx, player.y-m.ty) < R + player.r){
-      player.hp -= def.dmgPlanet;
+      player.hp -= def.dmgPlanet * (shieldT > 0 ? 0.25 : 1);
       if(player.hp <= 0){ player.hp = 0; explode(player.x, player.y, '#ffb45b', 90, 6); endGame(false); }
     }
     floater(m.tx, m.ty, def.name + '引爆！', def.color);
@@ -289,7 +339,7 @@ function explodeMissile(m){
     for(const s of ships) if(Math.hypot(s.x-m.tx, s.y-m.ty) < R) s.hp -= def.dmgShip;
     for(const s of eships) if(!s.friendly && Math.hypot(s.x-m.tx, s.y-m.ty) < R) s.hp -= def.dmgShip;
     if(Math.hypot(player.x-m.tx, player.y-m.ty) < R + player.r){
-      player.hp -= def.dmgPlanet;
+      player.hp -= def.dmgPlanet * (shieldT > 0 ? 0.25 : 1);
       sfx.hit();
       if(player.hp <= 0){ player.hp = 0; explode(player.x, player.y, '#ffb45b', 90, 6); endGame(false); }
     }
@@ -301,6 +351,68 @@ function explodeMissile(m){
     }
     floater(m.tx, m.ty, '敌方' + def.name + '引爆！', '#ff5b6a');
   }
+}
+
+// ================= 星球技能 =================
+const SKILLS = {
+  Q: { name:'轨道打击', cost:40, cd:12, unlockAt:1, desc:'天降6发轨道炮' },
+  W: { name:'引力护盾', cost:50, cd:20, unlockAt:2, desc:'8秒受伤-75%' },
+  E: { name:'超频生产', cost:35, cd:25, unlockAt:3, desc:'15秒产出×3' }
+};
+let energy = 100, energyMax = 100, energyRegen = 3.5; // 每秒回蓝
+let skillCds = { Q:0, W:0, E:0 };
+let shieldT = 0, overclockT = 0;
+let orbitalArmed = false;
+
+function skillUnlocked(k){ return kills >= SKILLS[k].unlockAt; }
+function castSkill(k){
+  if(!skillUnlocked(k)){ showHint(`需要吞噬 ${SKILLS[k].unlockAt} 颗敌星解锁`); sfx.error(); return; }
+  if(skillCds[k] > 0){ showHint('技能冷却中'); sfx.error(); return; }
+  if(energy < SKILLS[k].cost){ showHint('星球能量不足'); sfx.error(); return; }
+  if(k === 'Q'){
+    if(orbitalArmed){ orbitalArmed = false; showHint('已取消轨道打击'); return; }
+    orbitalArmed = true;
+    showHint('轨道打击已就绪，点击战场任意位置锁定打击点');
+    return;
+  }
+  energy -= SKILLS[k].cost;
+  skillCds[k] = SKILLS[k].cd;
+  if(k === 'W'){
+    shieldT = 8;
+    sfx.build();
+    showHint('引力护盾启动：8 秒内母星受伤 -75%');
+    floater(player.x, player.y - player.r - 20, '引力护盾！', '#5be3e3');
+  } else if(k === 'E'){
+    overclockT = 15;
+    sfx.build();
+    showHint('超频生产：15 秒内星尘产出 ×3');
+    floater(player.x, player.y - player.r - 20, '超频生产！', '#7dffb0');
+  }
+}
+function fireOrbital(tx, ty){
+  energy -= SKILLS.Q.cost;
+  skillCds.Q = SKILLS.Q.cd;
+  sfx.boom();
+  for(let i = 0; i < 6; i++){
+    const a = Math.random()*Math.PI*2, d = Math.random()*50;
+    parts.push({ x:tx+Math.cos(a)*d, y:ty+Math.sin(a)*d, vx:0, vy:0, life:1, decay:0.05, color:'#ffd76a', r:18, ring:true });
+  }
+  // 轨道打击伤害
+  const R = 60, DMG_SHIP = 80, DMG_PLANET = 90;
+  for(const s of eships) if(!s.friendly && Math.hypot(s.x-tx, s.y-ty) < R) s.hp -= DMG_SHIP;
+  for(const s of ships) if(Math.hypot(s.x-tx, s.y-ty) < R) s.hp -= DMG_SHIP*0.5;
+  for(const e of enemies){
+    if(e.alive && Math.hypot(e.x-tx, e.y-ty) < R + e.r){
+      e.hp -= DMG_PLANET;
+      if(e.hp <= 0) destroyEnemy(e);
+    }
+  }
+  if(Math.hypot(player.x-tx, player.y-ty) < R + player.r){
+    player.hp -= DMG_PLANET*0.5;
+    if(player.hp <= 0){ player.hp = 0; explode(player.x, player.y, '#ffb45b', 90, 6); endGame(false); }
+  }
+  explode(tx, ty, '#ffd76a', 40, 5);
+  showHint('轨道打击命中！');
 }
 
 // ================= 游戏状态 =================
@@ -483,11 +595,19 @@ function endGame(winFlag){
 // ================= 更新 =================
 function update(dt){
   gameTime += dt;
+  // 能量回复
+  energy = Math.min(energyMax, energy + energyRegen * dt);
+  // 技能计时
+  for(const k of ['Q','W','E']) if(skillCds[k] > 0) skillCds[k] = Math.max(0, skillCds[k] - dt);
+  if(shieldT > 0) shieldT -= dt;
+  if(overclockT > 0) overclockT -= dt;
+
   player.prodTimer += dt;
   const gap = prodGap();
+  const prodMult = overclockT > 0 ? 3 : 1;
   while(player.prodTimer >= gap){
     player.prodTimer -= gap;
-    player.stardust += 2 + (player.r - 20) * 0.35;
+    player.stardust += (2 + (player.r - 20) * 0.35) * prodMult;
   }
   player.defCd -= dt;
   enemyWar(dt);
@@ -705,7 +825,7 @@ function update(dt){
       }
     } else {
       if(Math.hypot(p.x-player.x, p.y-player.y) < player.r){
-        player.hp -= p.dmg; hit = true;
+        player.hp -= p.dmg * (shieldT > 0 ? 0.25 : 1); hit = true;
         explode(p.x, p.y, '#ff5b6a', 3, 1.2);
         sfx.hit();
         if(player.hp <= 0){ player.hp = 0; explode(player.x, player.y, '#ffb45b', 90, 6); endGame(false); }
@@ -914,19 +1034,41 @@ function render(){
   }
 
   // 上膛状态：鼠标处的落点预览
-  if(armedType && running){
-    const def = MISSILES[armedType];
+  if((armedType || orbitalArmed) && running){
+    const R = orbitalArmed ? 60 : MISSILES[armedType].radius;
+    const col = orbitalArmed ? '#ffd76a' : MISSILES[armedType].color;
     ctx.save();
-    ctx.strokeStyle = def.color;
+    ctx.strokeStyle = col;
     ctx.globalAlpha = 0.7;
     ctx.lineWidth = 2;
     ctx.setLineDash([5,5]);
-    ctx.beginPath(); ctx.arc(mouseX, mouseY, def.radius, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(mouseX, mouseY, R, 0, Math.PI*2); ctx.stroke();
     ctx.setLineDash([]);
     ctx.beginPath();
     ctx.moveTo(mouseX-8, mouseY); ctx.lineTo(mouseX+8, mouseY);
     ctx.moveTo(mouseX, mouseY-8); ctx.lineTo(mouseX, mouseY+8);
     ctx.stroke();
+    ctx.restore();
+  }
+
+  // 护盾视觉
+  if(shieldT > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.35 + 0.15*Math.sin(t*6);
+    ctx.strokeStyle = '#5be3e3';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = '#5be3e3'; ctx.shadowBlur = 20;
+    ctx.beginPath(); ctx.arc(player.x, player.y, player.r + 12, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+  }
+  // 超频视觉
+  if(overclockT > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.4 + 0.2*Math.sin(t*10);
+    ctx.strokeStyle = '#7dffb0';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4,6]);
+    ctx.beginPath(); ctx.arc(player.x, player.y, player.r + 20, t*3, t*3 + Math.PI*2); ctx.stroke();
     ctx.restore();
   }
 
@@ -966,6 +1108,21 @@ function refreshHud(){
   $('btnSpeed').classList.toggle('disabled', player.stardust < SPEED_COST);
   $('speedlv').textContent = 'Lv.' + player.speedLv;
 
+  // 技能栏
+  $('energyfill').style.width = (energy/energyMax*100) + '%';
+  $('energytext').textContent = Math.floor(energy) + ' / ' + energyMax;
+  for(const k of ['Q','W','E']){
+    const el = $('skill'+k), cdEl = $('cd'+k);
+    const unlocked = skillUnlocked(k);
+    const cd = skillCds[k];
+    el.classList.toggle('locked', !unlocked);
+    el.classList.toggle('disabled', unlocked && (cd > 0 || energy < SKILLS[k].cost));
+    el.classList.toggle('armed', k === 'Q' && orbitalArmed);
+    el.querySelector('.unlocktip').classList.toggle('hidden', unlocked);
+    if(cd > 0){ cdEl.classList.remove('hidden'); cdEl.textContent = Math.ceil(cd); }
+    else cdEl.classList.add('hidden');
+  }
+
   const tgt = player.target;
   if(tgt && tgt.alive){
     $('tname').textContent = tgt.name;
@@ -992,6 +1149,12 @@ canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clien
 canvas.addEventListener('click', e => {
   if(!running) return;
   const mx = e.clientX, my = e.clientY;
+  // 轨道打击已就绪 → 此次点击为锁定打击点
+  if(orbitalArmed){
+    orbitalArmed = false;
+    fireOrbital(mx, my);
+    return;
+  }
   // 导弹已上膛 → 此次点击为选定落点
   if(armedType){
     const def = MISSILES[armedType];
@@ -1024,8 +1187,11 @@ SHIPS.forEach((d,i) => $('btn'+i).addEventListener('click', () => buildShip(i)))
 $('btnNuke').addEventListener('click', () => running && armMissile('nuke'));
 $('btnCounter').addEventListener('click', () => running && armMissile('counter'));
 $('btnSpeed').addEventListener('click', () => running && buySpeed());
+for(const k of ['Q','W','E']) $('skill'+k).addEventListener('click', () => running && castSkill(k));
 addEventListener('keydown', e => {
   if(!running) return;
+  const k = e.key.toUpperCase();
+  if(k === 'Q' || k === 'W' || k === 'E'){ castSkill(k); return; }
   if(e.key === '8'){ armMissile('nuke'); return; }
   if(e.key === '9'){ armMissile('counter'); return; }
   if(e.key === '0'){ buySpeed(); return; }

@@ -600,6 +600,25 @@
       background: rgba(38, 113, 95, .11);
     }
 
+    .lesson-group {
+      margin: 12px 2px 2px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .lesson.finger {
+      min-height: 38px;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+
+    .lesson.finger small {
+      font-size: 11px;
+    }
+
     .footer-note {
       margin-top: 12px;
       color: var(--muted);
@@ -744,6 +763,17 @@
               <option value="game">遊戲詞彙</option>
               <option value="pinyin">粵拼短句</option>
               <option value="symbols">數字符號</option>
+              <optgroup label="手指專訓">
+                <option value="f_lpinky">左尾指 a q z</option>
+                <option value="f_lring">左無名指 w s x</option>
+                <option value="f_lmiddle">左中指 e d c</option>
+                <option value="f_lindex">左食指 r f v t g b</option>
+                <option value="f_rindex">右食指 y h n u j m</option>
+                <option value="f_rmiddle">右中指 i k ,</option>
+                <option value="f_rring">右無名指 o l .</option>
+                <option value="f_rpinky">右尾指 p ; /</option>
+                <option value="f_thumbs">雙手拇指 空格</option>
+              </optgroup>
             </select>
           </div>
           <div class="control-field">
@@ -839,6 +869,16 @@
             <button type="button" class="lesson" data-lesson="game"><span>方塊同戰術詞</span><small>mine cover zone</small></button>
             <button type="button" class="lesson" data-lesson="pinyin"><span>粵拼短句</span><small>gin6 pun2 fan3 lin6</small></button>
             <button type="button" class="lesson" data-lesson="symbols"><span>數字補給箱</span><small>123 456 !?</small></button>
+            <div class="lesson-group">手指專訓</div>
+            <button type="button" class="lesson finger" data-lesson="f_lpinky"><span>左尾指：尾指 + 雙手拇指</span><small>a q z ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_lring"><span>左無名指 + 雙手拇指</span><small>w s x ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_lmiddle"><span>左中指 + 雙手拇指</span><small>e d c ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_lindex"><span>左食指 + 雙手拇指</span><small>r f v t g b ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_rindex"><span>右食指 + 雙手拇指</span><small>y h n u j m ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_rmiddle"><span>右中指 + 雙手拇指</span><small>i k , ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_rring"><span>右無名指 + 雙手拇指</span><small>o l . ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_rpinky"><span>右尾指 + 雙手拇指</span><small>p ; / ＋ 空格</small></button>
+            <button type="button" class="lesson finger" data-lesson="f_thumbs"><span>雙手拇指：空格落位</span><small>空格節奏協調</small></button>
           </div>
         </div>
 
@@ -922,6 +962,177 @@
           "base-1: wood 64, stone 32",
           "team@zone-3 move? yes!",
           "aim 95% speed 42/min"
+        ]
+      },
+      f_lpinky: {
+        label: "左尾指",
+        keys: "a q z",
+        easy: [
+          "a q a",
+          "z a z",
+          "q a q"
+        ],
+        normal: [
+          "a q z a q",
+          "za qa aq za",
+          "aq za qa aq"
+        ],
+        hard: [
+          "aqz qaz zaq aqz",
+          "zaq aqz qza aq za",
+          "qaz aqz zaq qa az"
+        ]
+      },
+      f_lring: {
+        label: "左無名指",
+        keys: "w s x",
+        easy: [
+          "s w s",
+          "x s x",
+          "w s w"
+        ],
+        normal: [
+          "s w x s w",
+          "sw xs ws sx",
+          "ws xw sx ws"
+        ],
+        hard: [
+          "swx xws wsx swx xsw",
+          "xsw swx wsx sx wx",
+          "wxs sxw xws sw xsx"
+        ]
+      },
+      f_lmiddle: {
+        label: "左中指",
+        keys: "e d c",
+        easy: [
+          "e d e",
+          "c d c",
+          "d e d"
+        ],
+        normal: [
+          "e d c e d",
+          "ed ce dc ed",
+          "de cd ec de"
+        ],
+        hard: [
+          "dec ced edc dec cde",
+          "edc cde dec ed ce",
+          "ced edc dce ed cd"
+        ]
+      },
+      f_lindex: {
+        label: "左食指",
+        keys: "r f v t g b",
+        easy: [
+          "f r f",
+          "t g t",
+          "b v b"
+        ],
+        normal: [
+          "f r t g b v",
+          "ft rb vg tf",
+          "grb vft brg"
+        ],
+        hard: [
+          "grb vft brg tfv",
+          "rbg ftv grb vtf",
+          "ftv brg vtf grb"
+        ]
+      },
+      f_rindex: {
+        label: "右食指",
+        keys: "y h n u j m",
+        easy: [
+          "h y h",
+          "n u n",
+          "m j m"
+        ],
+        normal: [
+          "h y n u j m",
+          "hy nu jm yh",
+          "nu jm hy un"
+        ],
+        hard: [
+          "nujm yhmn jnym uhm",
+          "jymn humj nmyj ynh",
+          "mhyj nujm ynhm jym"
+        ]
+      },
+      f_rmiddle: {
+        label: "右中指",
+        keys: "i k ,",
+        easy: [
+          "i k i",
+          "k i k",
+          ", k ,"
+        ],
+        normal: [
+          "i k i k",
+          "ik ki ik ki",
+          "ki ik ik ki"
+        ],
+        hard: [
+          "iki kik iki kik",
+          "kik iki kik ikk",
+          "ik ik ik kik ik"
+        ]
+      },
+      f_rring: {
+        label: "右無名指",
+        keys: "o l .",
+        easy: [
+          "o l o",
+          "l o l",
+          ". l ."
+        ],
+        normal: [
+          "o l o l",
+          "ol lo ol lo",
+          "lo ol ol lo"
+        ],
+        hard: [
+          "olo lol olo lol",
+          "lol olo lol oll",
+          "ol ol ol lol ol"
+        ]
+      },
+      f_rpinky: {
+        label: "右尾指",
+        keys: "p ; /",
+        easy: [
+          "p ; p",
+          "; p ;",
+          "/ p /"
+        ],
+        normal: [
+          "p ; p /",
+          "p; ;p /p",
+          ";p p; /;"
+        ],
+        hard: [
+          "p;/ ;p/ p;/ ;p/",
+          "/p; p;/ ;p/ p;",
+          "p;/ ;p/ p;/ p;"
+        ]
+      },
+      f_thumbs: {
+        label: "雙手拇指",
+        keys: "空格",
+        easy: [
+          "a b c",
+          "d e f",
+          "g h i"
+        ],
+        normal: [
+          "the cat sat",
+          "go to bed",
+          "my dog ran"
+        ],
+        hard: [
+          "the quick brown fox",
+          "pack my box with five",
+          "how vex brown quartz jogs"
         ]
       }
     };
@@ -1327,7 +1538,7 @@
         return;
       }
       if (state.roundAdvancing) {
-        els.coach.textContent = "成句都啱晒！讀埋最後嘅字，就進入下一關。";
+        els.coach.textContent = "整句啱晒！撳空白鍵即刻進入下一關。";
         return;
       }
       if (accuracy >= target && speed >= 60) {
@@ -1415,8 +1626,8 @@
           els.coach.textContent = "呢句仲有錯誤。請改啱紅色位置，完成整句先會進入下一關。";
         } else if (getRemaining() > 0) {
           state.roundAdvancing = true;
-          els.input.disabled = true;
-          els.coach.textContent = "成句都啱晒！讀埋最後嘅字，就進入下一關。";
+          els.input.disabled = false;
+          els.coach.textContent = "整句啱晒！撳空白鍵即刻進入下一關。";
           state.roundAdvanceTimer = window.setTimeout(advanceAfterSpeech, 300);
         } else {
           finish("complete");
@@ -1463,7 +1674,15 @@
     });
     els.input.addEventListener("input", handleInput);
     els.input.addEventListener("paste", event => event.preventDefault());
-    els.input.addEventListener("keydown", event => flashKey(event.key));
+    els.input.addEventListener("keydown", event => {
+      if ((event.key === " " || event.code === "Space") && state.started && state.roundAdvancing && els.input.value === state.text) {
+        event.preventDefault();
+        window.clearTimeout(state.roundAdvanceTimer);
+        beginRound(true, true);
+        return;
+      }
+      flashKey(event.key);
+    });
     els.lessonSelect.addEventListener("change", event => setLesson(event.target.value));
     els.levelSelect.addEventListener("change", event => {
       state.level = event.target.value;

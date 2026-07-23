@@ -73,6 +73,9 @@
   .skill .cdmask { position:absolute; inset:0; border-radius:10px; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#ffd76a; }
   .skill .unlocktip { font-size:9px; color:#8a6a6a; margin-top:2px; }
 
+  #combo { position:absolute; top:70px; left:50%; transform:translateX(-50%); font-size:22px; font-weight:800; color:#ffd76a; text-shadow:0 0 16px rgba(255,215,106,.6), 0 2px 4px rgba(0,0,0,.8); letter-spacing:2px; animation:comboPop .3s ease-out; }
+  @keyframes comboPop { from { transform:translateX(-50%) scale(1.6); opacity:0; } to { transform:translateX(-50%) scale(1); opacity:1; } }
+
   #hint { position:absolute; bottom:110px; left:50%; transform:translateX(-50%); font-size:13px; color:#7dffb0; text-shadow:0 0 8px rgba(0,0,0,.8); opacity:0; transition:opacity .3s; }
 
   /* ---------- Overlays ---------- */
@@ -149,7 +152,13 @@
     </div>
   </div>
 
-  <div id="capacity" class="panel">机库容量 <b id="capused">0</b> / <span id="capmax">0</span></div>
+  <div id="capacity" class="panel">机库容量 <b id="capused">0</b> / <span id="capmax">0</span><br><span style="font-size:11px;color:#5b6694;">P 暂停 · 最高分 <b id="hiscore" style="color:#ffd76a;">--</b></span></div>
+  <div id="combo" class="hidden"></div>
+  <div id="paused" class="overlay hidden" style="z-index:15; background:rgba(3,4,10,.75);">
+    <h1 style="font-size:40px;">已 暂 停</h1>
+    <h2>按 P 或点击继续</h2>
+    <button class="bigbtn" id="resumebtn" style="font-size:16px; padding:12px 48px;">继 续</button>
+  </div>
 
   <div id="superbar" class="panel">
     <div class="superbtn" id="btnNuke">
@@ -163,6 +172,12 @@
       <div class="desc">大范围湮灭</div>
       <div class="cost">✦ 1000</div>
       <div class="key">键 9</div>
+    </div>
+    <div class="superbtn" id="btnAnti" style="border-color:rgba(255,43,214,.5); background:rgba(52,12,44,.92);">
+      <div class="name">⊙ 反物质炸弹</div>
+      <div class="desc">毁天灭地·极巨范围</div>
+      <div class="cost">✦ 2000</div>
+      <div class="key">键 -</div>
     </div>
     <div id="suptip">发射后点击落点<br>3~6 秒后爆炸</div>
     <div class="superbtn" id="btnSpeed" style="border-color:rgba(125,255,176,.4); background:rgba(16,44,30,.9);">
@@ -217,7 +232,7 @@
     ・ <span class="em">敌军之间也会互相开战</span>——坐山观虎斗，或趁虚而入<br>
     ・ 敌人也会派舰队反扑，小心你的星球血量<br>
     ・ 共 7 种飞船可建造（快捷键 1~7），合理搭配舰队<br>
-    ・ 救场神器：<span class="em">核弹（8，500✦）</span>与<span class="em">反制炸弹（9，1000✦）</span>，从母星发射、点击落点、延时引爆——注意弹片不分敌我，敌军也会发射<br>
+    ・ 救场神器：<span class="em">核弹（8，500✦）</span>、<span class="em">反制炸弹（9，1000✦）</span>、<span class="em">反物质炸弹（-，2000✦）</span>，从母星发射、点击落点、延时引爆——注意弹片不分敌我，敌军也会发射（反物质炸弹需 3500 星尘，极罕见）
     ・ <span class="em">生产提速（0，125✦）</span>：每级使生产间隔 -5%，可无限叠加，种田流核心科技<br>
     ・ 吞噬 1/2/3 颗敌星后觉醒<span class="em">星球技能</span>：Q 轨道打击 · W 引力护盾 · E 超频生产（消耗星球能量，自动回蓝）<br>
     ・ <span class="em">消灭星域内全部敌星</span>，即可称霸这片宇宙！
@@ -274,6 +289,17 @@ const sfx = {
 // ================= 星空背景 =================
 const stars = [];
 for(let i=0;i<260;i++) stars.push({ x:Math.random(), y:Math.random(), r:Math.random()*1.6+0.3, tw:Math.random()*Math.PI*2, sp:Math.random()*0.4+0.1 });
+// 太空尘埃（视差漂移）
+const dust = [];
+for(let i=0;i<60;i++) dust.push({ x:Math.random(), y:Math.random(), r:Math.random()*2.2+0.8, vx:(Math.random()-0.5)*0.006, vy:(Math.random()-0.5)*0.004, a:Math.random()*0.12+0.04 });
+// 小行星带
+const asteroids = [];
+for(let i=0;i<14;i++){
+  const x = Math.random(), y = Math.random();
+  // 避开中心区域
+  if(Math.hypot(x-0.5, y-0.52) < 0.18) continue;
+  asteroids.push({ x, y, r:Math.random()*8+4, rot:Math.random()*Math.PI*2, rotSp:(Math.random()-0.5)*0.3, verts:Array.from({length:7},()=>0.75+Math.random()*0.4) });
+}
 
 // ================= 飞船类型 =================
 const SHIPS = [
@@ -289,7 +315,8 @@ const SHIPS = [
 // ================= 救场神器 =================
 const MISSILES = {
   nuke:    { name:'核弹',     cost:500,  radius:80,  dmgShip:150, dmgPlanet:120, color:'#ffd76a' },
-  counter: { name:'反制炸弹', cost:1000, radius:140, dmgShip:400, dmgPlanet:300, color:'#ff5be3' }
+  counter: { name:'反制炸弹', cost:1000, radius:140, dmgShip:400, dmgPlanet:300, color:'#ff5be3' },
+  anti:    { name:'反物质炸弹', cost:2000, radius:240, dmgShip:1200, dmgPlanet:1200, color:'#ff2bd6' }
 };
 let missiles = [];   // { x,y, tx,ty, t, fuse, def, friendly }
 let armedType = null; // 玩家已上膛、等待点击落点的导弹类型
@@ -426,7 +453,12 @@ const ENEMY_DEFS = [
 ];
 
 let player, enemies, ships, eships, shots, parts, floaters;
-let running = false, gameTime = 0, lastTs = 0, kills = 0, built = 0, mouseX = 0, mouseY = 0;
+let running = false, paused = false, gameTime = 0, lastTs = 0, kills = 0, built = 0, mouseX = 0, mouseY = 0;
+// 连杀
+let comboCount = 0, comboTimer = 0;
+// 最高分
+function getHi(){ try{ return parseInt(localStorage.getItem('xqz_hi')||'0',10); }catch(e){ return 0; } }
+function setHi(v){ try{ localStorage.setItem('xqz_hi', String(v)); }catch(e){} }
 
 function initGame(){
   player = {
@@ -448,6 +480,9 @@ function initGame(){
   }));
   ships = []; eships = []; shots = []; parts = []; floaters = [];
   missiles = []; armedType = null;
+  energy = 100; skillCds = { Q:0, W:0, E:0 };
+  shieldT = 0; overclockT = 0; orbitalArmed = false;
+  comboCount = 0; comboTimer = 0;
   gameTime = 0; kills = 0; built = 0;
   autoTarget();
 }
@@ -560,6 +595,19 @@ function destroyEnemy(e, devoured){
   sfx.boom();
   explode(e.x, e.y, e.color, 60, 5);
   explode(e.x, e.y, '#ffffff', 25, 3);
+  // 连杀判定
+  comboCount = (comboTimer > 0) ? comboCount + 1 : 1;
+  comboTimer = 12;
+  if(comboCount >= 2){
+    const bonus = comboCount * 40;
+    player.stardust += bonus;
+    energy = Math.min(energyMax, energy + 15);
+    const el = document.getElementById('combo');
+    el.textContent = `🔥 ${comboCount} 连杀！ +${bonus}✦ +15⚡`;
+    el.classList.remove('hidden');
+    el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+    setTimeout(() => el.classList.add('hidden'), 2200);
+  }
   if(devoured === false){
     // 被其他敌星击毁：玩家无法吞噬，只回收少量残骸
     player.stardust += 30;
@@ -585,7 +633,12 @@ function destroyEnemy(e, devoured){
 function endGame(winFlag){
   running = false;
   const mins = Math.floor(gameTime/60), secs = Math.floor(gameTime%60);
-  const stats = `用时 <b>${mins}分${secs}秒</b> ・ 击毁敌星 <b>${kills}</b> 颗<br>建造飞船 <b>${built}</b> 艘 ・ 最终星球规模 <b>${(player.r/20).toFixed(1)}</b>`;
+  // 最高分（胜利局按用时，越短越好；用击杀+规模作为败局分）
+  const score = winFlag ? Math.round(100000 - gameTime*100 + kills*1000) : kills*500 + Math.round(player.r*10);
+  const hi = getHi();
+  const isNew = score > hi;
+  if(isNew) setHi(score);
+  const stats = `用时 <b>${mins}分${secs}秒</b> ・ 击毁敌星 <b>${kills}</b> 颗<br>建造飞船 <b>${built}</b> 艘 ・ 最终星球规模 <b>${(player.r/20).toFixed(1)}</b><br>评分 <b>${score}</b>${isNew ? ' <span style="color:#7dffb0;">🏆 新纪录！</span>' : `（最高 ${hi}）`}`;
   document.getElementById(winFlag ? 'endstats' : 'endstats2').innerHTML = stats;
   document.getElementById(winFlag ? 'win' : 'lose').classList.remove('hidden');
   document.getElementById('hud').classList.add('hidden');
@@ -730,13 +783,17 @@ function update(dt){
     // ---- 敌方发射导弹 ----
     e.missileCd -= dt;
     if(e.missileCd <= 0){
+      // 攒够 3500 星尘（用概率表示）的敌星才会动用反物质炸弹，且仅大型敌星有资格
+      let type;
+      if(e.r >= 34 && Math.random() < 0.1) type = 'anti';
+      else type = (e.r >= 30 && Math.random() < 0.4) ? 'counter' : 'nuke';
       e.missileCd = 40 + Math.random()*30;
-      const type = (e.r >= 30 && Math.random() < 0.4) ? 'counter' : 'nuke';
       const tx = player.x + (Math.random()-0.5)*player.r*4;
       const ty = player.y + (Math.random()-0.5)*player.r*4;
       launchMissile(type, e.x, e.y, tx, ty, false);
-      showHint(`⚠ 【${e.name}】发射了${MISSILES[type].name}！注意躲避！`);
-      floater(e.x, e.y - e.r - 22, '☢ 导弹发射！', '#ff5b6a');
+      const big = type === 'anti';
+      showHint(`⚠ 【${e.name}】发射了${MISSILES[type].name}！${big ? '☠ 需 3500 星尘的毁灭级武器，立即使用引力护盾或撤离母星！' : '注意躲避！'}`);
+      floater(e.x, e.y - e.r - 22, big ? '⊙ 反物质炸弹发射！' : '☢ 导弹发射！', big ? '#ff2bd6' : '#ff5b6a');
     }
   }
 
@@ -852,6 +909,23 @@ function update(dt){
     if(hit || p.life <= 0) shots.splice(i,1);
   }
 
+  // ---- 连杀计时 ----
+  if(comboTimer > 0){ comboTimer -= dt; if(comboTimer <= 0) comboCount = 0; }
+
+  // ---- 损伤冒烟 ----
+  if(player.hp < player.maxHp * 0.5 && Math.random() < dt * 8){
+    const a = Math.random()*Math.PI*2;
+    parts.push({ x:player.x + Math.cos(a)*player.r*0.7, y:player.y + Math.sin(a)*player.r*0.7,
+      vx:(Math.random()-0.5)*0.5, vy:-Math.random()*0.8-0.2, life:1, decay:0.02, color:'#666a80', r:Math.random()*4+2 });
+  }
+  for(const e of enemies){
+    if(e.alive && e.hp < e.maxHp * 0.4 && Math.random() < dt * 6){
+      const a = Math.random()*Math.PI*2;
+      parts.push({ x:e.x + Math.cos(a)*e.r*0.7, y:e.y + Math.sin(a)*e.r*0.7,
+        vx:(Math.random()-0.5)*0.5, vy:-Math.random()*0.8-0.2, life:1, decay:0.02, color:'#666a80', r:Math.random()*4+2 });
+    }
+  }
+
   // ---- 粒子 / 浮字 ----
   for(let i = parts.length-1; i >= 0; i--){
     const p = parts[i];
@@ -897,6 +971,33 @@ function render(){
     ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
+  // 太空尘埃漂移
+  for(const d of dust){
+    d.x += d.vx*0.016; d.y += d.vy*0.016;
+    if(d.x < 0) d.x = 1; if(d.x > 1) d.x = 0;
+    if(d.y < 0) d.y = 1; if(d.y > 1) d.y = 0;
+    ctx.globalAlpha = d.a;
+    ctx.fillStyle = '#aab4dd';
+    ctx.beginPath(); ctx.arc(d.x*W, d.y*H, d.r, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // 小行星
+  for(const a of asteroids){
+    a.rot += a.rotSp * 0.016;
+    ctx.save();
+    ctx.translate(a.x*W, a.y*H);
+    ctx.rotate(a.rot);
+    ctx.fillStyle = '#1a2038';
+    ctx.strokeStyle = '#2c3554';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for(let i = 0; i < 7; i++){
+      const ang = (i/7)*Math.PI*2, rr = a.r * a.verts[i];
+      i ? ctx.lineTo(Math.cos(ang)*rr, Math.sin(ang)*rr) : ctx.moveTo(Math.cos(ang)*rr, Math.sin(ang)*rr);
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
 
   if(!player) return;
 
@@ -1105,8 +1206,11 @@ function refreshHud(){
   $('btnNuke').classList.toggle('armed', armedType === 'nuke');
   $('btnCounter').classList.toggle('disabled', player.stardust < MISSILES.counter.cost);
   $('btnCounter').classList.toggle('armed', armedType === 'counter');
+  $('btnAnti').classList.toggle('disabled', player.stardust < MISSILES.anti.cost);
+  $('btnAnti').classList.toggle('armed', armedType === 'anti');
   $('btnSpeed').classList.toggle('disabled', player.stardust < SPEED_COST);
   $('speedlv').textContent = 'Lv.' + player.speedLv;
+  $('hiscore').textContent = getHi() || '--';
 
   // 技能栏
   $('energyfill').style.width = (energy/energyMax*100) + '%';
@@ -1137,7 +1241,7 @@ function refreshHud(){
 function loop(ts){
   const dt = Math.min(0.05, (ts - lastTs)/1000 || 0.016);
   lastTs = ts;
-  if(running){ update(dt); refreshHud(); }
+  if(running && !paused){ update(dt); refreshHud(); }
   render();
   requestAnimationFrame(loop);
 }
@@ -1146,8 +1250,13 @@ requestAnimationFrame(loop);
 // ================= 输入 =================
 canvas.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
+document.getElementById('resumebtn').addEventListener('click', () => {
+  paused = false;
+  document.getElementById('paused').classList.add('hidden');
+});
+
 canvas.addEventListener('click', e => {
-  if(!running) return;
+  if(!running || paused) return;
   const mx = e.clientX, my = e.clientY;
   // 轨道打击已就绪 → 此次点击为锁定打击点
   if(orbitalArmed){
@@ -1186,14 +1295,23 @@ canvas.addEventListener('click', e => {
 SHIPS.forEach((d,i) => $('btn'+i).addEventListener('click', () => buildShip(i)));
 $('btnNuke').addEventListener('click', () => running && armMissile('nuke'));
 $('btnCounter').addEventListener('click', () => running && armMissile('counter'));
+$('btnAnti').addEventListener('click', () => running && armMissile('anti'));
 $('btnSpeed').addEventListener('click', () => running && buySpeed());
 for(const k of ['Q','W','E']) $('skill'+k).addEventListener('click', () => running && castSkill(k));
 addEventListener('keydown', e => {
-  if(!running) return;
+  if(e.key === 'p' || e.key === 'P'){
+    if(running){
+      paused = !paused;
+      document.getElementById('paused').classList.toggle('hidden', !paused);
+    }
+    return;
+  }
+  if(!running || paused) return;
   const k = e.key.toUpperCase();
   if(k === 'Q' || k === 'W' || k === 'E'){ castSkill(k); return; }
   if(e.key === '8'){ armMissile('nuke'); return; }
   if(e.key === '9'){ armMissile('counter'); return; }
+  if(e.key === '-' || e.key === '_'){ armMissile('anti'); return; }
   if(e.key === '0'){ buySpeed(); return; }
   const n = parseInt(e.key, 10);
   if(n >= 1 && n <= SHIPS.length) buildShip(n - 1);

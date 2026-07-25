@@ -1296,6 +1296,7 @@ function updateCardVisibility(){
   $('cardFirecactus').classList.toggle('locked', !plantUnlocked('firecactus'));
   $('cardTriplegat').classList.toggle('locked', !plantUnlocked('triplegat'));
   $('cardIcecannon').classList.toggle('locked', !plantUnlocked('icecannon'));
+  fitLayout();   // 卡片增减会导致工具栏换行高度变化，重算画布缩放
 }
 function levelComplete(){
   if(state!=='playing') return;
@@ -1482,6 +1483,22 @@ function drawCardIcons(){
   c11.fillStyle='#fff'; c11.beginPath(); c11.arc(17,22,2,0,Math.PI*2); c11.fill(); c11.beginPath(); c11.arc(40,26,2,0,Math.PI*2); c11.fill();
 }
 
+/* ================= 画布自适应：工具栏换行/窗口变化时保证5行草坪完整可见 ================= */
+function fitLayout(){
+  const wrap = document.getElementById('wrap');
+  const tipEl = document.getElementById('tip');
+  const topEnd = wrap.offsetTop;                            // 标题+工具栏实际占用高度（换行后会变大）
+  const tipH = (tipEl ? tipEl.offsetHeight : 0) + 18;
+  const availH = window.innerHeight - topEnd - tipH;        // 画布可用高度
+  const availW = Math.min(window.innerWidth - 16, 948);     // 画布可用宽度（948 = 940 + 8px边框）
+  let scale = Math.min(1, availW/948, availH/508);          // 508 = 500 + 8px边框
+  // 底线：不小于0.5倍（除非宽度本身放不下），避免游戏过小
+  scale = Math.max(scale, Math.min(0.5, availW/948));
+  canvas.style.width  = Math.round(948*scale) + 'px';
+  canvas.style.height = Math.round(508*scale) + 'px';
+}
+window.addEventListener('resize', fitLayout);
+
 /* ================= 循环启动 ================= */
 function loop(t){
   if(!lastT) lastT = t;
@@ -1496,6 +1513,7 @@ function loop(t){
 }
 drawCardIcons();
 updateSun();
+fitLayout();
 requestAnimationFrame(loop);
 </script>
 </body>

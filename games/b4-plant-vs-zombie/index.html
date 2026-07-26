@@ -2399,8 +2399,8 @@ function fitLayout(){
   const availH = window.innerHeight - topEnd - tipH;        // 画布可用高度
   const availW = Math.min(window.innerWidth - 16, 948);     // 画布可用宽度（948 = 940 + 8px边框）
   let scale = Math.min(1, availW/948, availH/508);          // 508 = 500 + 8px边框
-  // 底线：不小于0.5倍（除非宽度本身放不下），避免游戏过小
-  scale = Math.max(scale, Math.min(0.5, availW/948));
+  // 底线：不小于0.35倍（究极模式14张卡片换行时需要更小缩放），宽屏下以高度为准
+  scale = Math.max(scale, Math.min(0.35, availW/948));
   canvas.style.width  = Math.round(948*scale) + 'px';
   canvas.style.height = Math.round(508*scale) + 'px';
 }

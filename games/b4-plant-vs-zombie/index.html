@@ -493,11 +493,11 @@ const $ = id => document.getElementById(id);
 const rand = (a,b) => a + Math.random()*(b-a);
 const ri = (a,b) => Math.floor(rand(a,b+1));
 function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=ri(0,i); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
-const rowY = r => 60 + r*CELL_H + CELL_H/2;
+const rowY = r => r*CELL_H + CELL_H/2;
 const cellX = c => LAWN_X + c*CELL;
 const colX = c => LAWN_X + c*CELL + CELL/2;
 const colAt = x => Math.floor((x - LAWN_X)/CELL);
-const rowAt = y => Math.floor((y - 60)/CELL_H);
+const rowAt = y => Math.floor(y/CELL_H);
 function plantAt(r,c){ return plants.find(p => p.row===r && p.col===c); }
 
 let AC = null;
@@ -1350,29 +1350,29 @@ function draw(){
       if(isWaterRow(r)){
         // 水路
         ctx.fillStyle = ((r+c)%2===0) ? '#42a5f5' : '#1e88e5';
-        ctx.fillRect(cellX(c), 60+r*CELL_H, CELL, CELL_H);
+        ctx.fillRect(cellX(c), r*CELL_H, CELL, CELL_H);
         // 水波纹
         ctx.strokeStyle = 'rgba(255,255,255,0.18)';
         ctx.lineWidth = 1.5;
-        const wy = 60 + r*CELL_H + CELL_H*0.5 + Math.sin(time*1.5 + c*0.7 + r) * 6;
+        const wy = r*CELL_H + CELL_H*0.5 + Math.sin(time*1.5 + c*0.7 + r) * 6;
         ctx.beginPath();
         ctx.moveTo(cellX(c)+12, wy);
         ctx.quadraticCurveTo(cellX(c)+CELL*0.5, wy-4, cellX(c)+CELL-12, wy);
         ctx.stroke();
-        const wy2 = 60 + r*CELL_H + CELL_H*0.75 + Math.sin(time*1.8 + c*0.5 + r+2) * 4;
+        const wy2 = r*CELL_H + CELL_H*0.75 + Math.sin(time*1.8 + c*0.5 + r+2) * 4;
         ctx.beginPath();
         ctx.moveTo(cellX(c)+16, wy2);
         ctx.quadraticCurveTo(cellX(c)+CELL*0.5, wy2-3, cellX(c)+CELL-16, wy2);
         ctx.stroke();
       } else {
         ctx.fillStyle = ((r+c)%2===0) ? '#8ed35a' : '#7ec24e';
-        ctx.fillRect(cellX(c), 60+r*CELL_H, CELL, CELL_H);
+        ctx.fillRect(cellX(c), r*CELL_H, CELL, CELL_H);
       }
     }
   }
   // 房子
   ctx.fillStyle = '#9c6b3f';
-  ctx.fillRect(0,60,LAWN_X,ROWS*CELL_H);
+  ctx.fillRect(0,0,LAWN_X,ROWS*CELL_H);
   ctx.fillStyle = '#7a4f2a';
   ctx.fillRect(0,40,LAWN_X+6,22);
   ctx.fillStyle = '#5c3a17';
@@ -1429,26 +1429,26 @@ function draw(){
     else if(ghost.canPlace) bg = 'rgba(139,195,74,0.4)';
     else bg = 'rgba(255,87,87,0.4)';
     ctx.fillStyle = bg;
-    ctx.fillRect(cellX(ghost.col), 60 + ghost.row * CELL_H, CELL, CELL_H);
+    ctx.fillRect(cellX(ghost.col), ghost.row * CELL_H, CELL, CELL_H);
     // 融合提示文字
     if(ghost.isFusion && ghost.fusedType){
       ctx.globalAlpha = 0.9;
       ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
       ctx.fillStyle = '#b8860b';
-      ctx.fillText('🔮融合为 ' + PLANTS[ghost.fusedType].name, colX(ghost.col), 60 + ghost.row * CELL_H + 18);
+      ctx.fillText('🔮融合为 ' + PLANTS[ghost.fusedType].name, colX(ghost.col), ghost.row * CELL_H + 18);
     }
     // 水路提示
     if(ghost.waterTile && !ghost.canPlace && ghost.type!=='lilypad'){
       ctx.globalAlpha = 0.9;
       ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
       ctx.fillStyle = '#1565c0';
-      ctx.fillText('需先种睡莲', colX(ghost.col), 60 + ghost.row * CELL_H + 18);
+      ctx.fillText('需先种睡莲', colX(ghost.col), ghost.row * CELL_H + 18);
     }
     if(ghost.waterTile && ghost.type==='lilypad' && ghost.canPlace){
       ctx.globalAlpha = 0.9;
       ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
       ctx.fillStyle = '#1565c0';
-      ctx.fillText('🪷种睡莲', colX(ghost.col), 60 + ghost.row * CELL_H + 18);
+      ctx.fillText('🪷种睡莲', colX(ghost.col), ghost.row * CELL_H + 18);
     }
     ctx.globalAlpha = 0.5;
     // 半透明植物预览

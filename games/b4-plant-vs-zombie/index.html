@@ -80,6 +80,7 @@
     background:linear-gradient(180deg,#8bc34a,#558b2f); color:#fff;
     border:3px solid #33691e; border-radius:12px; cursor:pointer;
   }
+
   .big-btn:hover { filter:brightness(1.1); }
   .hidden { display:none !important; }
   #banner {
@@ -89,6 +90,77 @@
     pointer-events:none; opacity:0; transition:opacity .4s; z-index:10; white-space:nowrap; text-align:center;
   }
   #tip { color:#33502a; font-size:14px; margin-top:6px; }
+  /* ===== 登录界面 ===== */
+  #loginOverlay {
+    position:fixed; inset:0; background:linear-gradient(180deg,rgba(46,90,30,.85),rgba(20,50,10,.92));
+    display:flex; align-items:center; justify-content:center; z-index:100;
+  }
+  #loginOverlay.hidden { display:none !important; }
+  .login-panel {
+    background:linear-gradient(180deg,#fffbe8,#fff5d0); border:6px solid #e0a814; border-radius:22px;
+    padding:36px 40px; width:440px; max-width:92vw; text-align:center;
+    box-shadow:0 16px 50px rgba(0,0,0,.4);
+  }
+  .login-panel h2 { color:#b8860b; font-size:24px; margin-bottom:6px; }
+  .login-panel .sub { color:#8a6d1f; font-size:14px; margin-bottom:20px; }
+  .login-input-wrap { margin-bottom:16px; }
+  .login-input {
+    width:100%; padding:14px 16px; font-size:18px; font-weight:bold; text-align:center;
+    border:3px solid #c9b458; border-radius:12px; background:#fffdf5; color:#5a4a12;
+    outline:none; transition:border-color .2s;
+  }
+  .login-input:focus { border-color:#ff9f1c; box-shadow:0 0 8px rgba(255,159,28,.3); }
+  .login-input::placeholder { color:#c4b89c; font-weight:normal; }
+  .login-btn {
+    width:100%; padding:14px; font-size:20px; font-weight:bold;
+    background:linear-gradient(180deg,#8bc34a,#558b2f); color:#fff;
+    border:3px solid #33691e; border-radius:12px; cursor:pointer;
+    transition:transform .1s,filter .15s; margin-top:4px;
+  }
+  .login-btn:hover { filter:brightness(1.1); transform:scale(1.02); }
+  .login-btn:active { transform:scale(.98); }
+  .login-btn:disabled { filter:grayscale(.7); opacity:.6; cursor:not-allowed; transform:none; }
+  .player-list { margin-top:18px; text-align:left; }
+  .player-list .pl-title { font-size:14px; color:#8a6d1f; margin-bottom:8px; font-weight:bold; }
+  .player-list .pl-items { display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; }
+  .player-item {
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:#fffdf5; border:2px solid #d4c878; border-radius:10px; cursor:pointer;
+    transition:transform .1s,border-color .15s;
+  }
+  .player-item:hover { transform:translateX(4px); border-color:#ff9f1c; background:#fff8e8; }
+  .player-item .avatar {
+    width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:20px; flex:0 0 auto; background:#e8f5d0; border:2px solid #6a994e;
+  }
+  .player-item .pinfo { flex:1; min-width:0; }
+  .player-item .pname { font-size:16px; font-weight:bold; color:#33502a; }
+  .player-item .pstats { font-size:12px; color:#8a9a5b; }
+  .player-item .pdel {
+    font-size:18px; color:#c62828; cursor:pointer; padding:4px 8px; border-radius:6px;
+    transition:background .15s; flex:0 0 auto;
+  }
+  .player-item .pdel:hover { background:rgba(198,40,40,.12); }
+  /* ===== 玩家信息栏 ===== */
+  #playerBar {
+    width:940px; display:flex; align-items:center; gap:10px; margin-bottom:6px;
+  }
+  #playerInfo {
+    display:flex; align-items:center; gap:8px; background:#fffbe8;
+    border:2px solid #e0a814; border-radius:10px; padding:5px 14px;
+    font-size:15px; font-weight:bold; color:#5a4a12;
+  }
+  #playerInfo .avatar {
+    width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:16px; background:#e8f5d0; border:2px solid #6a994e;
+  }
+  #btnSwitch {
+    margin-left:auto; padding:5px 14px; font-size:13px; font-weight:bold; cursor:pointer;
+    border:2px solid #5c3a17; border-radius:8px;
+    background:linear-gradient(180deg,#e8d6ff,#c8a0ff); color:#4a1a8a;
+    transition:transform .1s;
+  }
+  #btnSwitch:hover { transform:scale(1.05); }
   /* ===== 控制按钮栏 ===== */
   #ctrlBar {
     width:940px; display:flex; align-items:center; gap:8px; margin-bottom:6px;
@@ -133,31 +205,35 @@
     .ctrl-btn { padding:6px 10px; font-size:12px; }
     #progressWrap { width:100%; margin-top:4px; }
     #topbar { width:100%; }
+    #playerBar { width:100%; }
+    .login-panel { padding:24px 20px; }
   }
 </style>
-<script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
-<script>
-(function(){
-  try{
-    var beacon=new BeaconAction({
-      appkey:'0WEB06U85YBSLJNL',
-      versionCode:'1.0.0',
-      channelID:'share',
-      delay:1000,
-      sessionDuration:30*60*1000,
-      isOversea:false,
-      needReportRqdEvent:false
-    });
-    beacon.onDirectUserAction('preview_page_view',{
-      'url':location.href,
-      'referrer':document.referrer,
-      'title':document.title,
-      'sandbox_id':'b8d1bb38d3ef4923a46d6777779e2590'
-    });
-  }catch(e){}
-})();
-</script></head>
+</head>
 <body>
+
+<!-- 登录界面 -->
+<div id="loginOverlay">
+  <div class="login-panel">
+    <h2>🌻 植物大战僵尸 · 学习版</h2>
+    <div class="sub">输入你的名字，创建专属冒险档案！</div>
+    <div class="login-input-wrap">
+      <input type="text" class="login-input" id="loginName" placeholder="输入你的名字…" maxlength="12" autocomplete="off">
+    </div>
+    <button class="login-btn" id="btnLogin" disabled>🎮 开始冒险</button>
+    <div class="player-list" id="playerList"></div>
+  </div>
+</div>
+
+<!-- 玩家信息栏 -->
+<div id="playerBar">
+  <div id="playerInfo">
+    <div class="avatar" id="playerAvatar">🧑</div>
+    <span id="playerNameText">玩家</span>
+  </div>
+  <button id="btnSwitch">🔄 切换账号</button>
+</div>
+
 <h1>🌻 植物大战僵尸 · 学习版 🧟</h1>
 
 <div id="ctrlBar">
@@ -243,6 +319,32 @@
     <div class="cost">☀️500</div>
     <div class="cd" style="height:0"></div>
   </div>
+  <div class="card locked" id="cardNugatling" data-plant="nugatling" title="究极毁灭核爆机枪射手【究极】：每0.5s四发核爆弹·5×6超大范围·中心10000伤·杀100僵尸大招">
+    <canvas width="54" height="48"></canvas>
+    <div class="cost">☀️700</div>
+    <div class="cd" style="height:0"></div>
+  </div>
+  <div class="card" id="cardShroom_ice" data-plant="shroom_ice" title="寒冰菇：可用于融合">
+    <canvas width="54" height="48"></canvas>
+    <div class="cost">☀️75</div>
+    <div class="cd" style="height:0"></div>
+  </div>
+  <div class="card" id="cardShroom_doom" data-plant="shroom_doom" title="毁灭菇：可用于融合">
+    <canvas width="54" height="48"></canvas>
+    <div class="cost">☀️125</div>
+    <div class="cd" style="height:0"></div>
+  </div>
+  <!-- 我是僵尸模式：僵尸卡牌 -->
+  <div class="card zcard hidden" data-zombie="normal" title="普通僵尸 50阳光"><canvas width="54" height="48"></canvas><div class="cost">☀️50</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="imp" title="小鬼僵尸 50阳光(快)"><canvas width="54" height="48"></canvas><div class="cost">☀️50</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="cone" title="路障僵尸 75阳光"><canvas width="54" height="48"></canvas><div class="cost">☀️75</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="bucket" title="铁桶僵尸 150阳光"><canvas width="54" height="48"></canvas><div class="cost">☀️150</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="screendoor" title="铁网门僵尸 125阳光"><canvas width="54" height="48"></canvas><div class="cost">☀️125</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="football" title="橄榄球僵尸 250阳光(快而肉)"><canvas width="54" height="48"></canvas><div class="cost">☀️250</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="ladder" title="扶梯僵尸 225阳光(翻植物)"><canvas width="54" height="48"></canvas><div class="cost">☀️225</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="giant" title="巨人僵尸 450阳光(砸碎植物)"><canvas width="54" height="48"></canvas><div class="cost">☀️450</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="clown" title="小丑僵尸 150阳光(爆炸)"><canvas width="54" height="48"></canvas><div class="cost">☀️150</div><div class="cd" style="height:0"></div></div>
+  <div class="card zcard hidden" data-zombie="balloon" title="气球僵尸 50阳光(飞)"><canvas width="54" height="48"></canvas><div class="cost">☀️50</div><div class="cd" style="height:0"></div></div>
   <div id="shovel" title="铲子：移除植物">🪓</div>
   <div id="waveInfo">第 <b id="lvNum">1</b>/<span id="lvTotal">5</span> 关 · <span id="waveNum">0</span>/5 波<br><span id="zLeft"></span></div>
 </div>
@@ -251,7 +353,7 @@
   <canvas id="game" width="940" height="500"></canvas>
   <div id="banner"></div>
 </div>
-<div id="tip">👆 点击天降☀️收集阳光 | 🔮种同格植物触发融合进化 | ❄️寒冰减速 | ⛏️矿工绕后→双向射手对付 | 🏊泳池需先种睡莲 | 📖答题得阳光</div>
+<div id="tip">👆 点击天降☀️收集阳光 | 🔮种同格植物触发融合进化 | ❄️寒冰减速 | ⛏️矿工绕后→双向射手对付 | 🏊泳池需先种睡莲 | 🍄寒冰菇/毁灭菇融合 | 📖答题得阳光</div>
 
 <!-- 答题弹窗 -->
 <div class="overlay hidden" id="quizOverlay">
@@ -265,7 +367,7 @@
 </div>
 
 <!-- 开始/结束弹窗 -->
-<div class="overlay" id="msgOverlay">
+<div class="overlay hidden" id="msgOverlay">
   <div class="panel">
     <h2 id="msgTitle">🌻 植物大战僵尸 · 学习版</h2>
     <div class="q" id="msgText" style="font-size:17px;font-weight:normal;text-align:left;">
@@ -274,19 +376,22 @@
       🌻 向日葵50☀️(每5秒产25☀️) | 🌱 豌豆射手100☀️(20伤)<br>
       🥜 坚果墙50☀️(4000血) | 🌿 双重射手200☀️(2倍) | 🔫 机枪射手450☀️(4倍)<br>
       🍒 樱桃炸弹150☀️(3×3·1500伤·一次性) | ❄️ 寒冰射手175☀️(减速僵尸)<br>
+      🍄 寒冰菇75☀️ | ☠️ 毁灭菇125☀️<br>
       🔒 通关第1关解锁 <b>超级机枪射手</b>，第2关解锁 <b>仙人掌</b><br>
       🔒 通关第4关解锁 <b>🪷睡莲</b> + <b>❄️寒冰双重射手</b>！<br><br>
       🔮 <b>融合系统</b>：在已有植物上再种一棵，触发特殊融合！<br>
       🌱+🌱 = 🌿双重射手 | 🌿+🌱 = ↔️双向射手(前后双射) | ↔️+🌱 = 🔫机枪射手<br>
-      🥜+🌱 = 🎳坚果射手(发射150伤保龄球坚果) | 🌻+🥜 = ☀️向日葵豌豆(阳光子弹:命中+50☀️击杀+125☀️)<br>
-      ❄️寒冰射手+🌱豌豆 = ❄️🌿寒冰双重射手(双倍冰豌豆+减速)！<br><br>
+      🥜+🌱 = 🎳坚果射手(150伤保龄球) | 🌻+🌱 = ☀️向日葵豌豆(阳光子弹:命中+50☀️击杀+75☀️)<br>
+      🥜+🎳 = 💪超级保龄球射手(1.5s/发·无限穿透1000伤)！<br>
+      ❄️寒冰射手+🌱豌豆 = ❄️🌿寒冰双重射手 | 🍄寒冰菇+🌱 = ❄️寒冰射手<br>
+      🌿双重射手+🍄寒冰菇 = ❄️🌿寒冰双重射手 | 🌱+☠️毁灭菇 = 💥毁灭豌豆射手(10s/发·2000伤大爆炸)！<br><br>
       🧟 普通270 | 🚧 路障500 | 🪣 铁桶1000 | 🏃 撑杆720(会跳)<br>
       👺 第2关新增：小鬼(快)、巨人(3000血·砸碎植物)<br>
       🤡 第3关新增：小丑(爆炸毁植物)、气球(会飞·只有仙人掌能打)，且血量翻倍！<br>
       ⛏️ 第4关新增：矿工僵尸(挖地道绕到后方！双向射手能从背后攻击它)<br>
       🏊 第5关：<b>泳池地图</b>！中间三路是水，需先种<b>睡莲</b>才能种植物！<br><br>
-      🔥 <b>究极模式</b>：共 <b>20 关</b>！开局送 500☀️，全部植物直接解锁，额外拥有三大究极植物——<br>
-      🌵🔥火焰仙人掌300☀️(火焰溅射) | 🟣三线超级机枪800☀️(打三行) | ❄️寒冰毁灭加农炮500☀️(1800伤+冻结)<br>
+      🔥 <b>究极模式</b>：共 <b>20 关</b>！开局送 500☀️，全部植物直接解锁，额外拥有四大究极植物——<br>
+      🌵🔥火焰仙人掌300☀️(火焰溅射) | 🟣三线超级机枪800☀️(打三行) | ❄️寒冰毁灭加农炮500☀️(1800伤+冻结) | ☢️究极毁灭核爆机枪700☀️(核爆10000伤)<br>
       🏈 第2关起：橄榄球、铁网门、读报(狂暴)、扶梯(翻植物)僵尸<br>
       💀 BOSS：第5关<b>特种巨人</b>(2万血·快) | 第10关<b>武装巨人</b>(4万血) | 第15关<b>究极黑曜石巨人</b>(6万血) | 第20关三巨头齐上！<br><br>
       📖 点左上角「获得阳光」，答对 2~5 年级数学/英语/科学题 +100☀️
@@ -296,11 +401,10 @@
     <div id="modeSel" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
       <button class="big-btn" id="modeNormal" style="background:linear-gradient(180deg,#8bc34a,#558b2f);">🌱 普通模式</button>
       <button class="big-btn" id="modeUltimate" style="background:linear-gradient(180deg,#ff5252,#b71c1c);border-color:#7f0000;">🔥 究极模式</button>
+      <button class="big-btn" id="modeZombie" style="background:linear-gradient(180deg,#7e57c2,#4527a0);border-color:#311b92;">🧟 我是僵尸</button>
     </div>
 
-  </div>
 </div>
-
 
 <script>
 "use strict";
@@ -324,17 +428,29 @@ const PLANTS = {
   firecactus:{ name:'火焰仙人掌',  cost:300, hp:450,  cooldown:10, fireRate:2, air:true, ult:true, fire:true },
   triplegat: { name:'三线超级机枪',cost:800, hp:600,  cooldown:20, fireRate:6, air:true, ult:true, triple:true },
   icecannon: { name:'寒冰毁灭加农炮',cost:500,hp:800, cooldown:30, ult:true, cannon:true },
+  nugatling: { name:'究极毁灭核爆机枪射手',cost:700,hp:1200, cooldown:40, ult:true, air:true, nuclear:true },
   // ===== 泳池关卡通关解锁 =====
   lilypad:  { name:'睡莲',           cost:25,  hp:300,  cooldown:3, platform:true },
   icedouble:{ name:'寒冰双重射手',   cost:350, hp:300,  cooldown:8, fireRate:2, slow:true },
+  // ===== 新植物：蘑菇类 =====
+  shroom_ice:  { name:'寒冰菇',  cost:75,  hp:200, cooldown:8, shroom:true },
+  shroom_doom: { name:'毁灭菇',  cost:125, hp:200, cooldown:20, shroom:true },
   // ===== 融合专属植物（无卡牌、无法直接购买）=====
-  bidirectional: { name:'双向射手',     fusion:true, hp:350, fireRate:1, dualDir:true },
+  bidirectional: { name:'双向射手',     fusion:true, hp:350, fireRate:2, dualDir:true },
   nutshooter:    { name:'坚果射手',     fusion:true, hp:5000,fusionNut:true, nutCannon:true },
-  sunpeashooter: { name:'向日葵豌豆',   fusion:true, hp:350, sunPea:true }
+  sunpeashooter: { name:'向日葵豌豆',   fusion:true, hp:350, sunPea:true },
+  dualsupergat:  { name:'双向超级机枪', fusion:true, hp:500, fireRate:6, dualDir:true, ult:true, air:true },
+  doompea:       { name:'毁灭豌豆射手', fusion:true, hp:400, doomPea:true },
+  superbowling:  { name:'超级保龄球射手', fusion:true, hp:8000, superBowling:true }
 };
 const CHERRY_DMG = 1500, CHERRY_FUSE = 1.0;
 const NUT_DMG = 150, NUT_SPEED = 180, NUT_INTERVAL = 2.2;   // 坚果射手：保龄球坚果
 const SUNPEA_DMG = 20, SUNPEA_HIT_DROP = 50, SUNPEA_KILL_DROP = 75; // 向日葵豌豆：命中掉落+击杀额外掉落
+const DOOMPEA_INTERVAL = 10, DOOMPEA_DMG = 2000, DOOMPEA_RANGE = 2;    // 毁灭豌豆射手：10s一发，命中大范围2000伤害
+const SUPERBOWL_INTERVAL = 1.5, SUPERBOWL_DMG = 1000;                  // 超级保龄球射手：1.5s一发，无限穿透1000伤
+const NUKE_INTERVAL = 0.5, NUKE_BULLETS = 4, NUKE_DMG = 10000;         // 究极毁灭核爆机枪射手：0.5s四发，中心10000伤
+const NUKE_RANGE_ROWS = 2, NUKE_RANGE_COLS = 2.5;                       // 核爆范围：±2行, ±2.5列 → 5×6超大范围
+const NUKE_ULT_KILLS = 100;                                              // 击杀100僵尸触发大招
 /* ===== 融合规则：key = 种植目标格已有植物类型 + '+' + 手持植物类型 ===== */
 const FUSIONS = {
   'pea+pea':             'double',
@@ -342,15 +458,41 @@ const FUSIONS = {
   'bidirectional+pea':   'gatling',
   'nut+pea':             'nutshooter',
   'pea+nut':             'nutshooter',
-  'sunflower+nut':       'sunpeashooter',
-  'nut+sunflower':       'sunpeashooter',
+  'sunflower+pea':       'sunpeashooter',
+  'pea+sunflower':       'sunpeashooter',
   'snowpea+pea':         'icedouble',
   'pea+snowpea':         'icedouble',
   'snowpea+double':      'icedouble',
   'double+snowpea':      'icedouble',
+  'supergat+supergat':   'dualsupergat',
+  'shroom_ice+pea':      'snowpea',
+  'pea+shroom_ice':      'snowpea',
+  'double+shroom_ice':   'icedouble',
+  'shroom_ice+double':   'icedouble',
+  'pea+shroom_doom':     'doompea',
+  'shroom_doom+pea':     'doompea',
+  'nutshooter+nut':      'superbowling',
+  'nut+nutshooter':      'superbowling',
 };
 const ULT_INTERVAL = 10, ULT_DURATION = 5, ULT_RATE = 500; // 超级机枪射手大招
+const DUAL_ULT_RATE = 200; // 双向超级机枪大招射速倍率
 const SUN_PRODUCE = 25, SUN_INTERVAL = 5;                  // 向日葵产阳光
+
+/* ===== 我是僵尸模式 ===== */
+const ZOMBIE_CARDS = {           // 僵尸阳光花费
+  normal:50, imp:50, cone:75, bucket:150, screendoor:125,
+  football:250, ladder:225, giant:450, clown:150, balloon:50
+};
+const ZOMBIE_CARD_LIST = Object.keys(ZOMBIE_CARDS);
+const BRAIN_HP = 200;            // 每路脑子血量
+const SUNFLOWER_EATEN_BONUS = 50; // 吃掉向日葵奖励阳光
+const ZOMBIE_LEVELS = [
+  { name:'我是僵尸·第1关', pool:false, startSun:150, plants:['pea','sunflower','nut'],            count:8  },
+  { name:'我是僵尸·第2关', pool:false, startSun:150, plants:['pea','sunflower','nut','double'],    count:10 },
+  { name:'我是僵尸·第3关', pool:true,  startSun:200, plants:['pea','sunflower','nut','snowpea'],   count:10 },
+  { name:'我是僵尸·第4关', pool:false, startSun:150, plants:['pea','sunflower','nut','double','gatling','cherry'], count:12, cherryDefensive:true },
+  { name:'我是僵尸·第5关', pool:true,  startSun:200, plants:['pea','sunflower','nut','double','snowpea','gatling'], count:14 },
+];
 const FIRE_DMG = 50, FIRE_SPLASH_DMG = 30, FIRE_SPLASH_R = 1;   // 火焰仙人掌溅射
 const CANNON_INTERVAL = 10, CANNON_DMG = 1800, FREEZE_TIME = 6; // 寒冰加农炮
 const ZOMBIES = {
@@ -455,7 +597,7 @@ function curLevels(){ return ultimate ? ULT_LEVELS : LEVELS; }
 
 /* ================= 状态 ================= */
 let sun = 150;
-let plants = [], zombies = [], peas = [], backPeas = [], nutBalls = [], floaters = [], particles = [], shells = [];
+let plants = [], zombies = [], peas = [], backPeas = [], nutBalls = [], doomBullets = [], superBowlingBalls = [], nuclearBullets = [], floaters = [], particles = [], shells = [];
 let skySuns = [];          // 天降阳光
 let sunDropTimer = 0;      // 天降阳光计时器
 let paused = false;        // 暂停
@@ -463,7 +605,7 @@ let speedMul = 1;          // 速度倍率 1或2
 let muted = false;         // 静音
 let ghost = null;          // 放置预览 {row,col,type}
 let waveProgress = 0;      // 当前波次进度0~1
-let stats = null;          // localStorage统计
+let stats = { bestLevel:0, totalKills:0, quizCorrect:0, gamesPlayed:0, unlocked:{} };  // 登录后加载实际数据
 let waveIdx = -1, spawnQueue = [], waveTimer = 0, betweenWave = 0;
 let state = 'ready';
 let selected = null;
@@ -475,9 +617,9 @@ let cooldowns = {}; PLANT_TYPES.forEach(t => cooldowns[t] = 0);
 let level = 0;                       // 当前关卡 0-based
 let curWaves = LEVELS[0].waves, hpMult = 1;
 let ultimate = false;                // 是否究极模式
-let unlocked = { supergat:false, cactus:false, firecactus:false, triplegat:false, icecannon:false, lilypad:false, icedouble:false };
-const ALL_UNLOCK = () => ({ supergat:true,  cactus:true,  firecactus:true,  triplegat:true,  icecannon:true,  lilypad:true,  icedouble:true });
-const NO_UNLOCK  = () => ({ supergat:false, cactus:false, firecactus:false, triplegat:false, icecannon:false, lilypad:false, icedouble:false });
+let unlocked = { supergat:false, cactus:false, firecactus:false, triplegat:false, icecannon:false, nugatling:false, lilypad:false, icedouble:false };
+const ALL_UNLOCK = () => ({ supergat:true,  cactus:true,  firecactus:true,  triplegat:true,  icecannon:true,  nugatling:true,  lilypad:true,  icedouble:true });
+const NO_UNLOCK  = () => ({ supergat:false, cactus:false, firecactus:false, triplegat:false, icecannon:false, nugatling:false, lilypad:false, icedouble:false });
 function plantUnlocked(type){
   const def = PLANTS[type];
   if(!def.ult && !def.unlockLv) return true;          // 普通植物始终可用
@@ -487,6 +629,12 @@ function plantUnlocked(type){
 }
 let killCount = 0, totalZombies = 0;
 let time = 0, lastT = 0;
+/* ===== 我是僵尸模式状态 ===== */
+let gameMode = 'plants';            // 'plants' | 'zombie'
+let zombieLevel = 0;
+let brains = [];                     // [{row,hp,maxHp,eaten}]
+let zombieCooldowns = {}; ZOMBIE_CARD_LIST.forEach(t=>zombieCooldowns[t]=0);
+let zombieStuckTimer = 0;  // 僵尸模式：资源耗尽计时器（5秒后判负）
 
 /* ================= 工具 ================= */
 const $ = id => document.getElementById(id);
@@ -514,13 +662,112 @@ function beep(freq, dur=0.08, type='square', vol=0.05){
   }catch(e){}
 }
 
-/* ===== localStorage 统计 ===== */
-function loadStats(){
-  try{ return JSON.parse(localStorage.getItem('pvz_stats')) || {bestLevel:0, totalKills:0, quizCorrect:0, gamesPlayed:0}; }
-  catch(e){ return {bestLevel:0, totalKills:0, quizCorrect:0, gamesPlayed:0}; }
+/* ===== 玩家账号系统 + per-player 存档 ===== */
+let currentPlayer = null;   // 当前登录玩家名
+const AVATARS = ['🧑','👩','👨','👧','👦','👩‍🌾','👨‍🌾','🧙','🐱','🐰','🦊','🐻'];
+function getAvatar(name){
+  if(!name) return '🧑';
+  let h = 0; for(let i=0;i<name.length;i++) h = (h*31 + name.charCodeAt(i)) | 0;
+  return AVATARS[Math.abs(h) % AVATARS.length];
 }
-function saveStats(){ try{ localStorage.setItem('pvz_stats', JSON.stringify(stats)); }catch(e){} }
-stats = loadStats();
+function defaultStats(){
+  return { bestLevel:0, totalKills:0, quizCorrect:0, gamesPlayed:0, unlocked:{ supergat:false, cactus:false, lilypad:false, icedouble:false } };
+}
+function loadPlayerList(){
+  try{ return JSON.parse(localStorage.getItem('pvz_players')) || []; }
+  catch(e){ return []; }
+}
+function savePlayerList(list){ try{ localStorage.setItem('pvz_players', JSON.stringify(list)); }catch(e){} }
+function playerKey(name){ return 'pvz_stats_' + name; }
+function loadStats(){
+  if(!currentPlayer) return defaultStats();
+  try{
+    const s = JSON.parse(localStorage.getItem(playerKey(currentPlayer)));
+    if(!s) return defaultStats();
+    // 兼容旧数据：确保unlocked字段存在
+    if(!s.unlocked) s.unlocked = { supergat:false, cactus:false, lilypad:false, icedouble:false };
+    return s;
+  } catch(e){ return defaultStats(); }
+}
+function saveStats(){ if(!currentPlayer) return; try{ localStorage.setItem(playerKey(currentPlayer), JSON.stringify(stats)); }catch(e){} }
+
+/* ===== 登录/登出 ===== */
+function login(name){
+  name = name.trim();
+  if(!name) return;
+  currentPlayer = name;
+  const list = loadPlayerList();
+  if(!list.includes(name)){
+    list.push(name);
+    savePlayerList(list);
+  }
+  stats = loadStats();
+  // 恢复该玩家的解锁状态
+  unlocked = ultimate ? ALL_UNLOCK() : Object.assign(NO_UNLOCK(), stats.unlocked || {});
+  // 更新UI
+  $('playerNameText').textContent = name;
+  $('playerAvatar').textContent = getAvatar(name);
+  $('loginOverlay').classList.add('hidden');
+  $('playerBar').style.display = 'flex';
+  // 显示主菜单
+  state = 'ready';
+  $('msgTitle').textContent = '🌻 植物大战僵尸 · 学习版';
+  $('msgText').style.textAlign = 'left'; $('msgText').style.fontSize = '17px'; $('msgText').style.fontWeight = 'normal';
+  showWelcomeMsg();
+  showMsgButtons('mode');
+  $('msgOverlay').classList.remove('hidden');
+  refreshPlayerList();
+}
+function logout(){
+  currentPlayer = null;
+  stats = defaultStats();
+  unlocked = NO_UNLOCK();
+  $('loginOverlay').classList.remove('hidden');
+  $('msgOverlay').classList.add('hidden');
+  $('playerBar').style.display = 'none';
+  $('loginName').value = '';
+  $('btnLogin').disabled = true;
+  refreshPlayerList();
+}
+function deletePlayer(name){
+  const list = loadPlayerList().filter(n => n !== name);
+  savePlayerList(list);
+  try{ localStorage.removeItem(playerKey(name)); }catch(e){}
+  refreshPlayerList();
+}
+function refreshPlayerList(){
+  const list = loadPlayerList();
+  const container = $('playerList');
+  if(list.length === 0){ container.innerHTML = ''; return; }
+  let html = '<div class="pl-title">已有冒险者（点击直接进入）：</div><div class="pl-items">';
+  for(const name of list){
+    let s;
+    try{ s = JSON.parse(localStorage.getItem(playerKey(name))) || defaultStats(); } catch(e){ s = defaultStats(); }
+    html += `<div class="player-item" onclick="login('${name.replace(/'/g,"\\'")}')">`
+      + `<div class="avatar">${getAvatar(name)}</div>`
+      + `<div class="pinfo"><div class="pname">${name}</div>`
+      + `<div class="pstats">🎮 ${s.gamesPlayed||0}次 · 🧟 ${s.totalKills||0}杀 · 🏆 第${s.bestLevel||0}关</div></div>`
+      + `<div class="pdel" onclick="event.stopPropagation();confirmDeletePlayer('${name.replace(/'/g,"\\'")}')">🗑️</div>`
+      + `</div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+function confirmDeletePlayer(name){
+  // 用自定义确认弹窗替代confirm
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:200;';
+  overlay.innerHTML = `<div style="background:#fffbe8;border:4px solid #e0a814;border-radius:16px;padding:28px 32px;text-align:center;max-width:340px;">
+    <div style="font-size:18px;font-weight:bold;color:#5a4a12;margin-bottom:16px;">🗑️ 确定删除「${name}」的档案吗？<br><span style="font-size:14px;color:#8a6d1f;font-weight:normal;">所有进度将永久消失！</span></div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button id="delConfirm" style="padding:10px 24px;font-size:16px;font-weight:bold;background:#e53935;color:#fff;border:2px solid #b71c1c;border-radius:10px;cursor:pointer;">确认删除</button>
+      <button id="delCancel" style="padding:10px 24px;font-size:16px;font-weight:bold;background:#e0e0e0;color:#555;border:2px solid #999;border-radius:10px;cursor:pointer;">取消</button>
+    </div></div>`;
+  document.body.appendChild(overlay);
+  $('delConfirm').onclick = () => { deletePlayer(name); document.body.removeChild(overlay); };
+  $('delCancel').onclick = () => { document.body.removeChild(overlay); };
+  overlay.addEventListener('click', e => { if(e.target === overlay) document.body.removeChild(overlay); });
+}
 
 /* ================= 题库 ================= */
 const EN_WORDS = [
@@ -683,8 +930,10 @@ $('quizClose').onclick = () => {
 /* ================= 阳光 / 卡片 UI ================= */
 function updateSun(){ $('sunNum').textContent = sun; refreshCards(); }
 function refreshCards(){
+  if(gameMode==='zombie'){ refreshZombieCards(); return; }
   for(const t of PLANT_TYPES){
     const card = $('card'+t[0].toUpperCase()+t.slice(1));
+    if(!card) continue;
     if(card.classList.contains('locked')) continue;
     const cd = card.querySelector('.cd');
     const ratio = cooldowns[t] / PLANTS[t].cooldown;
@@ -692,6 +941,25 @@ function refreshCards(){
     if(!plantUnlocked(t) || sun < PLANTS[t].cost || cooldowns[t] > 0 || state!=='playing') card.classList.add('disabled');
     else card.classList.remove('disabled');
   }
+}
+function refreshZombieCards(){
+  for(const t of ZOMBIE_CARD_LIST){
+    const card = document.querySelector('.zcard[data-zombie="'+t+'"]');
+    if(!card) continue;
+    if(sun < ZOMBIE_CARDS[t] || zombieCooldowns[t] > 0 || state!=='playing') card.classList.add('disabled');
+    else card.classList.remove('disabled');
+  }
+}
+/* 切换卡牌栏：植物模式 / 僵尸模式 */
+function showPlantCards(){
+  document.querySelectorAll('.card[data-plant]').forEach(c=>c.classList.remove('hidden'));
+  document.querySelectorAll('.zcard').forEach(c=>c.classList.add('hidden'));
+  $('shovel').classList.remove('hidden');
+}
+function showZombieCards(){
+  document.querySelectorAll('.card[data-plant]').forEach(c=>c.classList.add('hidden'));
+  document.querySelectorAll('.zcard').forEach(c=>c.classList.remove('hidden'));
+  $('shovel').classList.add('hidden');
 }
 document.querySelectorAll('.card').forEach(card => {
   card.onclick = () => {
@@ -710,6 +978,17 @@ $('shovel').onclick = () => {
   $('shovel').classList.toggle('selected', selected==='shovel');
   document.querySelectorAll('.card').forEach(c=>c.classList.remove('selected'));
 };
+/* 僵尸卡牌点击（我是僵尸模式） */
+document.querySelectorAll('.zcard').forEach(card => {
+  card.onclick = () => {
+    if(state!=='playing' || gameMode!=='zombie') return;
+    const t = card.dataset.zombie;
+    if(sun < ZOMBIE_CARDS[t] || zombieCooldowns[t] > 0) return;
+    selected = (selected===t) ? null : t;
+    document.querySelectorAll('.zcard').forEach(c=>c.classList.remove('selected'));
+    if(selected) card.classList.add('selected');
+  };
+});
 
 /* ===== 控制按钮 ===== */
 $('btnPause').onclick = () => {
@@ -748,6 +1027,17 @@ canvas.addEventListener('click', e => {
       beep(1046, 0.1, 'sine', 0.05); setTimeout(beep, 80, 1318, 0.1, 'sine', 0.05);
       return;
     }
+  }
+  // 我是僵尸模式：部署僵尸
+  if(gameMode==='zombie'){
+    const r = rowAt(y);
+    if(r<0 || r>=ROWS || !selected) return;
+    const cost = ZOMBIE_CARDS[selected];
+    if(sun < cost || zombieCooldowns[selected] > 0) return;
+    sun -= cost; updateSun();
+    zombieCooldowns[selected] = 1.5;   // 部署冷却1.5秒
+    deployZombie(selected, r);
+    return;
   }
   const c = colAt(x), r = rowAt(y);
   if(c<0 || c>=COLS || r<0 || r>=ROWS) return;
@@ -821,6 +1111,9 @@ canvas.addEventListener('click', e => {
     const newP = { type:fusedType, row:r, col:c, hp:fdef.hp, maxHp:fdef.hp, fireTimer:0, onLilypad:wasOnLilypad };
     if(fusedType==='nutshooter'){ newP.fireTimer = NUT_INTERVAL * 0.6; } // 坚果射手首次攻击稍快
     if(fusedType==='sunpeashooter' || fusedType==='bidirectional') newP.fireTimer = 0.08;
+    if(fusedType==='dualsupergat'){ newP.ultCd = ULT_INTERVAL; newP.ultActive = 0; newP.fireTimer = 0.08; }
+    if(fusedType==='doompea') newP.fireTimer = 3;  // 毁灭豌豆首发射提前便于测试
+    if(fusedType==='superbowling') newP.fireTimer = SUPERBOWL_INTERVAL * 0.5;
     plants.push(newP);
     cooldowns[selected] = def.cooldown;
     // 融合特效
@@ -838,6 +1131,7 @@ canvas.addEventListener('click', e => {
   if(selected==='supergat' || selected==='triplegat'){ newP.ultCd = ULT_INTERVAL; newP.ultActive = 0; }
   if(selected==='sunflower') newP.sunTimer = SUN_INTERVAL;
   if(selected==='icecannon') newP.cannonCd = CANNON_INTERVAL;
+  if(selected==='nugatling'){ newP.fireTimer = 0.08; newP.nukeKills = 0; newP.ultFiring = 0; }
   plants.push(newP);
   cooldowns[selected] = def.cooldown;
   beep(600,0.08,'square',0.05);
@@ -849,6 +1143,16 @@ canvas.addEventListener('click', e => {
 canvas.addEventListener('mousemove', e => {
   if(state!=='playing' || !selected || selected==='shovel'){ ghost = null; return; }
   const { x, y } = getCanvasPos(e);
+  // 僵尸模式：显示部署行预览
+  if(gameMode==='zombie'){
+    const r = rowAt(y);
+    if(r>=0 && r<ROWS){
+      const cost = ZOMBIE_CARDS[selected];
+      ghost = { row:r, col:COLS-1, type:selected, zombieGhost:true,
+        canPlace: sun >= cost && zombieCooldowns[selected] <= 0 };
+    } else { ghost = null; }
+    return;
+  }
   const c = colAt(x), r = rowAt(y);
   if(c>=0 && c<COLS && r>=0 && r<ROWS){
     const exP = plantAt(r,c);
@@ -909,15 +1213,47 @@ function spawnZombie(type){
   });
   if(def.boss){ showBanner('⚠️ ' + def.name + ' 出现！'); beep(90,0.5,'sawtooth',0.09); }
 }
+/* 我是僵尸模式：在指定行部署僵尸 */
+function deployZombie(type, row){
+  const def = ZOMBIES[type];
+  const hp = def.hp;   // 僵尸模式不乘倍率
+  zombies.push({
+    type, row, x: LAWN_X + COLS*CELL + 10, hp, maxHp:hp,
+    speed:def.speed, eatTimer:0, jumped:false, jumping:false, jumpT:0,
+    jumpStart:0, jumpEnd:0, yOff:0,
+    fly:!!def.fly, smash:!!def.smash, bomb:!!def.bomb,
+    canJump: !!def.jump, rage: !!def.rage, raged: false, boss: !!def.boss,
+    fuse: def.bomb ? rand(6,10) : 0, wobble: rand(0,6),
+    frozenT: 0, slowT: 0, digging: !!def.dig, digEmergere: false,
+    playerZombie: true   // 标记为玩家方僵尸
+  });
+  addFloater('🧟'+def.name+' 出动！', LAWN_X + COLS*CELL, rowY(row)-40);
+  beep(300,0.1,'sawtooth',0.05);
+}
 
 /* ================= 主循环 ================= */
 function update(dt){
   time += dt;
   for(const t of PLANT_TYPES) if(cooldowns[t]>0) cooldowns[t] = Math.max(0, cooldowns[t]-dt);
+  for(const t of ZOMBIE_CARD_LIST) if(zombieCooldowns[t]>0) zombieCooldowns[t] = Math.max(0, zombieCooldowns[t]-dt);
   refreshCards();
 
-  // 波次逻辑
-  if(state==='playing'){
+  // 我是僵尸模式：无波次，检查胜负
+  if(gameMode==='zombie' && state==='playing'){
+    // 胜利：所有脑子被吃
+    if(brains.every(b=>b.eaten)){ zombieLevelComplete(); return; }
+    // 失败：阳光不够 + 场上无僵尸 + 脑子未全吃（给5秒缓冲让玩家答题）
+    const minCost = Math.min(...ZOMBIE_CARD_LIST.map(t=>ZOMBIE_CARDS[t]));
+    if(sun < minCost && zombies.length === 0 && !brains.every(b=>b.eaten)){
+      zombieStuckTimer = (zombieStuckTimer||0) + dt;
+      if(zombieStuckTimer > 5){ zombieLose(); return; }
+    } else {
+      zombieStuckTimer = 0;
+    }
+  }
+
+  // 波次逻辑（仅植物模式）
+  if(state==='playing' && gameMode==='plants'){
     if(waveIdx === -1){ startWave(0); }
     else if(spawnQueue.length === 0 && zombies.length === 0){
       if(waveIdx < curWaves.length-1){ if(betweenWave===0){ betweenWave = time + 4; showBanner('第 '+(waveIdx+2)+' 波即将到来…'); } else if(time >= betweenWave){ startWave(waveIdx+1); } }
@@ -930,6 +1266,7 @@ function update(dt){
   for(const p of plants){
     const def = PLANTS[p.type];
     if(!def.fireRate) continue;
+    if(p.type==='dualsupergat') continue;  // 双向超级机枪在双向射击循环中处理
     // 大招计时（超级机枪射手 / 三线超级机枪）
     let effRate = def.fireRate;
     if((p.type==='supergat' || p.type==='triplegat')){
@@ -959,22 +1296,37 @@ function update(dt){
     }
     if(guard>0) beep(p.type==='supergat'?(p.ultActive>0?1000:880):(p.type==='triplegat'?(p.ultActive>0?1000:920):(p.type==='gatling'?820:(p.type==='firecactus'?600:(p.type==='snowpea'?680:(p.type==='icedouble'?660:(p.type==='double'?770:720)))))),0.04,(p.type==='snowpea'||p.type==='icedouble')?'sine':'square',0.025);
   }
-  // 双向射手：前+后各一发豌豆
+  // 双向射手 & 双向超级机枪：前+后各一发豌豆
   for(const p of plants){
-    if(p.type!=='bidirectional') continue;
-    const hasTarget = zombies.some(z => !z.digging && z.row===p.row && z.x > colX(p.col)-10);
+    if(p.type!=='bidirectional' && p.type!=='dualsupergat') continue;
+    const def = PLANTS[p.type];
+    let effRate = def.fireRate;
+    // 双向超级机枪大招计时
+    if(p.type==='dualsupergat'){
+      if(p.ultActive > 0){
+        p.ultActive -= dt;
+        effRate = DUAL_ULT_RATE;
+        if(p.ultActive <= 0){ p.ultActive = 0; }
+      } else {
+        p.ultCd -= dt;
+        if(p.ultCd <= 0){ p.ultActive = ULT_DURATION; p.ultCd = ULT_INTERVAL; showBanner('💥 双向超级大招·前后弹幕！'); beep(1200,0.15,'square',0.05); }
+      }
+    }
+    const canAir = !!def.air;
+    const hasTarget = zombies.some(z => !z.digging && z.row===p.row && z.x > colX(p.col)-10 && (canAir || !z.fly));
     // 后方最近僵尸（可能正在啃前一个植物，或矿工出土后向右走）
-    const rearTarget = zombies.some(z => !z.digging && z.row===p.row && z.x < colX(p.col) && z.x > LAWN_X);
+    const rearTarget = zombies.some(z => !z.digging && z.row===p.row && z.x < colX(p.col) && z.x > LAWN_X && (canAir || !z.fly));
     if(!hasTarget && !rearTarget){ p.fireTimer = Math.min(p.fireTimer, 0.05); continue; }
     p.fireTimer -= dt;
     let guard = 0;
-    while(p.fireTimer <= 0 && guard < 10){
-      if(hasTarget) peas.push({ row:p.row, x:colX(p.col)+18, y:rowY(p.row)-8, dmg:PEA_DMG, hitFly:false });
+    const maxGuard = p.type==='dualsupergat' ? 60 : 10;
+    while(p.fireTimer <= 0 && guard < maxGuard){
+      if(hasTarget) peas.push({ row:p.row, x:colX(p.col)+18, y:rowY(p.row)-8, dmg:PEA_DMG, hitFly:canAir });
       if(rearTarget) backPeas.push({ row:p.row, x:colX(p.col)-18, y:rowY(p.row)-8, dmg:PEA_DMG });
-      p.fireTimer += FIRE_INTERVAL;
+      p.fireTimer += FIRE_INTERVAL / effRate;
       guard++;
     }
-    if(guard>0) beep(740,0.04,'square',0.025);
+    if(guard>0) beep(p.type==='dualsupergat'?(p.ultActive>0?1100:900):740, 0.04, 'square', 0.025);
   }
   // 向日葵豌豆：发射阳光子弹
   for(const p of plants){
@@ -1002,7 +1354,74 @@ function update(dt){
       beep(160,0.06,'sawtooth',0.04);
     }
   }
-  // 向日葵产阳光
+  // 毁灭豌豆射手：每10秒发射一颗子弹，命中后触发大范围爆炸2000伤害
+  for(const p of plants){
+    if(p.type!=='doompea') continue;
+    const hasTarget = zombies.some(z => z.row===p.row && z.x > colX(p.col)-10);
+    p.fireTimer -= dt;
+    if(p.fireTimer <= 0 && hasTarget){
+      p.fireTimer += DOOMPEA_INTERVAL;
+      doomBullets.push({ row:p.row, x:colX(p.col)+18, y:rowY(p.row)-8, dmg:DOOMPEA_DMG, range:DOOMPEA_RANGE });
+      beep(80,0.15,'sawtooth',0.05);
+    }
+  }
+  // 超级保龄球射手：每1.5秒发射穿透弹，每经过一个僵尸造成1000伤害
+  for(const p of plants){
+    if(p.type!=='superbowling') continue;
+    const hasTarget = zombies.some(z => z.row===p.row && z.x > colX(p.col)-10);
+    if(!hasTarget){ p.fireTimer = Math.min(p.fireTimer, 0.05); continue; }
+    p.fireTimer -= dt;
+    if(p.fireTimer <= 0){
+      p.fireTimer += SUPERBOWL_INTERVAL;
+      superBowlingBalls.push({ row:p.row, x:colX(p.col)+28, y:rowY(p.row)-16, dmg:SUPERBOWL_DMG, rot:0 });
+      beep(120,0.08,'sawtooth',0.04);
+    }
+  }
+  // 究极毁灭核爆机枪射手：每0.5s射4颗核爆弹，5×6超大范围，中心10000伤。杀100僵尸大招
+  for(const p of plants){
+    if(p.type!=='nugatling') continue;
+    // 大招：射击中
+    if(p.ultFiring > 0){
+      p.ultFiring -= dt;
+      const ultFireRate = 0.08;
+      p.fireTimer -= dt;
+      if(p.fireTimer <= 0){
+        p.fireTimer += ultFireRate;
+        // 三路各2颗=6颗
+        for(let dr=-1;dr<=1;dr++){
+          const tr = p.row + dr;
+          if(tr<0 || tr>=ROWS) continue;
+          for(let i=0;i<2;i++){
+            nuclearBullets.push({ row:tr, x:colX(p.col)+18+rand(-8,8), y:rowY(tr)-8+rand(-6,6), dmg:NUKE_DMG, rRows:NUKE_RANGE_ROWS, rCols:NUKE_RANGE_COLS, sx:colX(p.col) });
+          }
+        }
+        beep(40,0.08,'sawtooth',0.03);
+      }
+      if(p.ultFiring <= 0){ p.ultFiring = 0; }
+      continue;
+    }
+    // 检查击杀数
+    if(p.nukeKills >= NUKE_ULT_KILLS){
+      p.nukeKills = 0;
+      p.ultFiring = 1.5; // 大招持续1.5s
+      p.fireTimer = 0;
+      showBanner('☢️ 核爆大招·三路齐射！');
+      beep(80,0.3,'sawtooth',0.08);
+      continue;
+    }
+    // 正常射击
+    const hasTarget = zombies.some(z => z.row===p.row && z.x > colX(p.col)-10);
+    if(hasTarget) p.fireTimer -= dt;
+    if(p.fireTimer <= 0 && hasTarget){
+      p.fireTimer += NUKE_INTERVAL;
+      for(let i=0;i<NUKE_BULLETS;i++){
+        nuclearBullets.push({ row:p.row, x:colX(p.col)+18+rand(-6,6), y:rowY(p.row)-8+rand(-8,8), dmg:NUKE_DMG, rRows:NUKE_RANGE_ROWS, rCols:NUKE_RANGE_COLS, sx:colX(p.col) });
+      }
+      beep(50,0.1,'sawtooth',0.04);
+    }
+  }
+  // 向日葵产阳光（仅植物模式）
+  if(gameMode==='plants'){
   for(const p of plants){
     if(p.type!=='sunflower') continue;
     p.sunTimer -= dt;
@@ -1020,6 +1439,7 @@ function update(dt){
     const dropX = rand(LAWN_X + 80, LAWN_X + COLS * CELL - 60);
     skySuns.push({ x: dropX, y: 50, vy: 50, landed: false, landY: rand(120, 460), life: 12, t: 0 });
   }
+  }
   for(const ss of skySuns){
     ss.t += dt;
     if(!ss.landed){
@@ -1035,6 +1455,12 @@ function update(dt){
   // 樱桃炸弹引信
   for(const p of plants){
     if(p.type!=='cherry') continue;
+    // 僵尸模式：樱桃是地雷，僵尸靠近时触发
+    if(gameMode==='zombie' && p.fuse > 1){
+      const near = zombies.some(z => !z.digging && Math.abs(z.row - p.row)<=1 && Math.abs(colAt(z.x) - p.col)<=1);
+      if(near){ p.fuse = 0.5; addFloater('💣樱桃即将爆炸！', colX(p.col), rowY(p.row)-30); }
+      else continue;  // 没有僵尸靠近，不倒计时
+    }
     p.fuse -= dt;
     if(p.fuse<=0){
       const cx = colX(p.col), cy = rowY(p.row);
@@ -1095,6 +1521,12 @@ function update(dt){
   for(const bp of backPeas) bp.x -= PEA_SPEED*dt;
   // 保龄球坚果弹移动
   for(const nb of nutBalls){ nb.x += NUT_SPEED * dt; nb.rot += dt * 5; }
+  // 毁灭豌豆弹移动
+  for(const db of doomBullets) db.x += PEA_SPEED * dt;
+  // 超级保龄球弹移动
+  for(const sb of superBowlingBalls){ sb.x += NUT_SPEED * dt; sb.rot += dt * 5; }
+  // 核爆弹移动
+  for(const nb of nuclearBullets) nb.x += PEA_SPEED * 1.5 * dt;
 
   // 僵尸
   for(const z of zombies){
@@ -1102,6 +1534,24 @@ function update(dt){
     if(z.frozenT>0) z.frozenT -= dt;
     if(z.slowT>0) z.slowT -= dt;
     const fm = z.frozenT>0 ? 0.35 : (z.slowT>0 ? 0.55 : 1);   // 冻结35%速 / 减速55%速
+    // 我是僵尸模式：到达脑子位置，吃脑子
+    if(gameMode==='zombie' && !z.digging && z.x <= LAWN_X + 12){
+      const brain = brains[z.row];
+      if(brain && !brain.eaten){
+        z.x = LAWN_X + 12;
+        z.eatTimer -= dt;
+        if(z.eatTimer <= 0){
+          brain.hp -= BITE_DMG; z.eatTimer = BITE_INTERVAL;
+          beep(160,0.05,'sawtooth',0.03);
+          if(brain.hp <= 0){
+            brain.eaten = true; z.hp = 0; z.escaped = true;
+            addFloater('🧠 脑子被吃！', LAWN_X+10, rowY(z.row)-30);
+            beep(200,0.2,'sawtooth',0.06);
+          }
+        }
+        continue;
+      }
+    }
     // 撑杆跳跃中
     if(z.jumping){
       z.jumpT += dt/0.55;
@@ -1109,14 +1559,14 @@ function update(dt){
       z.x = z.jumpStart + (z.jumpEnd - z.jumpStart)*k;
       z.yOff = -Math.sin(k*Math.PI)*38;
       if(k>=1){ z.jumping=false; z.jumped=true; z.yOff=0; z.speed=11; }
-      if(z.x <= LAWN_X-14){ lose(); }
+      if(z.x <= LAWN_X-14){ if(gameMode!=='zombie') lose(); else { z.hp = 0; z.escaped = true; } }
       continue;
     }
     // 气球僵尸：飞过所有植物，只上下飘动
     if(z.fly){
       z.x -= z.speed*fm*dt;
       z.yOff = Math.sin(time*4 + z.wobble)*5;
-      if(z.x <= LAWN_X-14){ lose(); }
+      if(z.x <= LAWN_X-14){ if(gameMode!=='zombie') lose(); else { z.hp = 0; z.escaped = true; } }
       continue;
     }
     // 矿工僵尸：先挖掘到左侧（无敌），出土后向右走吃植物
@@ -1142,7 +1592,7 @@ function update(dt){
         if(z.eatTimer<=0){
           p.hp -= BITE_DMG; z.eatTimer = BITE_INTERVAL;
           beep(160,0.05,'sawtooth',0.03);
-          if(p.hp<=0){ plants = plants.filter(x=>x!==p); }
+          if(p.hp<=0){ onPlantEaten(p); plants = plants.filter(x=>x!==p); }
         }
       }
       if(z.x >= LAWN_X + COLS*CELL + 20){
@@ -1160,7 +1610,7 @@ function update(dt){
       if(z.fuse <= 0){
         // 3×3 摧毁植物
         for(const pl of plants){
-          if(Math.abs(pl.row - z.row)<=1 && Math.abs(pl.col - cc)<=1) pl.hp = 0;
+          if(Math.abs(pl.row - z.row)<=1 && Math.abs(pl.col - cc)<=1){ onPlantEaten(pl); pl.hp = 0; }
         }
         plants = plants.filter(pl=>pl.hp>0);
         spawnExplosion(z.x, rowY(z.row));
@@ -1184,7 +1634,7 @@ function update(dt){
         // 巨人：砸碎植物，砸后短暂停顿
         z.eatTimer -= dt;
         if(z.eatTimer<=0){
-          p.hp = 0; plants = plants.filter(x=>x.hp>0);
+          onPlantEaten(p); p.hp = 0; plants = plants.filter(x=>x.hp>0);
           z.eatTimer = 1.5;
           spawnBoom(colX(c), rowY(z.row));
           beep(70,0.2,'square',0.06);
@@ -1194,13 +1644,13 @@ function update(dt){
         if(z.eatTimer<=0){
           p.hp -= BITE_DMG; z.eatTimer = BITE_INTERVAL;
           beep(160,0.05,'sawtooth',0.03);
-          if(p.hp<=0){ plants = plants.filter(x=>x!==p); }
+          if(p.hp<=0){ onPlantEaten(p); plants = plants.filter(x=>x!==p); }
         }
       }
     } else {
       z.x -= z.speed*fm*dt;
     }
-    if(z.x <= LAWN_X-14){ lose(); }
+    if(z.x <= LAWN_X-14){ if(gameMode!=='zombie') lose(); else { z.hp = 0; z.escaped = true; } }
   }
 
   // 豌豆/尖刺命中（气球僵尸只有能打飞行的植物能命中；火焰尖刺附带溅射）
@@ -1278,6 +1728,83 @@ function update(dt){
     }
   }
   nutBalls = nutBalls.filter(nb => !nb.dead && nb.x < canvas.width+30);
+  // 毁灭豌豆弹命中 → 大范围爆炸2000伤害
+  for(const db of doomBullets){
+    for(const z of zombies){
+      if(z.hp<=0 || z.digging || z.fly) continue;
+      if(z.row===db.row && Math.abs(db.x - z.x) < 35){
+        // 触发范围爆炸：以子弹为中心，影响同列及上下各db.range行的僵尸
+        for(const zz of zombies){
+          if(zz.hp<=0 || zz.digging) continue;
+          if(Math.abs(zz.row - db.row) <= db.range && Math.abs(zz.x - db.x) < CELL * (db.range+0.5)){
+            zz.hp -= db.dmg;
+            if(zz.slowT < 2) zz.slowT = 2; // 爆炸附带短暂减速
+          }
+        }
+        db.dead = true;
+        spawnExplosion(db.x, rowY(db.row));
+        addFloater('💥毁灭爆炸!', db.x, rowY(db.row)-50);
+        beep(60,0.4,'sawtooth',0.1);
+        // 额外粒子
+        for(let i=0;i<20;i++){
+          const a = rand(0,Math.PI*2), sp = rand(50,180);
+          particles.push({x:db.x,y:rowY(db.row),vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-40,life:0.6,r:ri(3,7),c:'#ff5722'});
+        }
+        break;
+      }
+    }
+  }
+  doomBullets = doomBullets.filter(db => !db.dead && db.x < canvas.width+20);
+  // 超级保龄球弹：无限穿透，每经过一个僵尸造成1000伤害
+  for(const sb of superBowlingBalls){
+    for(const z of zombies){
+      if(z.hp<=0 || z.digging) continue;
+      if(z.row===sb.row && Math.abs(sb.x - z.x) < 32){
+        z.hp -= sb.dmg;
+        addFloater('-'+sb.dmg+'💀', z.x, rowY(z.row)-40);
+        spawnHit(sb.x, rowY(z.row));
+        beep(160,0.06,'sawtooth',0.04);
+        // 不break，继续穿透
+      }
+    }
+  }
+  superBowlingBalls = superBowlingBalls.filter(sb => sb.x < canvas.width+30);
+  // 核爆弹命中 → 5×6超大范围核爆，中心10000伤
+  for(const nb of nuclearBullets){
+    for(const z of zombies){
+      if(z.hp<=0 || z.digging) continue;
+      if(z.row===nb.row && Math.abs(nb.x - z.x) < 30){
+        // 触发超大范围核爆
+        for(const zz of zombies){
+          if(zz.hp<=0 || zz.digging) continue;
+          if(Math.abs(zz.row - nb.row) <= nb.rRows && Math.abs(zz.x - nb.x) < CELL * (nb.rCols+0.5)){
+            // 伤害衰减：中心10000，边缘按距离衰减到2000
+            const dist = Math.sqrt(Math.pow(zz.row - nb.row, 2) + Math.pow((zz.x - nb.x) / CELL, 2));
+            const falloff = Math.max(0.2, 1 - dist / (nb.rRows + nb.rCols));
+            zz.hp -= Math.round(nb.dmg * falloff);
+            if(zz.slowT < 3) zz.slowT = 3;
+          }
+        }
+        nb.dead = true;
+        spawnExplosion(nb.x, rowY(nb.row));
+        addFloater('☢️核爆!'+nb.dmg+'!', nb.x, rowY(nb.row)-60);
+        beep(30,0.5,'sawtooth',0.15);
+        // 大量核爆粒子
+        for(let i=0;i<40;i++){
+          const a = rand(0,Math.PI*2), sp = rand(30,300);
+          particles.push({x:nb.x,y:rowY(nb.row),vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-60,life:1.2,r:ri(3,10),c:['#ff5722','#ffeb3b','#ff9800','#f44336'][ri(0,3)]});
+        }
+        // 记录kills到发射者
+        for(const p of plants){
+          if(p.type==='nugatling' && Math.abs(p.col - colAt(nb.sx)) < 2){
+            p.nukeKills = (p.nukeKills||0) + 1;
+          }
+        }
+        break;
+      }
+    }
+  }
+  nuclearBullets = nuclearBullets.filter(nb => !nb.dead && nb.x < canvas.width+20);
 
   // 清理死亡僵尸
   for(let i=zombies.length-1;i>=0;i--){
@@ -1290,7 +1817,13 @@ function update(dt){
       zombies.splice(i,1);
     }
   }
-  $('zLeft').textContent = `场上僵尸：${zombies.length}　已消灭：${killCount}/${totalZombies}`;
+  if(gameMode==='zombie'){
+    const brainLeft = brains.filter(b=>!b.eaten).length;
+    const plantLeft = plants.length;
+    $('zLeft').textContent = `🧠脑子：${5-brainLeft}/5　🧟场上僵尸：${zombies.length}　🌱植物：${plantLeft}`;
+  } else {
+    $('zLeft').textContent = `场上僵尸：${zombies.length}　已消灭：${killCount}/${totalZombies}`;
+  }
 
   // 飘字/粒子
   for(const f of floaters){ f.y -= 30*dt; f.life -= dt; }
@@ -1340,6 +1873,14 @@ function spawnIceBlast(x,y){
   }
 }
 function addFloater(text,x,y){ floaters.push({text,x,y,life:1.0}); }
+/* 我是僵尸模式：植物被吃掉时的回调（向日葵给僵尸玩家奖励阳光） */
+function onPlantEaten(p){
+  if(gameMode==='zombie' && p.type==='sunflower'){
+    sun += SUNFLOWER_EATEN_BONUS; updateSun();
+    addFloater('+'+SUNFLOWER_EATEN_BONUS+'☀️ 吃向日葵！', colX(p.col), rowY(p.row)-34);
+    beep(1046,0.1,'sine',0.05); setTimeout(beep,80,1318,0.1,'sine',0.05);
+  }
+}
 
 /* ================= 渲染 ================= */
 function draw(){
@@ -1370,7 +1911,42 @@ function draw(){
       }
     }
   }
-  // 房子
+  // 房子 / 脑子（我是僵尸模式）
+  if(gameMode==='zombie'){
+    // 僵尸方房子（右侧不画）；左侧画脑子
+    ctx.fillStyle = '#5c3a17';
+    ctx.fillRect(0,0,LAWN_X,ROWS*CELL_H);
+    for(let r=0;r<ROWS;r++){
+      const brain = brains[r];
+      const by = rowY(r);
+      if(brain && !brain.eaten){
+        // 脑子本体：粉红色椭圆 + 纹路
+        const pulse = 1 + 0.08*Math.sin(time*3 + r);
+        ctx.fillStyle = 'rgba(255,200,200,0.3)';
+        ctx.beginPath(); ctx.arc(20, by, 18*pulse, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#f48fb1';
+        ctx.beginPath(); ctx.ellipse(20, by, 14, 12, 0, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#ec407a';
+        ctx.beginPath(); ctx.ellipse(20, by, 10, 8, 0, 0, Math.PI*2); ctx.fill();
+        // 纹路
+        ctx.strokeStyle = '#c2185b'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(14, by-4); ctx.quadraticCurveTo(20, by, 26, by-4); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(14, by+2); ctx.quadraticCurveTo(20, by+6, 26, by+2); ctx.stroke();
+        // 血条
+        const ratio = brain.hp / brain.maxHp;
+        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(8, by-22, 24, 4);
+        ctx.fillStyle = ratio>0.5?'#7bd67b':(ratio>0.25?'#ffd24d':'#ff5757');
+        ctx.fillRect(8, by-22, 24*ratio, 4);
+      } else {
+        // 已被吃的脑子：灰色残影
+        ctx.fillStyle = 'rgba(120,120,120,0.3)';
+        ctx.beginPath(); ctx.ellipse(20, by, 12, 10, 0, 0, Math.PI*2); ctx.fill();
+        ctx.font = '16px sans-serif'; ctx.textAlign='center';
+        ctx.fillStyle = 'rgba(200,200,200,0.5)';
+        ctx.fillText('💀', 20, by+6);
+      }
+    }
+  } else {
   ctx.fillStyle = '#9c6b3f';
   ctx.fillRect(0,0,LAWN_X,ROWS*CELL_H);
   ctx.fillStyle = '#7a4f2a';
@@ -1380,6 +1956,7 @@ function draw(){
   ctx.fillStyle = '#fff';
   ctx.font = '11px sans-serif'; ctx.textAlign='center';
   ctx.fillText('🏠', 20, 110);
+  }
 
   // 植物
   for(const p of plants){
@@ -1403,8 +1980,14 @@ function draw(){
     else if(p.type==='triplegat') drawTripleGat(x,y,p.ultActive>0);
     else if(p.type==='icecannon') drawIceCannon(x,y,p.cannonCd);
     else if(p.type==='bidirectional') drawBidirectional(x,y);
+    else if(p.type==='dualsupergat') drawDualSuperGat(x,y,p.ultActive>0);
     else if(p.type==='nutshooter') drawNutShooter(x,y,p.hp/p.maxHp);
     else if(p.type==='sunpeashooter') drawSunPeaShooter(x,y);
+    else if(p.type==='shroom_ice') drawShroomIce(x,y);
+    else if(p.type==='shroom_doom') drawShroomDoom(x,y);
+    else if(p.type==='doompea') drawDoomPea(x,y);
+    else if(p.type==='superbowling') drawSuperBowling(x,y,p.hp/p.maxHp);
+    else if(p.type==='nugatling') drawNukeGatling(x,y,p.ultFiring>0);
   }
   // 植物血条（受损时显示）
   for(const p of plants){
@@ -1419,6 +2002,29 @@ function draw(){
   }
   // 放置预览幽灵
   if(ghost && ghost.type){
+    // 僵尸模式部署预览
+    if(ghost.zombieGhost){
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = ghost.canPlace ? 'rgba(126,87,194,0.5)' : 'rgba(255,87,87,0.4)';
+      ctx.fillRect(LAWN_X, ghost.row * CELL_H, COLS*CELL, CELL_H);
+      ctx.globalAlpha = 0.6;
+      // 在右侧画半透明僵尸预览
+      const zx = LAWN_X + COLS*CELL - 30, zy = rowY(ghost.row);
+      const z = { type:ghost.type, row:ghost.row, x:zx, yOff:0, hp:1, maxHp:1,
+        fly:!!ZOMBIES[ghost.type].fly, digging:false, rage:false, raged:false,
+        boss:false, frozenT:0, slowT:0, fuse:0, wobble:0, jumping:false };
+      drawZombie(z);
+      ctx.globalAlpha = 1;
+      // 提示文字
+      ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = ghost.canPlace ? '#4527a0' : '#c62828';
+      ctx.fillText(ghost.canPlace ? ('🧟部署'+ZOMBIES[ghost.type].name) : '☀️阳光不足',
+        LAWN_X + COLS*CELL/2, ghost.row * CELL_H + 20);
+      if(!ghost.canPlace){
+        ctx.strokeStyle = '#ff5252'; ctx.lineWidth = 3;
+        ctx.strokeRect(LAWN_X+2, 62 + ghost.row * CELL_H, COLS*CELL-4, CELL_H-4);
+      }
+    } else {
     const x = colX(ghost.col), y = rowY(ghost.row);
     ctx.globalAlpha = 0.4;
     // 半透明格子高亮（融合用金色，水路需睡莲用蓝色提示）
@@ -1467,11 +2073,15 @@ function draw(){
     else if(gt==='firecactus') drawFireCactus(x,y);
     else if(gt==='triplegat') drawTripleGat(x,y,false);
     else if(gt==='icecannon') drawIceCannon(x,y,1);
+    else if(gt==='shroom_ice') drawShroomIce(x,y);
+    else if(gt==='shroom_doom') drawShroomDoom(x,y);
+    else if(gt==='nugatling') drawNukeGatling(x,y,false);
     ctx.globalAlpha = 1;
     if(!ghost.canPlace){
       ctx.strokeStyle = '#ff5252'; ctx.lineWidth = 3;
       ctx.strokeRect(cellX(ghost.col)+2, 62 + ghost.row * CELL_H, CELL-4, CELL_H-4);
     }
+    } // end else (非僵尸模式幽灵)
   }
   // 僵尸
   for(const z of zombies) drawZombie(z);
@@ -1539,6 +2149,75 @@ function draw(){
     ctx.fillStyle = 'rgba(255,255,255,0.3)';
     ctx.beginPath(); ctx.arc(-5, -5, 5, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = '#b8860b';
+    ctx.restore();
+  }
+  // 毁灭豌豆弹
+  for(const db of doomBullets){
+    ctx.save();
+    ctx.fillStyle = '#b71c1c';
+    ctx.beginPath(); ctx.arc(db.x, db.y, 10, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ff5722';
+    ctx.beginPath(); ctx.arc(db.x, db.y, 7, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ffeb3b';
+    ctx.beginPath(); ctx.arc(db.x, db.y, 3, 0, Math.PI*2); ctx.fill();
+    // 危险光环
+    ctx.fillStyle = 'rgba(244,67,54,'+(0.2+0.15*Math.sin(time*10))+')';
+    ctx.beginPath(); ctx.arc(db.x, db.y, 14, 0, Math.PI*2); ctx.fill();
+    // 尾迹
+    ctx.fillStyle = 'rgba(255,87,34,0.3)';
+    ctx.beginPath(); ctx.arc(db.x+12, db.y, 6, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  // 超级保龄球弹
+  for(const sb of superBowlingBalls){
+    ctx.save();
+    ctx.translate(sb.x, sb.y);
+    ctx.rotate(sb.rot || 0);
+    // 大型金属保龄球
+    ctx.fillStyle = '#607d8b';
+    ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#78909c';
+    ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI*2); ctx.fill();
+    // 金属光泽环
+    ctx.strokeStyle = '#cfd8dc'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, -5, 10, Math.PI*0.3, Math.PI*0.7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 5, 10, Math.PI*1.3, Math.PI*1.7); ctx.stroke();
+    // 金色标记
+    ctx.fillStyle = '#ffeb3b';
+    ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('⚡', 0, 0);
+    // 高光
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath(); ctx.arc(-6, -6, 6, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  // 核爆弹
+  for(const nb of nuclearBullets){
+    ctx.save();
+    // 外发光
+    const glow = 0.3 + 0.2 * Math.sin(time * 15);
+    ctx.fillStyle = 'rgba(255,87,34,'+glow+')';
+    ctx.beginPath(); ctx.arc(nb.x, nb.y, 18, 0, Math.PI*2); ctx.fill();
+    // 中层
+    ctx.fillStyle = '#ff5722';
+    ctx.beginPath(); ctx.arc(nb.x, nb.y, 12, 0, Math.PI*2); ctx.fill();
+    // 内核
+    ctx.fillStyle = '#ffeb3b';
+    ctx.beginPath(); ctx.arc(nb.x, nb.y, 7, 0, Math.PI*2); ctx.fill();
+    // 白热核心
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(nb.x, nb.y, 3, 0, Math.PI*2); ctx.fill();
+    // ☢️标记
+    ctx.fillStyle = '#fff'; ctx.font='10px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('☢️', nb.x, nb.y-14);
+    // 脉冲环
+    ctx.strokeStyle = 'rgba(255,235,59,'+glow+')'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(nb.x, nb.y, 20, 0, Math.PI*2); ctx.stroke();
+    // 尾迹
+    ctx.fillStyle = 'rgba(255,87,34,0.2)';
+    ctx.beginPath(); ctx.arc(nb.x+16, nb.y, 10, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,235,59,0.15)';
+    ctx.beginPath(); ctx.arc(nb.x+10, nb.y, 6, 0, Math.PI*2); ctx.fill();
     ctx.restore();
   }
   // 粒子
@@ -1864,6 +2543,40 @@ function drawBidirectional(x,y){
   ctx.beginPath(); ctx.moveTo(x-28, y-4); ctx.lineTo(x-20, y-4); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(x+26, y-4); ctx.lineTo(x+34, y-4); ctx.stroke();
 }
+function drawDualSuperGat(x,y,ult){
+  // 双向超级机枪：超级机枪射手的双向升级版
+  // 大招光环
+  if(ult){
+    ctx.fillStyle = 'rgba(255,80,0,'+(0.25+0.2*Math.sin(time*20))+')';
+    ctx.beginPath(); ctx.arc(x, y-4, 34, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = '#3d8b1e';
+  ctx.fillRect(x-6, y+6, 10, 22);            // 茎
+  // 中央机身（比超级机枪更大）
+  ctx.fillStyle = ult ? '#e53935' : '#a11d1d';
+  ctx.beginPath(); ctx.arc(x, y-4, 22, 0, Math.PI*2); ctx.fill();
+  // 金色钢盔
+  ctx.fillStyle = '#c9a227';
+  ctx.beginPath(); ctx.arc(x, y-10, 21, Math.PI, 0); ctx.fill();
+  ctx.fillRect(x-21, y-12, 42, 5);
+  ctx.fillStyle = '#ffd54f'; ctx.fillRect(x-3, y-32, 6, 10); // 顶饰
+  // 前方六管炮口（朝右）
+  ctx.fillStyle = '#5c1414';
+  for(let i=0;i<6;i++) ctx.fillRect(x+14, y-16+i*6, 16, 5);
+  // 后方六管炮口（朝左）
+  for(let i=0;i<6;i++) ctx.fillRect(x-30, y-16+i*6, 16, 5);
+  // 前方眼睛（朝右）
+  ctx.fillStyle = '#ffeb3b';
+  ctx.beginPath(); ctx.arc(x+4, y-4, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+10, y-4, 3, 0, Math.PI*2); ctx.fill();
+  // 后方眼睛（朝左）
+  ctx.beginPath(); ctx.arc(x-4, y-4, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x-10, y-4, 3, 0, Math.PI*2); ctx.fill();
+  // 双向箭头标记
+  ctx.strokeStyle = 'rgba(255,235,59,0.6)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x-38, y-4); ctx.lineTo(x-32, y-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+32, y-4); ctx.lineTo(x+38, y-4); ctx.stroke();
+}
 function drawNutShooter(x,y,ratio){
   // 坚果射手：坚果身体 + 豌豆炮口
   ctx.fillStyle = '#c79a5b';
@@ -1914,6 +2627,90 @@ function drawSunPeaShooter(x,y){
   ctx.beginPath(); ctx.arc(x-2, y-7, 1, 0, Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(x+5, y-7, 1, 0, Math.PI*2); ctx.fill();
 }
+/* ===== 新植物绘制 ===== */
+function drawShroomIce(x,y){
+  // 寒冰菇：冰蓝色蘑菇，有雪花标记
+  ctx.fillStyle = '#e8eaf6';                 // 茎
+  ctx.fillRect(x-5, y+8, 10, 18);
+  ctx.fillStyle = '#81d4fa';                 // 蘑菇伞盖
+  ctx.beginPath(); ctx.arc(x, y-2, 18, Math.PI, 0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#4fc3f7';
+  ctx.beginPath(); ctx.arc(x, y-4, 20, Math.PI, 0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#e1f5fe';                 // 伞盖高光
+  ctx.beginPath(); ctx.arc(x+6, y-12, 8, Math.PI*0.6, Math.PI*1.6); ctx.fill();
+  // 雪花标记
+  ctx.fillStyle = '#fff';
+  ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('❄️', x, y+2);
+  // 冷气粒子
+  ctx.fillStyle = 'rgba(255,255,255,'+(0.2+0.15*Math.sin(time*5))+')';
+  ctx.beginPath(); ctx.arc(x-10, y-10, 3+Math.sin(time*6)*1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+12, y-8, 2.5+Math.cos(time*7)*1, 0, Math.PI*2); ctx.fill();
+}
+function drawShroomDoom(x,y){
+  // 毁灭菇：暗红色蘑菇，有危险标记
+  ctx.fillStyle = '#5d4037';                 // 茎
+  ctx.fillRect(x-5, y+8, 10, 18);
+  ctx.fillStyle = '#c62828';                 // 蘑菇伞盖
+  ctx.beginPath(); ctx.arc(x, y-2, 18, Math.PI, 0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#f44336';
+  ctx.beginPath(); ctx.arc(x, y-4, 20, Math.PI, 0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#ff8a80';                 // 伞盖高光
+  ctx.beginPath(); ctx.arc(x+6, y-12, 8, Math.PI*0.6, Math.PI*1.6); ctx.fill();
+  // 危险标记
+  ctx.fillStyle = '#ffeb3b';
+  ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('☠️', x, y+2);
+  // 暗红光芒脉冲
+  ctx.fillStyle = 'rgba(244,67,54,'+(0.15+0.1*Math.sin(time*4))+')';
+  ctx.beginPath(); ctx.arc(x, y-4, 24, 0, Math.PI*2); ctx.fill();
+}
+function drawDoomPea(x,y){
+  // 毁灭豌豆射手：暗红豌豆头+倒计时环
+  ctx.fillStyle = '#3d8b1e'; ctx.fillRect(x-4, y+4, 8, 22);
+  ctx.fillStyle = '#b71c1c';                 // 暗红色头部
+  ctx.beginPath(); ctx.arc(x, y-4, 18, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#c62828';
+  ctx.beginPath(); ctx.arc(x+4, y-8, 7, -0.6, 0.6); ctx.fill();
+  ctx.fillStyle = '#ffeb3b';                 // 眼睛
+  ctx.beginPath(); ctx.arc(x-5, y-8, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+2, y-8, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#5a0000';
+  ctx.beginPath(); ctx.arc(x-4, y-8, 1.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+3, y-8, 1.5, 0, Math.PI*2); ctx.fill();
+  // 危险光环
+  ctx.strokeStyle = 'rgba(244,67,54,'+(0.3+0.2*Math.sin(time*3))+')';
+  ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y-4, 22, 0, Math.PI*2); ctx.stroke();
+  // ☠️标记
+  ctx.fillStyle = '#fff'; ctx.font='11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('☠️', x+13, y-18);
+}
+function drawSuperBowling(x,y,ratio){
+  // 超级保龄球射手：巨大坚果+金属炮管
+  ctx.fillStyle = '#8d6e33';                 // 深色坚果
+  ctx.beginPath(); ctx.ellipse(x, y+4, 22, 28, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#c79a5b';
+  ctx.beginPath(); ctx.ellipse(x, y+2, 20, 26, 0, 0, Math.PI*2); ctx.fill();
+  // 金属护甲
+  ctx.fillStyle = '#607d8b';
+  ctx.fillRect(x-22, y-6, 44, 6);
+  ctx.strokeStyle = '#b0bec5'; ctx.lineWidth = 1;
+  for(let i=0;i<3;i++){ ctx.beginPath(); ctx.moveTo(x-16+i*14, y-6); ctx.lineTo(x-16+i*14, y-1); ctx.stroke(); }
+  // 大型炮管
+  ctx.fillStyle = '#455a64';
+  ctx.fillRect(x+10, y-22, 16, 14);
+  ctx.fillStyle = '#37474f';
+  ctx.beginPath(); ctx.arc(x+22, y-15, 7, 0, Math.PI*2); ctx.fill();
+  // 炮口闪光
+  ctx.fillStyle = 'rgba(255,235,59,'+(0.15+0.1*Math.sin(time*6))+')';
+  ctx.beginPath(); ctx.arc(x+26, y-15, 5, 0, Math.PI*2); ctx.fill();
+  // 坚果脸
+  ctx.fillStyle = '#fff'; ctx.font='12px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('💪', x, y+10);
+  // 血条
+  ctx.fillStyle = '#5a3d1a'; ctx.fillRect(x-24, y-46, 48, 5);
+  ctx.fillStyle = '#7bd67b'; ctx.fillRect(x-24, y-46, 48*(ratio||1), 5);
+}
 function drawNut(x,y,ratio){
   ctx.fillStyle = '#c79a5b';
   ctx.beginPath(); ctx.ellipse(x, y, 22, 30, 0, 0, Math.PI*2); ctx.fill();
@@ -1924,6 +2721,56 @@ function drawNut(x,y,ratio){
   // 血条
   ctx.fillStyle = '#5a3d1a'; ctx.fillRect(x-22, y-40, 44, 5);
   ctx.fillStyle = '#7bd67b'; ctx.fillRect(x-22, y-40, 44*ratio, 5);
+}
+function drawNukeGatling(x,y,ult){
+  // 究极毁灭核爆机枪射手：黑色重金属风格+四管机枪+核辐射光环
+  // 底座
+  ctx.fillStyle = '#263238';
+  ctx.fillRect(x-16, y+8, 32, 20);
+  ctx.fillStyle = '#37474f';
+  ctx.fillRect(x-14, y+10, 28, 16);
+  // 主体
+  ctx.fillStyle = '#212121';
+  ctx.beginPath(); ctx.arc(x, y-6, 16, 0, Math.PI*2); ctx.fill();
+  // 金属头盔
+  ctx.fillStyle = '#455a64';
+  ctx.beginPath(); ctx.arc(x, y-6, 14, Math.PI, 0); ctx.fill();
+  ctx.fillRect(x-14, y-6, 28, 3);
+  // 四管机枪（上下排列）
+  ctx.fillStyle = '#1b0000';
+  ctx.fillRect(x+9, y-18, 16, 3);  // 管1
+  ctx.fillRect(x+11, y-13, 18, 3); // 管2
+  ctx.fillRect(x+9, y-8, 16, 3);   // 管3
+  ctx.fillRect(x+11, y-3, 18, 3);  // 管4
+  // 管口火焰
+  const flicker = 0.3 + 0.2 * Math.sin(time * 20);
+  ctx.fillStyle = 'rgba(255,87,34,'+flicker+')';
+  ctx.beginPath(); ctx.arc(x+25, y-16.5, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+29, y-11.5, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+25, y-6.5, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+29, y-1.5, 3.5, 0, Math.PI*2); ctx.fill();
+  // 眼睛：红色凶光
+  ctx.fillStyle = '#ff1744';
+  ctx.beginPath(); ctx.arc(x-4, y-10, 3, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+5, y-10, 3, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(x-3, y-11, 1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+6, y-11, 1, 0, Math.PI*2); ctx.fill();
+  // ☢️标记
+  ctx.fillStyle = '#ffeb3b'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('☢️', x, y-24);
+  // 辐射光环
+  ctx.strokeStyle = 'rgba(255,87,34,'+(0.3+0.2*Math.sin(time*5))+')';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(x, y-4, 20, 0, Math.PI*2); ctx.stroke();
+  // 大招特效
+  if(ult){
+    ctx.strokeStyle = 'rgba(255,235,59,'+(0.5+0.3*Math.sin(time*10))+')';
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(x, y-4, 24, 0, Math.PI*2); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,235,59,0.3)';
+    ctx.beginPath(); ctx.arc(x, y-4, 22, 0, Math.PI*2); ctx.fill();
+  }
 }
 function drawZombie(z){
   const x = z.x, y = rowY(z.row) + z.yOff;
@@ -2153,6 +3000,7 @@ function updateCardVisibility(){
   $('cardFirecactus').classList.toggle('locked', !plantUnlocked('firecactus'));
   $('cardTriplegat').classList.toggle('locked', !plantUnlocked('triplegat'));
   $('cardIcecannon').classList.toggle('locked', !plantUnlocked('icecannon'));
+  $('cardNugatling').classList.toggle('locked', !plantUnlocked('nugatling'));
   $('cardLilypad').classList.toggle('locked', !plantUnlocked('lilypad'));
   $('cardIcedouble').classList.toggle('locked', !plantUnlocked('icedouble'));
   fitLayout();   // 卡片增减会导致工具栏换行高度变化，重算画布缩放
@@ -2161,7 +3009,6 @@ function levelComplete(){
   if(state!=='playing') return;
   stats.totalKills += killCount;
   stats.bestLevel = Math.max(stats.bestLevel, level + 1);
-  saveStats();
   // 通关解锁（究极模式已全解锁，不再提示）
   let unlockMsg = '';
   if(!ultimate){
@@ -2172,6 +3019,9 @@ function levelComplete(){
     else if(level===3 && !unlocked.lilypad){ unlocked.lilypad = true; unlocked.icedouble = true;
       unlockMsg = '🔓 解锁新植物：<b>🪷睡莲</b> 和 <b>❄️寒冰双重射手</b>！<br>睡莲可种在水上，其他植物能种在睡莲上！寒冰双重射手双倍冰豌豆+减速！<br>🔮 也可用寒冰射手+豌豆射手融合获得！'; }
   }
+  // 保存解锁状态到玩家档案
+  stats.unlocked = { supergat:unlocked.supergat, cactus:unlocked.cactus, lilypad:unlocked.lilypad, icedouble:unlocked.icedouble };
+  saveStats();
   updateCardVisibility();
 
   const LV = curLevels();
@@ -2205,10 +3055,10 @@ function levelComplete(){
     state = 'win';
     $('msgTitle').textContent = ultimate ? '🏆 究极模式 20 关全通！你是传说植物大师！' : '🏆 全部通关！你太厉害了！';
     $('msgText').style.textAlign='center'; $('msgText').style.fontSize='18px';
-    $('msgText').innerHTML = '你击退了全部 <b>' + LV.length + ' 关</b> 的僵尸大军，守住了房子！' +
+    $('msgText').innerHTML = '<b>' + currentPlayer + '</b>，你击退了全部 <b>' + LV.length + ' 关</b> 的僵尸大军，守住了房子！' +
       (ultimate ? '<br>💀 连究极黑曜石巨人都倒在了你的防线前！' : '') +
       '<br><br>📚 一路靠答题积攒阳光，学习真的让你变强了！' +
-      '<br><br>📊 <b>累计战绩</b>：击杀僵尸 ' + stats.totalKills + ' 只 · 答对题目 ' + stats.quizCorrect + ' 道 · 最高到达第 ' + stats.bestLevel + ' 关' +
+      '<br><br>📊 <b>' + currentPlayer + ' 的累计战绩</b>：击杀僵尸 ' + stats.totalKills + ' 只 · 答对题目 ' + stats.quizCorrect + ' 道 · 最高到达第 ' + stats.bestLevel + ' 关' +
       '<br><br>👇 再选一个模式挑战吧！';
     showMsgButtons('mode');
     $('msgOverlay').classList.remove('hidden');
@@ -2228,7 +3078,54 @@ function lose(){
   beep(200,0.3,'sawtooth',0.05);
 }
 
-/* ================= 开始关卡 ================= */
+/* ===== 我是僵尸模式 胜负 ===== */
+function zombieLevelComplete(){
+  if(state!=='playing') return;
+  state = 'zombieclear';
+  stats.totalKills += plants.filter(p=>p.hp<=0).length;
+  stats.bestLevel = Math.max(stats.bestLevel, zombieLevel + 1);
+  saveStats();
+  if(zombieLevel < ZOMBIE_LEVELS.length - 1){
+    $('msgTitle').textContent = '🧟 吃掉所有脑子！通过 ' + ZOMBIE_LEVELS[zombieLevel].name + '！';
+    $('msgText').style.fontSize = '18px'; $('msgText').style.textAlign = 'center';
+    const nx = ZOMBIE_LEVELS[zombieLevel+1];
+    $('msgText').innerHTML = 'brains 被你吃光了！准备进攻 <b>' + nx.name + '</b>！<br>' +
+      (nx.pool ? '🏊 本关为<b>泳池地形</b>，中间三路是水！' : '🌱 本关为<b>草坪地形</b>。') +
+      '<br>💡 提示：吃掉<b>向日葵</b>可以获得 +50☀️ 阳光！用便宜的僵尸当炮灰，巨人砸碎坚果！';
+    $('msgBtn').textContent = '进入 ' + nx.name;
+    showMsgButtons('continue');
+    $('msgOverlay').classList.remove('hidden');
+    beep(660,0.15,'sine',0.06); setTimeout(beep,160,880,0.15,'sine',0.06);
+  } else {
+    state = 'zombiewin';
+    $('msgTitle').textContent = '🧟🏆 我是僵尸模式全通关！';
+    $('msgText').style.fontSize = '18px'; $('msgText').style.textAlign = 'center';
+    $('msgText').innerHTML = '<b>' + currentPlayer + '</b>，你指挥僵尸大军吃光了全部 <b>' + ZOMBIE_LEVELS.length + ' 关</b> 的脑子！<br><br>' +
+      '💀 植物的防线在你面前土崩瓦解！<br><br>' +
+      '📊 <b>' + currentPlayer + ' 的累计战绩</b>：击杀僵尸 ' + stats.totalKills + ' 只 · 答对题目 ' + stats.quizCorrect + ' 道 · 最高到达第 ' + stats.bestLevel + ' 关<br><br>' +
+      '👇 再选一个模式挑战吧！';
+    showMsgButtons('mode');
+    $('msgOverlay').classList.remove('hidden');
+    beep(660,0.15,'sine',0.06); setTimeout(beep,160,880,0.15,'sine',0.06); setTimeout(beep,320,1100,0.2,'sine',0.06);
+  }
+}
+function zombieLose(){
+  if(state!=='playing') return;
+  state = 'zombielose';
+  $('msgTitle').textContent = '🌱 植物守住了脑子…';
+  $('msgText').style.fontSize = '18px'; $('msgText').style.textAlign = 'center';
+  const brainLeft = brains.filter(b=>!b.eaten).length;
+  $('msgText').innerHTML = '在 <b>' + ZOMBIE_LEVELS[zombieLevel].name + '</b>，你的僵尸大军耗尽了阳光，还剩 <b>' + brainLeft + '</b> 个脑子没吃到。<br><br>' +
+    '💡 提示：优先派便宜僵尸吃<b>向日葵</b>攒阳光（+50☀️）！<br>' +
+    '🪜 扶梯僵尸能翻过植物！🤡 小丑僵尸爆炸清场！<br>' +
+    '🪣 铁桶/铁网门僵尸抗打，用来当肉盾！<br>' +
+    '🏈 橄榄球僵尸跑得快，适合突袭！<br>' +
+    '💪 巨人僵尸能砸碎坚果，但很贵(450☀️)！';
+  $('msgBtn').textContent = '重试 ' + ZOMBIE_LEVELS[zombieLevel].name;
+  showMsgButtons('continue');
+  $('msgOverlay').classList.remove('hidden');
+  beep(200,0.3,'sawtooth',0.05);
+}
 function startLevel(idx){
   level = idx;
   const LV = curLevels();
@@ -2237,7 +3134,7 @@ function startLevel(idx){
   poolMode = !!LV[idx].pool;            // 泳池模式
   $('lvTotal').textContent = LV.length;
   totalZombies = curWaves.flat().length;
-  sun = ultimate ? 500 : (poolMode ? 175 : 150); plants=[]; zombies=[]; peas=[]; backPeas=[]; nutBalls=[]; floaters=[]; particles=[]; shells=[];
+  sun = ultimate ? 500 : (poolMode ? 175 : 150); plants=[]; zombies=[]; peas=[]; backPeas=[]; nutBalls=[]; doomBullets=[]; superBowlingBalls=[]; nuclearBullets=[]; floaters=[]; particles=[]; shells=[];
   skySuns=[]; sunDropTimer=6; ghost=null; paused=false; speedMul=1;
   $('btnPause').textContent='⏸️ 暂停'; $('btnSpeed').textContent='⏩ 2倍速'; $('btnSpeed').classList.remove('active');
   waveIdx=-1; spawnQueue=[]; betweenWave=0; selected=null; waveProgress=0;
@@ -2255,19 +3152,86 @@ $('msgBtn').onclick = () => {
   $('msgOverlay').classList.add('hidden');
   if(state==='levelclear') startLevel(level+1);
   else if(state==='lose') startLevel(level);
+  else if(state==='zombieclear') startZombieLevel(zombieLevel+1);
+  else if(state==='zombielose') startZombieLevel(zombieLevel);
+  else if(state==='zombiewin') { gameMode='plants'; showPlantCards(); }
   else startLevel(0);
 };
 // 模式选择（初始 / 通关后）
 function beginMode(ult){
+  if(!currentPlayer){ logout(); return; }
+  gameMode = 'plants';
   ultimate = ult;
-  unlocked = ult ? ALL_UNLOCK() : NO_UNLOCK();
+  unlocked = ult ? ALL_UNLOCK() : Object.assign(NO_UNLOCK(), stats.unlocked || {});
   stats.gamesPlayed++;
   saveStats();
   $('msgOverlay').classList.add('hidden');
+  showPlantCards();
   startLevel(0);
 }
 $('modeNormal').onclick   = () => beginMode(false);
 $('modeUltimate').onclick = () => beginMode(true);
+$('modeZombie').onclick   = () => beginZombieMode();
+
+/* ================= 我是僵尸模式 ================= */
+function beginZombieMode(){
+  if(!currentPlayer){ logout(); return; }
+  gameMode = 'zombie';
+  ultimate = false;
+  unlocked = NO_UNLOCK();
+  stats.gamesPlayed++;
+  saveStats();
+  $('msgOverlay').classList.add('hidden');
+  zombieLevel = 0;
+  startZombieLevel(0);
+}
+function startZombieLevel(idx){
+  zombieLevel = idx;
+  level = idx;
+  const LV = ZOMBIE_LEVELS[idx];
+  poolMode = !!LV.pool;
+  hpMult = 1;                         // 僵尸模式不调整血量
+  $('lvTotal').textContent = ZOMBIE_LEVELS.length;
+  sun = LV.startSun;
+  plants=[]; zombies=[]; peas=[]; backPeas=[]; nutBalls=[]; doomBullets=[]; superBowlingBalls=[]; nuclearBullets=[]; floaters=[]; particles=[]; shells=[];
+  skySuns=[]; sunDropTimer=999; ghost=null; paused=false; speedMul=1;
+  // 随机生成植物（5列×5行区域）
+  generateZombiePlants(LV);
+  // 初始化脑子（每路一个）
+  brains = [];
+  for(let r=0;r<ROWS;r++) brains.push({row:r, hp:BRAIN_HP, maxHp:BRAIN_HP, eaten:false});
+  totalZombies = plants.length;       // 进度条用植物数
+  ZOMBIE_CARD_LIST.forEach(t=>zombieCooldowns[t]=0);
+  selected=null; killCount=0; time=0; bannerTimer=0; zombieStuckTimer=0;
+  $('btnPause').textContent='⏸️ 暂停'; $('btnSpeed').textContent='⏩ 2倍速'; $('btnSpeed').classList.remove('active');
+  $('lvNum').textContent = idx+1;
+  $('waveNum').textContent='0';
+  document.querySelectorAll('.zcard').forEach(c=>c.classList.remove('selected'));
+  showZombieCards();
+  fitLayout();
+  updateSun();
+  state = 'playing';
+  showBanner('🧟 我是僵尸！部署僵尸，吃掉所有脑子！');
+  beep(200,0.2,'sawtooth',0.06);
+}
+function generateZombiePlants(LV){
+  // 在5列×5行范围内随机放置植物
+  const slots = [];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<5;c++) slots.push({r,c});
+  shuffle(slots);
+  const n = Math.min(LV.count, slots.length);
+  for(let i=0;i<n;i++){
+    const {r,c} = slots[i];
+    const type = LV.plants[ri(0, LV.plants.length-1)];
+    const def = PLANTS[type];
+    const p = { type, row:r, col:c, hp:def.hp, maxHp:def.hp, fireTimer: rand(0,1) };
+    if(type==='sunflower') p.sunTimer = SUN_INTERVAL;
+    if(type==='cherry') p.fuse = 99;   // 僵尸模式樱桃不自动爆（需被打才爆）
+    if(type==='icecannon') p.cannonCd = CANNON_INTERVAL;
+    if(isWaterRow(r)) p.onLilypad = true;  // 泳池水路植物自动有睡莲
+    plants.push(p);
+  }
+}
 
 // 结束界面切换按钮显隐：胜利/初始→显示模式选择；关卡间/失败→显示继续按钮
 function showMsgButtons(mode){ // 'mode' | 'continue'
@@ -2277,7 +3241,7 @@ function showMsgButtons(mode){ // 'mode' | 'continue'
   const sl = $('statsLine');
   if(mode==='mode' && stats && (stats.totalKills > 0 || stats.gamesPlayed > 0)){
     sl.style.display = 'block';
-    sl.innerHTML = '📊 累计战绩：🎮 游戏 ' + stats.gamesPlayed + ' 次 · 🧟 击杀 ' + stats.totalKills + ' 只 · ✅ 答对 ' + stats.quizCorrect + ' 题 · 🏆 最高第 ' + stats.bestLevel + ' 关';
+    sl.innerHTML = '📊 ' + currentPlayer + ' 的战绩：🎮 游戏 ' + stats.gamesPlayed + ' 次 · 🧟 击杀 ' + stats.totalKills + ' 只 · ✅ 答对 ' + stats.quizCorrect + ' 题 · 🏆 最高第 ' + stats.bestLevel + ' 关';
   } else {
     sl.style.display = 'none';
   }
@@ -2388,6 +3352,71 @@ function drawCardIcons(){
   c11.fillStyle='#29b6f6'; c11.fillRect(-6,-22,12,26); c11.fillStyle='#01579b'; c11.fillRect(-7,-24,14,5); c11.restore();
   c11.fillStyle='#b3e5fc'; c11.beginPath(); c11.arc(27,30,6,0,Math.PI*2); c11.fill();
   c11.fillStyle='#fff'; c11.beginPath(); c11.arc(17,22,2,0,Math.PI*2); c11.fill(); c11.beginPath(); c11.arc(40,26,2,0,Math.PI*2); c11.fill();
+  // 寒冰菇
+  const cs2 = $('cardShroom_ice').querySelector('canvas').getContext('2d');
+  cs2.clearRect(0,0,54,48);
+  cs2.fillStyle='#e8eaf6'; cs2.fillRect(23,28,8,14);
+  cs2.fillStyle='#81d4fa'; cs2.beginPath(); cs2.arc(27,18,16,Math.PI,0); cs2.closePath(); cs2.fill();
+  cs2.fillStyle='#4fc3f7'; cs2.beginPath(); cs2.arc(27,16,17,Math.PI,0); cs2.closePath(); cs2.fill();
+  cs2.fillStyle='#fff'; cs2.font='16px sans-serif'; cs2.textAlign='center'; cs2.fillText('❄️',27,34);
+  // 毁灭菇
+  const cd2 = $('cardShroom_doom').querySelector('canvas').getContext('2d');
+  cd2.clearRect(0,0,54,48);
+  cd2.fillStyle='#5d4037'; cd2.fillRect(23,28,8,14);
+  cd2.fillStyle='#c62828'; cd2.beginPath(); cd2.arc(27,18,16,Math.PI,0); cd2.closePath(); cd2.fill();
+  cd2.fillStyle='#f44336'; cd2.beginPath(); cd2.arc(27,16,17,Math.PI,0); cd2.closePath(); cd2.fill();
+  cd2.fillStyle='#ffeb3b'; cd2.font='16px sans-serif'; cd2.textAlign='center'; cd2.fillText('☠️',27,34);
+  // 究极毁灭核爆机枪射手
+  const cn = $('cardNugatling').querySelector('canvas').getContext('2d');
+  cn.clearRect(0,0,54,48);
+  cn.fillStyle='#263238'; cn.fillRect(17,30,20,14);
+  cn.fillStyle='#212121'; cn.beginPath(); cn.arc(27,18,14,0,Math.PI*2); cn.fill();
+  cn.fillStyle='#1b0000';
+  cn.fillRect(35,8,10,2); cn.fillRect(37,12,12,2);
+  cn.fillRect(35,16,10,2); cn.fillRect(37,20,12,2);
+  cn.fillStyle='#ff1744'; cn.beginPath(); cn.arc(23,15,2.5,0,Math.PI*2); cn.fill(); cn.beginPath(); cn.arc(30,15,2.5,0,Math.PI*2); cn.fill();
+  cn.fillStyle='#ffeb3b'; cn.font='13px sans-serif'; cn.textAlign='center'; cn.fillText('☢️',27,6);
+}
+
+/* ===== 僵尸卡牌图标绘制（我是僵尸模式） ===== */
+function drawZombieCardIcons(){
+  const ZC = { // 简化僵尸小图标 (54×48)
+    normal:   {body:'#9bbf7a',head:'#cfe0b0'},
+    imp:      {body:'#9bbf7a',head:'#cfe0b0',scale:0.7},
+    cone:     {body:'#9bbf7a',head:'#cfe0b0',hat:'cone'},
+    bucket:   {body:'#9bbf7a',head:'#cfe0b0',hat:'bucket'},
+    screendoor:{body:'#9bbf7a',head:'#cfe0b0',hat:'door'},
+    football: {body:'#b03a3a',head:'#cfe0b0',hat:'football'},
+    ladder:   {body:'#9bbf7a',head:'#cfe0b0',hat:'ladder'},
+    giant:    {body:'#7c9c5c',head:'#a8c087',scale:1.3},
+    clown:    {body:'#b57ab5',head:'#f0e0f0',hat:'clown'},
+    balloon:  {body:'#9bbf7a',head:'#cfe0b0',hat:'balloon'},
+  };
+  for(const t of ZOMBIE_CARD_LIST){
+    const card = document.querySelector('.zcard[data-zombie="'+t+'"]');
+    if(!card) continue;
+    const c = card.querySelector('canvas').getContext('2d');
+    c.clearRect(0,0,54,48);
+    const d = ZC[t]; const s = d.scale||1;
+    c.save(); c.translate(27,30); c.scale(s,s); c.translate(-27,-30);
+    // 腿
+    c.fillStyle='#6b6b6b'; c.fillRect(20,34,6,12); c.fillRect(28,34,6,12);
+    // 身体
+    c.fillStyle=d.body; c.fillRect(18,20,18,18);
+    // 头
+    c.fillStyle=d.head; c.beginPath(); c.arc(27,16,9,0,Math.PI*2); c.fill();
+    // 眼
+    c.fillStyle='#3a3a3a'; c.beginPath(); c.arc(24,15,1.5,0,Math.PI*2); c.fill(); c.beginPath(); c.arc(30,15,1.5,0,Math.PI*2); c.fill();
+    // 帽子/装备
+    if(d.hat==='cone'){ c.fillStyle='#e08a2e'; c.beginPath(); c.moveTo(20,10); c.lineTo(34,10); c.lineTo(27,-4); c.closePath(); c.fill(); }
+    else if(d.hat==='bucket'){ c.fillStyle='#b8b8b8'; c.fillRect(19,2,16,14); c.fillStyle='#909090'; c.fillRect(18,2,18,3); }
+    else if(d.hat==='door'){ c.fillStyle='rgba(160,170,180,0.85)'; c.fillRect(4,8,8,30); c.strokeStyle='#78909c'; c.lineWidth=1.5; c.strokeRect(4,8,8,30); }
+    else if(d.hat==='football'){ c.fillStyle='#c62828'; c.beginPath(); c.arc(27,14,11,Math.PI*0.9,Math.PI*2.1); c.fill(); c.fillRect(16,12,22,6); }
+    else if(d.hat==='ladder'){ c.strokeStyle='#b0bec5'; c.lineWidth=2; c.beginPath(); c.moveTo(40,36); c.lineTo(46,4); c.stroke(); c.beginPath(); c.moveTo(44,36); c.lineTo(50,4); c.stroke(); }
+    else if(d.hat==='clown'){ c.fillStyle='#ff5252'; c.beginPath(); c.moveTo(20,10); c.lineTo(34,10); c.lineTo(27,-4); c.closePath(); c.fill(); c.fillStyle='#ffd54f'; c.beginPath(); c.arc(27,-4,2.5,0,Math.PI*2); c.fill(); }
+    else if(d.hat==='balloon'){ c.strokeStyle='#7a5230'; c.lineWidth=1.5; c.beginPath(); c.moveTo(27,6); c.lineTo(27,-4); c.stroke(); c.fillStyle='#e53935'; c.beginPath(); c.ellipse(27,-12,9,11,0,0,Math.PI*2); c.fill(); c.fillStyle='rgba(255,255,255,.4)'; c.beginPath(); c.ellipse(24,-15,2.5,4,0,0,Math.PI*2); c.fill(); }
+    c.restore();
+  }
 }
 
 /* ================= 画布自适应：工具栏换行/窗口变化时保证5行草坪完整可见 ================= */
@@ -2399,7 +3428,7 @@ function fitLayout(){
   const availH = window.innerHeight - topEnd - tipH;        // 画布可用高度
   const availW = Math.min(window.innerWidth - 16, 948);     // 画布可用宽度（948 = 940 + 8px边框）
   let scale = Math.min(1, availW/948, availH/508);          // 508 = 500 + 8px边框
-  // 底线：不小于0.35倍（究极模式14张卡片换行时需要更小缩放），宽屏下以高度为准
+  // 底线：不小于0.35倍（17张卡片究极模式易换行需要更小缩放）
   scale = Math.max(scale, Math.min(0.35, availW/948));
   canvas.style.width  = Math.round(948*scale) + 'px';
   canvas.style.height = Math.round(508*scale) + 'px';
@@ -2408,6 +3437,13 @@ window.addEventListener('resize', fitLayout);
 
 /* ================= 循环启动 ================= */
 function updateProgressBar(){
+  if(gameMode==='zombie'){
+    const brainEaten = brains.filter(b=>b.eaten).length;
+    const pct = (brainEaten / 5) * 100;
+    $('progressBar').style.width = pct + '%';
+    $('progressText').textContent = `🧠脑子 ${brainEaten}/5 · 🧟场上${zombies.length}只 · 🌱植物${plants.length}棵 · ☀️${sun}`;
+    return;
+  }
   const total = totalZombies || 1;
   const done = Math.min(killCount, total);
   const pct = (done / total) * 100;
@@ -2442,8 +3478,57 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 drawCardIcons();
+drawZombieCardIcons();
 updateSun();
 fitLayout();
+
+/* ================= 登录界面初始化 ================= */
+$('loginName').addEventListener('input', () => {
+  const v = $('loginName').value.trim();
+  $('btnLogin').disabled = v.length === 0;
+});
+$('loginName').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && $('loginName').value.trim()) login($('loginName').value);
+});
+$('btnLogin').onclick = () => { if($('loginName').value.trim()) login($('loginName').value); };
+$('btnSwitch').onclick = () => { logout(); };
+$('playerBar').style.display = 'none';
+$('msgOverlay').classList.add('hidden');
+refreshPlayerList();
+
+/* ===== 欢迎信息生成（含玩家名和战绩） ===== */
+function showWelcomeMsg(){
+  $('msgText').innerHTML =
+    `👋 欢迎，<b>${currentPlayer}</b>！准备好保卫花园了吗？<br><br>` +
+    `🗺️ 共 <b>5 关</b>，每关 5 波僵尸，全部消灭即可通关！<br>` +
+    `☀️ <b>天降阳光</b>：天上会掉阳光，点击收集 +25！种向日葵也能产阳光<br><br>` +
+    `🌻 向日葵50☀️(每5秒产25☀️) | 🌱 豌豆射手100☀️(20伤)<br>` +
+    `🥜 坚果墙50☀️(4000血) | 🌿 双重射手200☀️(2倍) | 🔫 机枪射手450☀️(4倍)<br>` +
+    `🍒 樱桃炸弹150☀️(3×3·1500伤·一次性) | ❄️ 寒冰射手175☀️(减速僵尸)<br>` +
+    `🔒 通关第1关解锁 <b>超级机枪射手</b>，第2关解锁 <b>仙人掌</b><br>` +
+    `🔒 通关第4关解锁 <b>🪷睡莲</b> + <b>❄️寒冰双重射手</b>！<br><br>` +
+    `🔮 <b>融合系统</b>：在已有植物上再种一棵，触发特殊融合！<br>` +
+    `🌱+🌱 = 🌿双重射手 | 🌿+🌱 = ↔️双向射手(前后双射) | ↔️+🌱 = 🔫机枪射手<br>` +
+    `🥜+🌱 = 🎳坚果射手(150伤保龄球) | 🌻+🌱 = ☀️向日葵豌豆(阳光子弹:命中+50☀️击杀+75☀️)<br>` +
+    `🥜+🎳 = 💪超级保龄球射手(1.5s/发·无限穿透1000伤)！<br>` +
+    `🍄寒冰菇+🌱 = ❄️寒冰射手 | 🌿双重+🍄寒冰菇 = ❄️🌿寒冰双重射手<br>` +
+    `🌱+☠️毁灭菇 = 💥毁灭豌豆射手(10s/发·2000伤大爆炸)！<br><br>` +
+    `🧟 普通270 | 🚧 路障500 | 🪣 铁桶1000 | 🏃 撑杆720(会跳)<br>` +
+    `👺 第2关新增：小鬼(快)、巨人(3000血·砸碎植物)<br>` +
+    `🤡 第3关新增：小丑(爆炸毁植物)、气球(会飞·只有仙人掌能打)，且血量翻倍！<br>` +
+    `⛏️ 第4关新增：矿工僵尸(挖地道绕到后方！双向射手能从背后攻击它)<br>` +
+    `🏊 第5关：<b>泳池地图</b>！中间三路是水，需先种<b>睡莲</b>才能种植物！<br><br>` +
+    `🔥 <b>究极模式</b>：共 <b>20 关</b>！开局送 500☀️，全部植物直接解锁，额外拥有四大究极植物——<br>` +
+    `🌵🔥火焰仙人掌300☀️(火焰溅射) | 🟣三线超级机枪800☀️(打三行) | ❄️寒冰毁灭加农炮500☀️(1800伤+冻结)<br>` +
+    `🏈 第2关起：橄榄球、铁网门、读报(狂暴)、扶梯(翻植物)僵尸<br>` +
+    `💀 BOSS：第5关<b>特种巨人</b>(2万血·快) | 第10关<b>武装巨人</b>(4万血) | 第15关<b>究极黑曜石巨人</b>(6万血) | 第20关三巨头齐上！<br><br>` +
+    `🧟 <b>我是僵尸模式</b>：扮演僵尸方！用阳光部署僵尸，吃掉每一路的<b>脑子</b>即可获胜！<br>` +
+    `🧟普通50☀️ | 👺小鬼50☀️ | 🚧路障75☀️ | 🪣铁桶150☀️ | 🚪铁网门125☀️<br>` +
+    `🏈橄榄球250☀️ | 🪜扶梯225☀️ | 💪巨人450☀️ | 🤡小丑150☀️ | 🎈气球50☀️<br>` +
+    `💡 吃掉向日葵 +50☀️！植物随机出现在 5×5 区域，每关可能是草坪或泳池！<br><br>` +
+    `📖 点左上角「获得阳光」，答对 2~5 年级数学/英语/科学题 +100☀️`;
+}
+
 requestAnimationFrame(loop);
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8288326db23e463fa31f44b6a04c9227","r":1}' crossorigin="anonymous"></script>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#10233f">
   <title>粵語正音朗讀練習站｜難忘的經</title>
-  <meta name="version" content="c1-nan-wang-de-jing-a785b42-speed-1.4">
+  <meta name="version" content="c1-nan-wang-de-jing-pause-vocab">
   <style>
     :root{--navy:#10233f;--ink:#172033;--muted:#67748a;--paper:#f5f7fb;--card:#fff;--line:#dfe5ef;--blue:#246bfd;--coral:#ff665b;--green:#1b9b71;--shadow:0 14px 36px rgba(18,35,63,.10)}
     *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.65}
@@ -13,13 +13,13 @@
     header{background:linear-gradient(135deg,#0c1c34,#173c69);color:#fff;padding:calc(18px + env(safe-area-inset-top)) max(18px,calc((100vw - 1120px)/2)) 20px;box-shadow:0 5px 20px rgba(12,28,52,.18)}
     .head-row{display:flex;align-items:center;justify-content:space-between;gap:18px}.brand h1{font-size:clamp(1.25rem,3vw,1.8rem);margin:0}.brand p{margin:4px 0 0;color:#cbd8e9;font-size:.9rem}.home-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:9px;color:#dce9f8;text-decoration:none;font-size:.82rem;font-weight:700}.home-link:hover,.home-link:focus-visible{color:#fff;text-decoration:underline;outline:none}.scoreboard{min-width:128px;text-align:center;padding:8px 14px;border:1px solid rgba(255,255,255,.24);border-radius:14px;background:rgba(255,255,255,.09)}.scoreboard strong{display:block;font-size:1.55rem;line-height:1.2}.scoreboard span{font-size:.78rem;color:#d9e4f1}
     main{max-width:1120px;margin:22px auto;padding:0 18px 50px}.toolbar,.pager{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.toolbar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:18px;box-shadow:0 8px 24px rgba(18,35,63,.05)}
-    .toolbar button,.toolbar select,.pager button,.action{border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:9px 13px;cursor:pointer;transition:transform .16s,background .16s,color .16s,border-color .16s,box-shadow .16s}.toolbar button:hover,.toolbar select:hover,.pager button:hover,.action:hover{border-color:#9bb7e7;box-shadow:0 5px 14px rgba(36,107,253,.12)}button:active{transform:scale(.96)}button:disabled{opacity:.48;cursor:not-allowed}.repeat-control,.rate{display:flex;align-items:center;gap:9px;font-size:.88rem}.repeat-control select{padding:7px 30px 7px 10px}.rate{margin-left:auto}.rate input{width:130px;accent-color:var(--blue)}
+    .toolbar button,.toolbar select,.pager button,.action,.chip-play,.line-expand{border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:9px 13px;cursor:pointer;transition:transform .16s,background .16s,color .16s,border-color .16s,box-shadow .16s}.toolbar button:hover,.toolbar select:hover,.pager button:hover,.action:hover,.chip-play:hover,.line-expand:hover{border-color:#9bb7e7;box-shadow:0 5px 14px rgba(36,107,253,.12)}button:active{transform:scale(.96)}button:disabled{opacity:.48;cursor:not-allowed}.repeat-control,.pause-control,.rate{display:flex;align-items:center;gap:9px;font-size:.88rem}.repeat-control select,.pause-control select{padding:7px 30px 7px 10px}.rate{margin-left:auto}.rate input{width:130px;accent-color:var(--blue)}
     .cards{display:grid;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,30px);box-shadow:var(--shadow)}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.card h2{font-size:1.05rem;margin:0}.best{font-size:.83rem;color:var(--muted);white-space:nowrap}.best b{color:var(--green);font-size:1.15rem}
-    .reading{max-width:100%;overflow-wrap:anywhere;font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-size:clamp(1.35rem,4.4vw,2rem);line-height:2.25;letter-spacing:0}.lyric-line{display:block;position:relative;margin:.25em 0;padding:.08em .1em .08em 2.45em;border-radius:8px;cursor:pointer;transition:background .12s ease}.lyric-line:hover{background:#f3f7ff}.lyric-line.selected{background:linear-gradient(#e6efff,#e6efff) left bottom/100% 1.45em no-repeat}.lyric-line.active{background:var(--coral);color:#fff}.lyric-line:focus-visible{outline:2px solid var(--blue);outline-offset:3px}.line-no{position:absolute;left:.25em;top:.7em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.44em;color:var(--muted);letter-spacing:0}.lyric-line.active .line-no{color:#fff}.token{display:inline-block;position:relative;vertical-align:baseline;line-height:1.35}.word-span{display:inline-block;line-height:1.35;padding:0 .015em;transition:color .1s ease}.word-span.asr-ok{color:var(--green)}.word-span.asr-miss{color:#d33;background:#fff0ef}.lyric-line.active .word-span,.lyric-line.active .punct{color:#fff;background:transparent}.jyutping{display:block;color:var(--blue);background:transparent;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.45em;line-height:1;text-align:center;letter-spacing:0;margin-bottom:0;min-width:2.2em}.lyric-line.active .jyutping{color:#fff}.hide-jyutping .jyutping{display:none}.punct{color:#8390a4}.hint{margin-top:18px;padding:13px 15px;border-left:4px solid var(--blue);background:#f3f7ff;border-radius:0 10px 10px 0;color:#49566c;font-size:.93rem}
+    .reading{max-width:100%;overflow-wrap:anywhere;font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-size:clamp(1.35rem,4.4vw,2rem);line-height:2.25;letter-spacing:0}.line-block{margin:.25em 0}.line-main{display:flex;align-items:flex-start;gap:9px}.lyric-line{display:block;position:relative;flex:1;min-width:0;padding:.08em .1em .08em 2.45em;border-radius:8px;cursor:pointer;transition:background .12s ease}.lyric-line:hover{background:#f3f7ff}.lyric-line.selected{background:linear-gradient(#e6efff,#e6efff) left bottom/100% 1.45em no-repeat}.lyric-line.active{background:var(--coral);color:#fff}.lyric-line:focus-visible{outline:2px solid var(--blue);outline-offset:3px}.line-expand{align-self:center;padding:6px 9px;font-size:.72rem;white-space:nowrap}.line-no{position:absolute;left:.25em;top:.7em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.44em;color:var(--muted);letter-spacing:0}.lyric-line.active .line-no{color:#fff}.token{display:inline-block;position:relative;vertical-align:baseline;line-height:1.35}.word-span{display:inline-block;line-height:1.35;padding:0 .015em;transition:color .1s ease}.word-span.asr-ok{color:var(--green)}.word-span.asr-miss{color:#d33;background:#fff0ef}.lyric-line.active .word-span,.lyric-line.active .punct{color:#fff;background:transparent}.jyutping{display:block;color:var(--blue);background:transparent;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.45em;line-height:1;text-align:center;letter-spacing:0;margin-bottom:0;min-width:2.2em}.lyric-line.active .jyutping{color:#fff}.hide-jyutping .jyutping{display:none}.punct{color:#8390a4}.word-panel{display:none;margin:.45rem 0 .7rem 2.45em;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fbfdff;font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:.92rem;line-height:1.55}.line-block.expanded .word-panel{display:block}.word-group{display:grid;grid-template-columns:minmax(3.2em,.8fr) 3fr;gap:8px;align-items:start;padding:7px 0;border-top:1px dashed #d9e2ef}.word-group:first-child{border-top:0}.word-term{font-weight:800;color:var(--navy)}.word-chips{display:flex;flex-wrap:wrap;gap:7px}.chip-play{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-size:.85rem}.chip-play.playing-word{background:var(--navy);border-color:var(--navy);color:#fff}.hint{margin-top:18px;padding:13px 15px;border-left:4px solid var(--blue);background:#f3f7ff;border-radius:0 10px 10px 0;color:#49566c;font-size:.93rem}
     .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.action.primary{background:var(--blue);border-color:var(--blue);color:#fff}.action.recording{background:var(--coral);border-color:var(--coral);color:#fff;animation:pulse 1s infinite}.action.playing{background:var(--navy);border-color:var(--navy);color:#fff}.result{min-height:31px;margin-top:12px;font-size:.92rem;color:var(--muted)}.result strong{font-size:1.25rem;color:var(--green)}
     .pager{justify-content:center;margin-top:22px}.pager span{min-width:110px;text-align:center;color:var(--muted)}.support{margin-top:18px;color:var(--muted);font-size:.8rem;text-align:center}
     @keyframes pulse{50%{box-shadow:0 0 0 7px rgba(255,102,91,.16)}}
-    @media(max-width:760px){main{margin-top:14px;padding-inline:12px}.head-row{align-items:flex-start}.scoreboard{min-width:105px}.brand p{display:none}.toolbar{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:5;padding:10px}.repeat-control{margin-left:auto}.rate{width:100%;margin-left:0}.rate input{flex:1;min-width:80px}.card{border-radius:15px;padding:18px 14px}.reading{font-size:clamp(1.2rem,5.5vw,1.65rem);line-height:2.45}.actions{gap:8px}.action{flex:1;min-width:128px}.hint{font-size:.88rem}.pager button{min-width:92px}}
+    @media(max-width:760px){main{margin-top:14px;padding-inline:12px}.head-row{align-items:flex-start}.scoreboard{min-width:105px}.brand p{display:none}.toolbar{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:5;padding:10px}.repeat-control{margin-left:auto}.pause-control,.rate{width:100%;margin-left:0}.rate input{flex:1;min-width:80px}.card{border-radius:15px;padding:18px 14px}.reading{font-size:clamp(1.2rem,5.5vw,1.65rem);line-height:2.45}.actions{gap:8px}.action{flex:1;min-width:128px}.word-panel{margin-left:0}.word-group{grid-template-columns:1fr}.hint{font-size:.88rem}.pager button{min-width:92px}}
     @media(max-width:420px){header{padding-inline:14px}.head-row{gap:10px}.brand h1{font-size:1.08rem;line-height:1.35}.scoreboard{min-width:92px;padding:7px 8px}.scoreboard strong{font-size:1.3rem}.scoreboard span{font-size:.68rem}.toolbar button{flex:1;padding:8px 7px;font-size:.84rem}.card-head{display:block}.best{display:block;margin-top:3px}.reading{font-size:clamp(1.08rem,5.7vw,1.42rem);line-height:2.55}.lyric-line{padding-left:2.15em}.line-no{font-size:.42em}.action{width:100%;flex-basis:100%}}
     @media(min-width:761px) and (max-width:1024px){main{padding-inline:24px}.reading{font-size:clamp(1.5rem,2.7vw,1.85rem)}}
     @media(orientation:landscape) and (max-height:520px){header{padding-block:10px}.toolbar{position:static}.card{padding-block:16px}.reading{line-height:2.15}}
@@ -32,6 +32,7 @@
     <section class="toolbar" aria-label="朗讀設定">
       <button id="toggleJyutping" aria-pressed="true">粵拼：顯示</button>
       <label class="repeat-control">每句重複 <select id="repeatCount" aria-label="每句重複次數"><option value="1">1次</option><option value="2">2次</option><option value="3">3次</option></select></label>
+      <label class="pause-control">句間停頓 <select id="pauseTime" aria-label="每句之間停頓時間"><option value="500">0.5秒</option><option value="1000">1秒</option><option value="1500">1.5秒</option><option value="2000">2秒</option><option value="3000">3秒</option></select></label>
       <label class="rate">語速 <input id="rate" type="range" min="0.5" max="1.4" step="0.05" value="0.7"><b id="rateValue">0.70×</b></label>
     </section>
     <section id="cards" class="cards" aria-live="polite"></section>
@@ -141,13 +142,35 @@ const jyutping=[
  'ze5 saa1 gwan2 gwan2 seoi2 zau3 zau3 siu3 zoek6 long6 dong6',
  'taam1 fun1 jat1 hoeng2 pin1 gaau3 naa5 neoi5 ji4 cing4 coeng4 maai4 zong3'
 ].map(line=>line.split(' '));
+const vocabBank={
+ '笑':['笑容','笑話','笑聲'],'枉':['枉費','冤枉','枉然'],'花光':['花費','花錢','花時間'],'心計':['心思','計謀','心機'],
+ '愛':['愛心','愛護','喜愛'],'競逐':['競賽','追逐','競爭'],'鏡花':['鏡子','花影','鏡花水月'],'美麗':['美貌','美景','漂亮'],
+ '幸運':['幸運兒','好運','福氣'],'轉眼':['轉眼間','一眨眼','很快'],'遠逝':['逝去','遠去','流逝'],
+ '貪':['貪心','貪玩','貪吃'],'嗔':['嗔怪','生氣','責怪'],'喜惡':['喜歡','厭惡','好惡'],'怒':['怒氣','發怒','憤怒'],'著迷':['入迷','迷戀','沉迷'],
+ '責':['責備','責任','斥責'],'貪功':['功勞','邀功','立功'],'戀勢':['權勢','勢力','形勢'],
+ '怪':['怪責','奇怪','怪事'],'大地':['土地','天地','地上'],'眾生':['眾人','生命','生靈'],
+ '悔':['後悔','悔改','懊悔'],'舊日':['舊時','昔日','從前'],'執信':['相信','守信','信念'],'約誓':['誓言','約定','承諾'],
+ '悲歡':['悲傷','歡喜','悲歡離合'],'哀怨':['哀傷','怨氣','埋怨'],'妒':['妒忌','嫉妒','妒意'],
+ '捨不得':['不捨','留戀','捨棄'],'璀璨':['燦爛','光彩','耀眼'],'俗世':['世俗','人間','塵世'],
+ '躲':['躲避','躲開','閃躲'],'痴嗔':['痴心','嗔怒','執迷'],'合體':['合成','身體','一體'],
+ '吞風吻雨':['風雨','冒雨','風浪'],'葬':['埋葬','葬禮','安葬'],'落日':['夕陽','日落','黃昏'],'徬徨':['彷徨','猶豫','迷惘'],
+ '欺山趕海':['山海','趕路','遠行'],'踐':['實踐','踐踏','履行'],'雪徑':['雪地','小徑','山徑'],'絕望':['失望','希望','無望'],
+ '拈花':['花朵','拈起','拈花微笑'],'把酒':['酒杯','飲酒','把盞'],'折煞':['折服','煞費','難倒'],'情狂':['情感','癡情','狂熱'],
+ '憑':['憑藉','憑證','任憑'],'兩手':['雙手','手掌','手心'],'劈開':['劈柴','打開','分開'],'生死路':['生死','道路','出路'],
+ '天闊':['天空','廣闊','海闊天空'],'雪漫漫':['漫長','漫天','白雪'],'同航':['同行','航行','同路'],
+ '沙滾滾':['沙地','風沙','滾動'],'水皺皺':['水面','皺紋','波紋'],'浪蕩':['流浪','遊蕩','浪子'],
+ '貪歡':['歡樂','貪玩','享樂'],'一餉':['片刻','一會兒','頃刻'],'女兒情':['情意','柔情','兒女情長'],'長埋葬':['埋藏','長久','埋葬'],
+ '參一生':['參透','人生','一生'],'參不透':['看不透','想不通','參透'],'難題':['問題','題目','困難']
+};
+const vocabOrder=Object.keys(vocabBank).sort((a,b)=>b.length-a.length);
 const pageData=Array.from({length:Math.ceil(lyrics.length/4)},(_,page)=>{
   const start=page*4,end=Math.min(start+4,lyrics.length);
   return{id:`p${page+1}`,title:`第 ${page+1} 頁・第 ${start+1} 至 ${end} 句`,lines:lyrics.slice(start,end),py:jyutping.slice(start,end),start};
 });
 const savedRepeat=Number(localStorage.getItem('nanwangRepeatCount')||1);
+const savedPause=Number(localStorage.getItem('nanwangPauseMs')||1000);
 localStorage.removeItem('nanwangVoiceURI');
-const state={page:0,rate:.7,rateTimer:null,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,speaking:null,recognition:null,selected:{},best:JSON.parse(localStorage.getItem('nanwangBestScores')||'{}')};
+const state={page:0,rate:.7,rateTimer:null,pauseMs:[500,1000,1500,2000,3000].includes(savedPause)?savedPause:1000,repeat:[1,2,3].includes(savedRepeat)?savedRepeat:1,showJyutping:true,speaking:null,recognition:null,wordSpeaking:null,selected:{},best:JSON.parse(localStorage.getItem('nanwangBestScores')||'{}')};
 const $=s=>document.querySelector(s);const cards=$('#cards');
 const isHan=c=>/\p{Script=Han}/u.test(c);const clean=s=>(s||'').normalize('NFKC').replace(/[^\p{Script=Han}]/gu,'');
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -157,8 +180,10 @@ function renderLine(line,lineIndex,absoluteIndex,py){
     body+=isHan(ch)?`<span class="token"><small class="jyutping">${esc(py[pyIndex]||'')}</small><span class="word-span" data-line="${lineIndex}">${ch}</span></span>`:`<span class="punct">${esc(ch)}</span>`;
     if(isHan(ch))pyIndex++;
   }
-  return `<span class="lyric-line" data-line="${lineIndex}" role="button" tabindex="0" aria-label="從第 ${absoluteIndex+1} 句開始朗讀"><span class="line-no">${absoluteIndex+1}</span>${body}</span>`;
+  return `<div class="line-block" data-line-block="${lineIndex}"><div class="line-main"><span class="lyric-line" data-line="${lineIndex}" role="button" tabindex="0" aria-label="從第 ${absoluteIndex+1} 句開始朗讀"><span class="line-no">${absoluteIndex+1}</span>${body}</span><button class="line-expand" data-expand="${lineIndex}" aria-expanded="false">拆詞</button></div><div class="word-panel" data-panel="${lineIndex}"></div></div>`;
 }
+function vocabForLine(line){const used=[];for(const term of vocabOrder){if(line.includes(term)&&!used.some(x=>term.includes(x)||x.includes(term)))used.push(term);if(used.length>=5)break;}return used.map(term=>({term,words:vocabBank[term]}));}
+function renderWordPanel(line){const groups=vocabForLine(line);if(!groups.length)return '<span class="muted">呢句暫時未有拆詞。</span>';return groups.map(group=>`<div class="word-group"><div class="word-term">${esc(group.term)}</div><div class="word-chips">${group.words.map(word=>`<button class="chip-play" data-word="${esc(word)}" aria-label="播放 ${esc(word)}">▶ ${esc(word)}</button>`).join('')}</div></div>`).join('');}
 function selectStart(card,item,index){
   state.selected[item.id]=index;
   card.querySelectorAll('.lyric-line').forEach((line,i)=>{line.classList.toggle('selected',i===index);line.setAttribute('aria-pressed',i===index?'true':'false');});
@@ -171,6 +196,13 @@ function render(){
   el.querySelectorAll('.lyric-line').forEach((line,index)=>{
     const pick=()=>selectStart(el,item,index);line.onclick=pick;
     line.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};
+  });
+  el.querySelectorAll('.line-expand').forEach(button=>{
+    button.onclick=e=>{
+      e.stopPropagation();const index=Number(button.dataset.expand),block=el.querySelector(`[data-line-block="${index}"]`),panel=el.querySelector(`[data-panel="${index}"]`),open=!block.classList.contains('expanded');
+      block.classList.toggle('expanded',open);button.setAttribute('aria-expanded',open?'true':'false');button.textContent=open?'收起':'拆詞';
+      if(open&&!panel.dataset.ready){panel.innerHTML=renderWordPanel(item.lines[index]);panel.dataset.ready='true';panel.querySelectorAll('.chip-play').forEach(chip=>{chip.onclick=ev=>{ev.stopPropagation();speakWord(chip.dataset.word,chip);};});}
+    };
   });
   if(Number.isInteger(state.selected[item.id]))selectStart(el,item,state.selected[item.id]);
   el.querySelector('.play').onclick=()=>speak(item,el);el.querySelector('.record').onclick=()=>assess(item,el);cards.appendChild(el);
@@ -202,15 +234,26 @@ function speak(item,card){
     u.lang='zh-HK';u.rate=state.rate;u.pitch=1;u.volume=1;
     if(voice)u.voice=voice;
     u.onstart=()=>{if(session.cancelled)return;showCurrent();};
-    u.onend=()=>{if(session.cancelled)return;session.utterance=null;session.repeated++;if(session.repeated>=session.repeat){session.repeated=0;session.index++;}setTimeout(playNext,90);};
+    u.onend=()=>{if(session.cancelled)return;session.utterance=null;session.repeated++;if(session.repeated>=session.repeat){session.repeated=0;session.index++;}setTimeout(playNext,state.pauseMs);};
     u.onerror=e=>{if(!session.cancelled){session.cancelled=true;session.cleanup();state.speaking=null;result.textContent=`語音播放失敗：${e.error||'未知錯誤'}`;}};
     speechSynthesis.speak(u);
     showCurrent();
   }
   playNext();
 }
+function speakWord(word,button){
+  stopAll();
+  if(!('speechSynthesis'in window))return;
+  document.querySelectorAll('.playing-word').forEach(x=>x.classList.remove('playing-word'));
+  const voice=chooseVoice(),u=new SpeechSynthesisUtterance(word);state.wordSpeaking=u;
+  u.lang='zh-HK';u.rate=state.rate;u.pitch=1;u.volume=1;if(voice)u.voice=voice;
+  u.onstart=()=>button.classList.add('playing-word');u.onend=()=>{button.classList.remove('playing-word');if(state.wordSpeaking===u)state.wordSpeaking=null;};
+  u.onerror=()=>{button.classList.remove('playing-word');if(state.wordSpeaking===u)state.wordSpeaking=null;};
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+}
 function stopAll(){
   if(state.speaking){const session=state.speaking;session.cancelled=true;speechSynthesis.cancel();session.cleanup?.();state.speaking=null;}
+  if(state.wordSpeaking){speechSynthesis.cancel();state.wordSpeaking=null;document.querySelectorAll('.playing-word').forEach(x=>x.classList.remove('playing-word'));}
   if(state.recognition){try{state.recognition.stop();}catch{}state.recognition=null;}
   document.querySelectorAll('.active').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.playing').forEach(b=>{b.classList.remove('playing');b.textContent='▶ 粵語示範';});
@@ -240,6 +283,8 @@ function restartSpeakingWithNewRate(){
 $('#rate').oninput=e=>{state.rate=+e.target.value;$('#rateValue').textContent=state.rate.toFixed(2)+'×';clearTimeout(state.rateTimer);if(state.speaking)state.rateTimer=setTimeout(restartSpeakingWithNewRate,180);};
 $('#repeatCount').value=String(state.repeat);
 $('#repeatCount').onchange=e=>{state.repeat=Number(e.target.value);localStorage.setItem('nanwangRepeatCount',String(state.repeat));};
+$('#pauseTime').value=String(state.pauseMs);
+$('#pauseTime').onchange=e=>{state.pauseMs=Number(e.target.value);localStorage.setItem('nanwangPauseMs',String(state.pauseMs));};
 $('#toggleJyutping').onclick=e=>{state.showJyutping=!state.showJyutping;e.currentTarget.setAttribute('aria-pressed',state.showJyutping);e.currentTarget.textContent=`粵拼：${state.showJyutping?'顯示':'隱藏'}`;applyVisibility();};
 $('#prev').onclick=()=>{if(state.page>0){state.page--;render();scrollTo({top:0,behavior:'smooth'});}};
 $('#next').onclick=()=>{if(state.page<pageData.length-1){state.page++;render();scrollTo({top:0,behavior:'smooth'});}};

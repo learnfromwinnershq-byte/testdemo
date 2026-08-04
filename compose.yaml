@@ -1,0 +1,9 @@
+services:
+  yezi:
+    build:
+      context: .
+    image: ${YEZI_IMAGE:-yezi:latest}
+    container_name: ${YEZI_CONTAINER_NAME:-yezi}
+    ports:
+      - "${YEZI_PORT:-8069}:80"
+    restart: unless-stopped

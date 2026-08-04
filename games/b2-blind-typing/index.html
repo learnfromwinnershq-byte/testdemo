@@ -1538,7 +1538,7 @@
         return;
       }
       if (state.roundAdvancing) {
-        els.coach.textContent = "整句啱晒！撳空白鍵即刻進入下一關。";
+        els.coach.textContent = "整句啱晒！撳回車鍵即刻進入下一關。";
         return;
       }
       if (accuracy >= target && speed >= 60) {
@@ -1627,8 +1627,8 @@
         } else if (getRemaining() > 0) {
           state.roundAdvancing = true;
           els.input.disabled = false;
-          els.coach.textContent = "整句啱晒！撳空白鍵即刻進入下一關。";
-          state.roundAdvanceTimer = window.setTimeout(advanceAfterSpeech, 300);
+          els.coach.textContent = "整句啱晒！撳回車鍵（或撳「換一關」）即刻進入下一關。";
+          els.next.focus();
         } else {
           finish("complete");
         }
@@ -1675,12 +1675,16 @@
     els.input.addEventListener("input", handleInput);
     els.input.addEventListener("paste", event => event.preventDefault());
     els.input.addEventListener("keydown", event => {
-      if ((event.key === " " || event.code === "Space") && state.started && state.roundAdvancing && els.input.value === state.text) {
+      const enterLike = event.key === "Enter" || event.code === "Enter" || event.code === "NumpadEnter"
+        || event.key === "Process" || event.code === "Process";
+      if (enterLike && state.started && state.roundAdvancing) {
         event.preventDefault();
         window.clearTimeout(state.roundAdvanceTimer);
-        beginRound(true, true);
+        if (els.next && !els.next.disabled) els.next.click();
+        else beginRound(true);
         return;
       }
+      if (event.isComposing) return;
       flashKey(event.key);
     });
     els.lessonSelect.addEventListener("change", event => setLesson(event.target.value));

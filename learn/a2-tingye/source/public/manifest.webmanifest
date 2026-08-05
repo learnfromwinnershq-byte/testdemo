@@ -1,0 +1,13 @@
+{
+  "name": "听叶 · 家庭粤语听书",
+  "short_name": "听叶",
+  "description": "家长安心准备，孩子专心聆听的家庭粤语听书空间。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5eddc",
+  "theme_color": "#102f43",
+  "lang": "zh-Hans",
+  "icons": [
+    { "src": "/app-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

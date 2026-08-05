@@ -1,0 +1,12 @@
+{
+  "name": "听叶家庭粤语听书",
+  "short_name": "听叶",
+  "start_url": "/learn/a2-tingye/",
+  "scope": "/learn/a2-tingye/",
+  "display": "standalone",
+  "background_color": "#f7f0df",
+  "theme_color": "#102f43",
+  "icons": [
+    { "src": "/learn/a2-tingye/app-icon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

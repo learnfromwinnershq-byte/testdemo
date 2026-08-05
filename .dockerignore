@@ -2,3 +2,12 @@
 .gitignore
 Dockerfile
 compose.yaml
+learn/a2-tingye/source/node_modules
+learn/a2-tingye/source/dist
+learn/a2-tingye/source/static-dist
+learn/a2-tingye/source/.vinext
+learn/a2-tingye/source/.wrangler
+learn/a2-tingye/source/.book-build
+learn/a2-tingye/source/tsconfig.tsbuildinfo
+learn/a2-tingye/source/public/books
+learn/a2-tingye/source/public/book-cover.png

@@ -6,4 +6,6 @@ services:
     container_name: ${YEZI_CONTAINER_NAME:-yezi}
     ports:
       - "${YEZI_PORT:-8069}:80"
+    volumes:
+      - ./learn/a2-tingye/source/public/books:/usr/share/nginx/html/learn/a2-tingye/books:ro
     restart: unless-stopped

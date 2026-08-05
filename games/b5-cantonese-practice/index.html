@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>粤语（广东话）词汇练习</title>
+<style>
+  :root{
+    --bg:#fbf7f0; --card:#fffdf9; --ink:#3a2f25; --muted:#8a7a68;
+    --brand:#d97742; --brand-d:#b85c2c; --ok:#3f8f5b; --bad:#c8503e;
+    --line:#efe3d3; --shadow:0 10px 30px rgba(120,80,40,.12);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 18px 64px}
+  header{text-align:center;margin-bottom:18px}
+  header h1{margin:0 0 4px;font-size:26px;color:var(--brand-d)}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:22px;margin-bottom:18px;position:relative}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+  .tab{border:1px solid var(--line);background:#fff;color:var(--muted);
+    padding:9px 16px;border-radius:999px;cursor:pointer;font-size:14px;transition:.15s}
+  .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .tab:hover{color:var(--ink)}
+  .tab.active:hover{color:#fff}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin:6px 0}
+  select,button{font-family:inherit;font-size:15px}
+  select{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+  .btn{background:var(--brand);color:#fff;border:none;padding:11px 22px;border-radius:12px;
+    cursor:pointer;font-weight:600;transition:.15s;box-shadow:0 4px 12px rgba(217,119,66,.3)}
+  .btn:hover{background:var(--brand-d)}
+  .btn.ghost{background:#fff;color:var(--brand-d);border:1px solid var(--line);box-shadow:none}
+  .btn.ghost:hover{background:#fff6ee}
+  .btn:disabled{background:#ccc;cursor:not-allowed;box-shadow:none}
+  .prog{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin-bottom:10px}
+  .prog>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#f0a868,var(--brand));transition:.25s}
+  .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:14px}
+  .q-prompt{font-size:22px;text-align:center;margin:14px 0 6px;font-weight:700}
+  .q-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:16px}
+  .speak-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-size:14px;cursor:pointer;color:var(--brand);font-weight:600;display:inline-flex;gap:6px;align-items:center;margin:0 auto 8px}
+  .speak-btn:hover{background:#fff7ec}
+  .options{display:grid;gap:10px}
+  .opt{border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px 16px;
+    cursor:pointer;font-size:17px;text-align:left;transition:.12s;display:flex;gap:10px;align-items:center}
+  .opt:hover{border-color:var(--brand);background:#fff8f1}
+  .opt .k{width:26px;height:26px;border-radius:8px;background:#f3e7d8;color:var(--brand-d);
+    display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+  .opt.correct{border-color:var(--ok);background:#eef8f0;color:var(--ok)}
+  .opt.wrong{border-color:var(--bad);background:#fdeeeb;color:var(--bad)}
+  .opt.disabled{cursor:default}
+  .typed{display:flex;gap:10px;margin:8px 0 4px}
+  .typed input{flex:1;padding:13px 14px;border:1px solid var(--line);border-radius:12px;
+    font-size:18px;font-family:inherit;outline:none}
+  .typed input:focus{border-color:var(--brand)}
+  .feedback{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:15px;display:none}
+  .feedback.ok{display:block;background:#eef8f0;color:var(--ok);border:1px solid #cfe9d6}
+  .feedback.bad{display:block;background:#fdeeeb;color:var(--bad);border:1px solid #f3cfc8}
+  .feedback .ans{font-weight:700}
+  .result h2{text-align:center;color:var(--brand-d);margin:6px 0}
+  .score-big{text-align:center;font-size:46px;font-weight:800;color:var(--brand);margin:10px 0}
+  .stat{display:flex;justify-content:center;gap:22px;margin:14px 0;flex-wrap:wrap}
+  .stat div{text-align:center}
+  .stat b{display:block;font-size:22px}
+  .stat span{font-size:12px;color:var(--muted)}
+  .gloss th,.gloss td{border:1px solid var(--line);padding:7px 10px;font-size:14px;text-align:left}
+  .gloss th{background:#fff6ee;color:var(--brand-d)}
+  .gloss tr:nth-child(even) td{background:#fffaf4}
+  .gloss-wrap{overflow:auto}
+  .cat{font-weight:700;color:var(--brand-d);margin:18px 0 6px;font-size:15px}
+  .hidden{display:none}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+  mark{background:#fff0d6;color:inherit;padding:0 2px;border-radius:3px}
+  /* game */
+  .gamebar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .gstat{background:#fff6ee;border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:14px}
+  .gstat b{color:var(--brand-d);font-size:18px;margin-left:4px}
+  .gamewrap{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;position:relative}
+  #cv{background:#eef6e8;border:1px solid var(--line);border-radius:14px;width:100%;max-width:600px;height:auto;touch-action:none}
+  .gamecol{flex:1 1 400px;min-width:320px;max-width:600px;display:flex;flex-direction:column;gap:12px}
+  .qcol{flex:1 1 300px;min-width:280px;display:flex;flex-direction:column;gap:12px}
+  .qpanel{position:sticky;top:12px}
+  .panel{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fffaf4}
+  .panel-title{font-weight:700;color:var(--brand-d);margin-bottom:8px;font-size:14px}
+  .ghint{font-size:13px;color:var(--muted);background:#fff6ee;border:1px dashed var(--brand);border-radius:10px;padding:8px 10px;line-height:1.5}
+  .shop{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+  .shopbtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 4px;cursor:pointer;font-size:13px;text-align:center;line-height:1.3}
+  .shopbtn small{color:var(--brand);font-weight:700}
+  .shopbtn:hover{border-color:var(--brand);background:#fff8f1}
+  .shopbtn.sel{border-color:var(--brand);background:#ffe9d6}
+  .btn.star{width:100%;background:#7b5cc4;margin-top:4px}
+  .btn.star:hover:not(:disabled){background:#6648ad}
+  .upHint{font-size:12px;color:var(--muted);margin-top:8px}
+  #upPanel .ub{margin:4px 0;font-size:13px}
+  #upPanel button{font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;margin-left:4px}
+  #upPanel button:hover{border-color:var(--brand)}
+  .qcard-opt{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;cursor:pointer;margin:6px 0;font-size:15px}
+  .qcard-opt:hover{border-color:var(--brand);background:#fff8f1}
+  .qcard-opt.correct{border-color:var(--ok);background:#eef8f0;color:var(--ok)}
+  .qcard-opt.wrong{border-color:var(--bad);background:#fdeeeb;color:var(--bad)}
+  .goal{font-size:13px;color:var(--brand-d);background:#fff6ee;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:4px}
+  .overlay{position:fixed;inset:0;background:rgba(40,28,18,.55);display:flex;align-items:center;justify-content:center;z-index:50}
+  .overlay.hidden{display:none}
+  .overlay .box{background:#fff;border-radius:16px;padding:26px 30px;text-align:center;max-width:320px}
+  .start-ov{position:absolute;inset:0;background:rgba(255,250,244,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:16px;z-index:6;text-align:center;padding:24px}
+  .start-ov.hidden{display:none}
+  .start-ov h2{color:var(--brand-d);margin:0 0 10px;font-size:24px}
+  .start-ov p{color:var(--muted);max-width:340px;margin:0 0 16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>粤语（广东话）词汇练习</h1>
+    <p>把学习材料变成题目 · 选择题 / 拼写 / 词汇表 / 塔防游戏 四种模式随时切换</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="quiz">📝 答题模式</div>
+    <div class="tab" data-tab="gloss">📚 词汇总表</div>
+    <div class="tab" data-tab="game">🎮 塔防游戏</div>
+  </div>
+
+  <!-- ===== Quiz ===== -->
+  <section id="quiz">
+    <div class="card" id="setup">
+      <div class="row">
+        <label style="color:var(--muted);font-size:14px">题型：</label>
+        <select id="mode">
+          <option value="mc">选择题（看普通话选粤语）</option>
+          <option value="mcRev">选择题（看粤语选普通话）</option>
+          <option value="type">拼写题（看普通话写粤语）</option>
+        </select>
+      </div>
+      <div class="row">
+        <label style="color:var(--muted);font-size:14px">题量：</label>
+        <select id="count">
+          <option value="10">10 题</option>
+          <option value="20" selected>20 题</option>
+          <option value="all">全部</option>
+        </select>
+        <label style="color:var(--muted);font-size:14px;margin-left:8px">范围：</label>
+        <select id="scope">
+          <option value="all" selected>全部词汇</option>
+          <option value="kin">亲属称谓</option>
+          <option value="time">时间表达</option>
+          <option value="num">数字表达</option>
+          <option value="home">家居物品</option>
+          <option value="food">饮食相关</option>
+          <option value="nature">自然与环境</option>
+          <option value="emo">情感与心理</option>
+          <option value="phrase">交际 / 基础用语</option>
+          <option value="dialog">情景对话</option>
+        </select>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="startBtnQuiz">开始练习</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="play">
+      <div class="prog"><span id="bar"></span></div>
+      <div class="meta">
+        <span id="qno">第 1 / 20 题</span>
+        <span id="score">得分 0</span>
+      </div>
+      <div class="q-prompt" id="qPrompt"></div>
+      <div class="q-sub" id="qSub"></div>
+      <div style="text-align:center"><button class="speak-btn" id="speakBtn" type="button">🔊 读一下</button></div>
+      <div id="qBody"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn hidden" id="nextBtn">下一题 →</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="result">
+      <div class="result">
+        <h2>练习完成！</h2>
+        <div class="score-big" id="finalScore">0 / 0</div>
+        <div class="stat">
+          <div><b id="rOk" style="color:var(--ok)">0</b><span>答对数</span></div>
+          <div><b id="rBad" style="color:var(--bad)">0</b><span>答错数</span></div>
+          <div><b id="rPct" style="color:var(--brand)">0%</b><span>正确率</span></div>
+        </div>
+        <p class="hint" id="rMsg"></p>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="againBtn">再来一组</button>
+          <button class="btn ghost" id="toGlossBtn">查看词汇表</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Glossary ===== -->
+  <section id="gloss" class="hidden">
+    <div class="card">
+      <p class="hint" style="text-align:left;margin-top:0">
+        说明：左列为<strong>普通话</strong>，右列为对应的<strong>粤语（广东话）</strong>说法。
+        部分词汇有多个常用说法，用「/」分隔，均算正确。
+      </p>
+      <div class="gloss-wrap" id="glossBody"></div>
+    </div>
+  </section>
+
+  <!-- ===== Game ===== -->
+  <section id="game" class="hidden">
+    <div class="card">
+      <div class="gamebar">
+        <div class="gstat">经验 <b id="gXP">20</b></div>
+        <div class="gstat">地保 <b id="gHP">100</b></div>
+        <div class="gstat">波次 <b id="gWave">0</b></div>
+        <button class="btn ghost" id="gPause">暂停</button>
+        <button class="btn ghost" id="gRestart">重新开始</button>
+      </div>
+      <div class="gamewrap">
+        <div class="gamecol">
+          <canvas id="cv" width="600" height="600"></canvas>
+          <div class="ghint" id="gHint">先用经验买植物，再点「开始守卫」。答对粤语题会让植物齐射并回复地保！</div>
+          <div class="panel">
+            <div class="panel-title">🛒 商店（植物 20 经验 / 升级 10 经验）</div>
+            <div class="shop">
+              <button class="shopbtn" data-buy="pea">豌豆射手<br><small>20经验</small></button>
+              <button class="shopbtn" data-buy="snow">寒冰射手<br><small>20经验</small></button>
+              <button class="shopbtn" data-buy="repeater">双发射手<br><small>20经验</small></button>
+              <button class="shopbtn" data-buy="chomper">大嘴花<br><small>40经验</small></button>
+            </div>
+            <button class="btn star" id="starBtn">✨ 激活流星杨桃（50经验）</button>
+            <div class="upHint" id="upHint">点击场上的植物可升级：伤害 / 子弹数 / 射速，各 10 经验。</div>
+            <div id="upPanel" class="hidden"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🏆 成长路线</div>
+            <div class="goal" id="gGoal">🎯 目标：买第 1 棵植物（20 经验）</div>
+          </div>
+        </div>
+        <div class="qcol">
+          <div class="panel qpanel">
+            <div class="panel-title">📖 答题赚经验（每题 +10，答对还会让植物齐射）</div>
+            <div id="qCard"></div>
+            <button class="btn" id="qNext" style="margin-top:8px">下一题 →</button>
+          </div>
+        </div>
+      </div>
+      <div class="start-ov" id="startOverlay">
+        <h2>🌱 粤语守卫战</h2>
+        <p>僵尸会从上下左右四个方向来攻打你的地保！<br>答对粤语题赚经验 → 买植物、升级、激活流星杨桃。<br><b>每答对一题，植物会齐射一次并回复地保血量。</b></p>
+        <button class="btn" id="startBtnGame" style="font-size:18px;padding:14px 30px">开始守卫 ▶</button>
+      </div>
+    </div>
+    <div class="overlay hidden" id="over">
+      <div class="box">
+        <h2 style="color:var(--bad);margin:0 0 8px">地保失守！</h2>
+        <p id="overScore" style="color:var(--muted)"></p>
+        <button class="btn" onclick="document.getElementById('over').classList.add('hidden');document.getElementById('gRestart').click();">再战一次</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ============ 题库数据（已从材料中提取并去重） ============ */
+const DATA = [
+  {cat:'kin', m:'爸爸', c:['老豆']},
+  {cat:'kin', m:'妈妈', c:['妈咪']},
+  {cat:'kin', m:'爷爷', c:['阿爷']},
+  {cat:'kin', m:'奶奶', c:['阿嫲']},
+  {cat:'kin', m:'外公', c:['公公']},
+  {cat:'kin', m:'外婆', c:['婆婆']},
+  {cat:'kin', m:'哥哥', c:['阿哥']},
+  {cat:'kin', m:'姐姐', c:['家姐']},
+  {cat:'kin', m:'弟弟', c:['细佬']},
+  {cat:'kin', m:'妹妹', c:['细妹']},
+  {cat:'kin', m:'伯父', c:['伯爷']},
+  {cat:'kin', m:'伯母', c:['伯娘']},
+  {cat:'kin', m:'叔叔', c:['阿叔']},
+  {cat:'kin', m:'婶婶', c:['阿婶']},
+  {cat:'kin', m:'舅舅', c:['舅父']},
+  {cat:'kin', m:'舅妈', c:['舅母']},
+  {cat:'kin', m:'阿姨', c:['阿姨']},
+  {cat:'time', m:'今天', c:['今日']},
+  {cat:'time', m:'每天', c:['每日']},
+  {cat:'time', m:'明天', c:['听日']},
+  {cat:'time', m:'昨天', c:['琴日']},
+  {cat:'time', m:'后天', c:['后日']},
+  {cat:'time', m:'前两天', c:['前两日']},
+  {cat:'time', m:'早上', c:['朝早']},
+  {cat:'time', m:'中午', c:['晏昼']},
+  {cat:'time', m:'晚上', c:['夜晚']},
+  {cat:'time', m:'今年', c:['今年']},
+  {cat:'time', m:'好久', c:['好耐']},
+  {cat:'time', m:'最近', c:['近排','呢排']},
+  {cat:'time', m:'凌晨', c:['零晨']},
+  {cat:'time', m:'昨晚', c:['琴晚']},
+  {cat:'time', m:'上午', c:['上昼']},
+  {cat:'time', m:'下午', c:['下昼']},
+  {cat:'time', m:'月初', c:['月头']},
+  {cat:'time', m:'月底', c:['月底','月尾']},
+  {cat:'time', m:'年初', c:['年头']},
+  {cat:'time', m:'年底', c:['年尾']},
+  {cat:'time', m:'前年', c:['前年']},
+  {cat:'time', m:'去年', c:['旧年']},
+  {cat:'time', m:'立刻', c:['即刻']},
+  {cat:'time', m:'偶尔 / 有时候', c:['一时时']},
+  {cat:'time', m:'一会儿', c:['一阵','一阵间']},
+  {cat:'time', m:'等一下', c:['等阵']},
+  {cat:'time', m:'待会', c:['转头']},
+  {cat:'num', m:'100', c:['一百']},
+  {cat:'num', m:'1000', c:['一千']},
+  {cat:'num', m:'10000', c:['一万']},
+  {cat:'num', m:'分（货币单位）', c:['仙']},
+  {cat:'num', m:'角', c:['5毫','毫']},
+  {cat:'num', m:'元', c:['蚊']},
+  {cat:'num', m:'零钱', c:['散纸']},
+  {cat:'num', m:'0.5', c:['零点五']},
+  {cat:'num', m:'1.25', c:['一点二五']},
+  {cat:'num', m:'二分之一', c:['二份一']},
+  {cat:'num', m:'三分之二', c:['三份二']},
+  {cat:'num', m:'一', c:['一']},{cat:'num', m:'二', c:['二']},
+  {cat:'num', m:'三', c:['三']},{cat:'num', m:'四', c:['四']},
+  {cat:'num', m:'五', c:['五']},{cat:'num', m:'六', c:['六']},
+  {cat:'num', m:'七', c:['七']},{cat:'num', m:'八', c:['八']},
+  {cat:'num', m:'九', c:['九']},{cat:'num', m:'十', c:['十']},
+  {cat:'home', m:'床', c:['床']},
+  {cat:'home', m:'衣柜', c:['衣柜']},
+  {cat:'home', m:'床头柜', c:['床头柜']},
+  {cat:'home', m:'书桌', c:['书枱']},
+  {cat:'home', m:'沙发', c:['梳化']},
+  {cat:'home', m:'椅子', c:['凳']},
+  {cat:'home', m:'茶几', c:['茶机']},
+  {cat:'home', m:'餐桌', c:['餐枱','飯枱']},
+  {cat:'home', m:'梳妆桌', c:['化妆枱']},
+  {cat:'home', m:'电视', c:['电视']},
+  {cat:'home', m:'空调', c:['冷气']},
+  {cat:'home', m:'电饭煲', c:['电饭煲']},
+  {cat:'home', m:'冰箱', c:['雪柜']},
+  {cat:'home', m:'洗衣机', c:['洗衣机']},
+  {cat:'home', m:'微波炉', c:['微波炉']},
+  {cat:'home', m:'家', c:['屋企']},
+  {cat:'home', m:'钥匙', c:['锁匙']},
+  {cat:'home', m:'手机', c:['手机','手提电话']},
+  {cat:'home', m:'杯子', c:['杯']},
+  {cat:'home', m:'毛巾', c:['毛巾']},
+  {cat:'home', m:'牙刷', c:['牙刷']},
+  {cat:'home', m:'牙膏', c:['牙膏']},
+  {cat:'home', m:'刷牙', c:['涮牙']},
+  {cat:'food', m:'饭', c:['饭']},
+  {cat:'food', m:'菜（菜肴）', c:['餸']},
+  {cat:'food', m:'鱼', c:['鱼']},
+  {cat:'food', m:'肉', c:['肉']},
+  {cat:'food', m:'鸡蛋', c:['鸡蛋']},
+  {cat:'food', m:'面条', c:['面']},
+  {cat:'food', m:'水果', c:['生果','水果']},
+  {cat:'food', m:'粥', c:['粥']},
+  {cat:'food', m:'粉（河粉/肠粉）', c:['粉','河粉','肠粉']},
+  {cat:'food', m:'面包', c:['面包']},
+  {cat:'food', m:'蛋糕', c:['蛋糕']},
+  {cat:'food', m:'馒头', c:['馒头']},
+  {cat:'food', m:'汤', c:['汤']},
+  {cat:'food', m:'炒菜', c:['炒菜']},
+  {cat:'food', m:'炖菜', c:['炆菜']},
+  {cat:'food', m:'清蒸鱼', c:['清蒸鱼']},
+  {cat:'food', m:'红烧肉', c:['红烧肉']},
+  {cat:'food', m:'饼干', c:['饼乾']},
+  {cat:'food', m:'糖果', c:['糖']},
+  {cat:'food', m:'薯片', c:['薯片']},
+  {cat:'food', m:'巧克力', c:['朱古力']},
+  {cat:'food', m:'果冻', c:['啫喱']},
+  {cat:'food', m:'茶', c:['茶']},
+  {cat:'food', m:'咖啡', c:['咖啡']},
+  {cat:'food', m:'果汁', c:['果汁']},
+  {cat:'food', m:'汽水', c:['汽水']},
+  {cat:'food', m:'奶茶', c:['奶茶']},
+  {cat:'food', m:'可乐', c:['可乐']},
+  {cat:'nature', m:'晴天', c:['天晴']},
+  {cat:'nature', m:'阴天', c:['阴天']},
+  {cat:'nature', m:'雨天', c:['雨天']},
+  {cat:'nature', m:'下雪', c:['落雪']},
+  {cat:'nature', m:'下雨', c:['落雨']},
+  {cat:'nature', m:'刮风', c:['打风']},
+  {cat:'nature', m:'山水', c:['山水']},
+  {cat:'nature', m:'洪水', c:['水浸']},
+  {cat:'nature', m:'地球', c:['地球']},
+  {cat:'nature', m:'大海', c:['大海']},
+  {cat:'nature', m:'森林', c:['森林']},
+  {cat:'nature', m:'太阳', c:['太阳']},
+  {cat:'nature', m:'月亮', c:['月亮']},
+  {cat:'nature', m:'星星', c:['星星']},
+  {cat:'nature', m:'天空', c:['天空']},
+  {cat:'nature', m:'云朵', c:['云']},
+  {cat:'emo', m:'开心', c:['开心']},
+  {cat:'emo', m:'难过', c:['难过']},
+  {cat:'emo', m:'不开心', c:['唔开心']},
+  {cat:'emo', m:'没信心', c:['没信心']},
+  {cat:'emo', m:'生气', c:['嬲']},
+  {cat:'emo', m:'害怕', c:['惊']},
+  {cat:'emo', m:'紧张', c:['紧张']},
+  {cat:'emo', m:'满足', c:['满足']},
+  {cat:'emo', m:'寂寞', c:['寂寞']},
+  {cat:'emo', m:'害羞', c:['怕丑']},
+  {cat:'emo', m:'伤心', c:['伤心']},
+  {cat:'emo', m:'烦', c:['烦']},
+  {cat:'emo', m:'感动', c:['感动']},
+  {cat:'emo', m:'满意', c:['满意']},
+  {cat:'emo', m:'担心', c:['担心']},
+  {cat:'emo', m:'哭', c:['喊']},
+  {cat:'phrase', m:'你好', c:['你好']},
+  {cat:'phrase', m:'早上好', c:['早晨']},
+  {cat:'phrase', m:'好久不见', c:['好耐冇见']},
+  {cat:'phrase', m:'晚上好', c:['晚上好']},
+  {cat:'phrase', m:'再见', c:['再见']},
+  {cat:'phrase', m:'拜拜', c:['拜拜']},
+  {cat:'phrase', m:'下次见', c:['下次见']},
+  {cat:'phrase', m:'谢谢', c:['唔该','多谢']},
+  {cat:'phrase', m:'麻烦了', c:['麻烦晒','唔该晒']},
+  {cat:'phrase', m:'不用客气', c:['唔使客气']},
+  {cat:'phrase', m:'对不起', c:['对唔住']},
+  {cat:'phrase', m:'不好意思', c:['唔好意思']},
+  {cat:'phrase', m:'你在干什么？', c:['你喺度做咩呀']},
+  {cat:'phrase', m:'你在干嘛？', c:['你做咩啊']},
+  {cat:'phrase', m:'你吃饭了吗？', c:['你食佐饭未呀']},
+  {cat:'phrase', m:'你吃早餐了吗？', c:['你食咗早餐未呀']},
+  {cat:'phrase', m:'好久不见，最近忙什么？', c:['好耐冇见，近排忙紧乜咩啊']},
+  {cat:'phrase', m:'你气色不错，最近有什么喜事？', c:['你气色唔错喔，最近有乜咩好事']},
+  {cat:'phrase', m:'早上好，吃早餐了吗？', c:['早晨，食咗早餐未呀']},
+  {cat:'phrase', m:'今天你这么早啊？', c:['今日你咁早既']},
+  {cat:'phrase', m:'下次有机会再慢慢聊！', c:['下次得闲再倾过啦']},
+  {cat:'phrase', m:'一路顺风，到了通知我。', c:['一路顺风，到咗同我讲声']},
+  {cat:'phrase', m:'拜拜，自己保重啊！', c:['拜拜啦，保重身体啊']},
+  {cat:'dialog', m:'你最近好吗？', c:['你呢排好吗']},
+  {cat:'dialog', m:'我挺好的，你呢？', c:['我几好啊，你呢']},
+  {cat:'dialog', m:'你去哪里？', c:['你去边度']},
+  {cat:'dialog', m:'我回家。', c:['我返屋企']},
+  {cat:'dialog', m:'现在几点了？', c:['依家几点呀']},
+  {cat:'dialog', m:'现在是三点钟。', c:['依家系三点钟']},
+  {cat:'dialog', m:'几点了？', c:['几点喇']},
+  {cat:'dialog', m:'你意见如何？', c:['你点呀']}
+];
+
+const CAT_NAME = {
+  kin:'亲属称谓', time:'时间表达', num:'数字表达', home:'家居物品',
+  food:'饮食相关', nature:'自然与环境', emo:'情感与心理',
+  phrase:'交际 / 基础用语', dialog:'情景对话'
+};
+
+/* ============ 工具函数 ============ */
+const $ = s=>document.querySelector(s);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function sample(arr,n){return shuffle(arr).slice(0,n);}
+const allC = DATA.flatMap(d=>d.c);
+const allM = DATA.map(d=>d.m);
+
+/* ============ 标签页切换 ============ */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const tab=t.dataset.tab;
+    $('#quiz').classList.toggle('hidden',tab!=='quiz');
+    $('#gloss').classList.toggle('hidden',tab!=='gloss');
+    $('#game').classList.toggle('hidden',tab!=='game');
+    if(tab==='gloss') buildGloss();
+    if(tab==='game') initGameTab();
+  };
+});
+
+/* ============ 词汇总表 ============ */
+function buildGloss(){
+  const cats=Object.keys(CAT_NAME);
+  let html='';
+  cats.forEach(cat=>{
+    const items=DATA.filter(d=>d.cat===cat);
+    if(!items.length) return;
+    html+=`<div class="cat">${CAT_NAME[cat]}（${items.length}）</div>`;
+    html+='<table class="gloss"><thead><tr><th>普通话</th><th>粤语（广东话）</th></tr></thead><tbody>';
+    items.forEach(d=>{ html+=`<tr><td>${d.m}</td><td>${d.c.join(' / ')}</td></tr>`;});
+    html+='</tbody></table>';
+  });
+  $('#glossBody').innerHTML=html;
+}
+
+/* ============ 答题引擎 ============ */
+let QS=[];
+function speakCantonese(text){
+  if(!text || typeof window==='undefined' || !('speechSynthesis' in window)) return;
+  try{
+    if(Array.isArray(text)) text=text.join(' ');
+    const synth=window.speechSynthesis;
+    synth.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    const voices = synth.getVoices ? synth.getVoices() : [];
+    const canto = voices.find(v=>/^yue/i.test(v.lang) || /cantonese|粤/i.test(v.name));
+    let lang;
+    if(canto){ u.voice=canto; lang=canto.lang; }
+    else { lang = voices.find(v=>/^zh[-_]HK/i.test(v.lang)) ? 'zh-HK' : 'zh-CN'; }
+    u.lang=lang; u.rate=0.95; u.pitch=1;
+    synth.speak(u);
+  }catch(e){}
+}
+
+let idx=0, score=0;
+
+$('#startBtnQuiz').onclick=start;
+$('#againBtn').onclick=()=>{ $('#result').classList.add('hidden'); $('#setup').classList.remove('hidden'); };
+$('#toGlossBtn').onclick=()=>{ document.querySelector('.tab[data-tab="gloss"]').click(); };
+$('#nextBtn').onclick=next;
+
+function start(){
+  const mode=$('#mode').value;
+  const scope=$('#scope').value;
+  const cnt=$('#count').value;
+  let pool=DATA.filter(d=>scope==='all'||d.cat===scope);
+  if(!pool.length){ alert('该范围暂无可练习内容'); return; }
+  if(cnt!=='all') pool=sample(pool, Math.min(parseInt(cnt),pool.length));
+  else pool=shuffle(pool);
+
+  QS=pool.map(item=>{
+    if(mode==='type'){
+      return {type:'type', prompt:item.m, answers:item.c, cantonese:item.c, cat:item.cat};
+    }
+    const reverse = mode==='mcRev';
+    const prompt = reverse? item.c[0] : item.m;
+    const answer = reverse? item.m : item.c[0];
+    const distPool = reverse? allM.filter(x=>x!==item.m) : allC.filter(x=>!item.c.includes(x));
+    const options = shuffle([answer, ...sample(distPool,3)]);
+    return {type:'mc', reverse, prompt, answer, options, cantonese:item.c[0], item};
+  });
+
+  idx=0; score=0;
+  $('#setup').classList.add('hidden');
+  $('#result').classList.add('hidden');
+  $('#play').classList.remove('hidden');
+  render();
+}
+
+function render(){
+  const q=QS[idx];
+  $('#qno').textContent=`第 ${idx+1} / ${QS.length} 题`;
+  $('#score').textContent=`得分 ${score}`;
+  $('#bar').style.width = (idx/QS.length*100)+'%';
+  $('#feedback').className='feedback';
+  $('#feedback').innerHTML='';
+  $('#nextBtn').classList.add('hidden');
+  $('#qPrompt').textContent = q.prompt;
+  $('#speakBtn').onclick = ()=>speakCantonese(q.cantonese);
+  $('#qSub').textContent = q.type==='type' ? '请写出对应的粤语说法' :
+    (q.reverse ? '听到／看到这段粤语，它的普通话意思是？' : '请选出对应的粤语说法');
+
+  const body=$('#qBody'); body.innerHTML='';
+
+  if(q.type==='mc'){
+    const grid=document.createElement('div'); grid.className='options';
+    const keys=['A','B','C','D'];
+    q.options.forEach((opt,i)=>{
+      const b=document.createElement('button'); b.className='opt';
+      b.innerHTML=`<span class="k">${keys[i]}</span><span>${opt}</span>`;
+      b.onclick=()=>chooseMC(q,opt,b,grid);
+      grid.appendChild(b);
+    });
+    body.appendChild(grid);
+  } else {
+    const wrap=document.createElement('div'); wrap.className='typed';
+    const inp=document.createElement('input'); inp.type='text'; inp.placeholder='输入粤语…'; inp.autocomplete='off';
+    const btn=document.createElement('button'); btn.className='btn'; btn.textContent='提交';
+    const submit=()=>checkType(q,inp.value);
+    btn.onclick=submit;
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+    wrap.appendChild(inp); wrap.appendChild(btn); body.appendChild(wrap);
+    setTimeout(()=>inp.focus(),50);
+  }
+}
+
+function chooseMC(q,opt,btn,grid){
+  speakCantonese(q.cantonese);
+  grid.querySelectorAll('.opt').forEach(o=>o.classList.add('disabled'));
+  const correct = opt===q.answer;
+  btn.classList.add(correct?'correct':'wrong');
+  grid.querySelectorAll('.opt').forEach(o=>{
+    if(o.querySelector('span:last-child').textContent===q.answer) o.classList.add('correct');
+  });
+  afterAnswer(correct, q);
+}
+
+function checkType(q,val){
+  const v=val.trim().replace(/\s+/g,'');
+  const ok = q.answers.some(a=>a.replace(/\s+/g,'')===v);
+  const fb=$('#feedback');
+  if(ok){
+    score++;
+    fb.className='feedback ok';
+    fb.innerHTML=`✅ 正确！粤语也可以说：<span class="ans">${q.answers.join(' / ')}</span>`;
+  }else{
+    fb.className='feedback bad';
+    fb.innerHTML=`❌ 正确答案：<span class="ans">${q.answers.join(' / ')}</span>`;
+  }
+  speakCantonese(q.cantonese);
+  updateProgressAndNext();
+}
+
+function afterAnswer(correct,q){
+  if(correct) score++;
+  const fb=$('#feedback');
+  if(correct){
+    fb.className='feedback ok'; fb.innerHTML='✅ 答对了！';
+  }else{
+    fb.className='feedback bad';
+    fb.innerHTML=`❌ 正确答案：<span class="ans">${q.answer}</span>`;
+  }
+  updateProgressAndNext();
+}
+
+function updateProgressAndNext(){
+  $('#score').textContent=`得分 ${score}`;
+  $('#bar').style.width=((idx+1)/QS.length*100)+'%';
+  $('#nextBtn').classList.remove('hidden');
+}
+
+function next(){
+  idx++;
+  if(idx>=QS.length){ finish(); }
+  else render();
+}
+
+function finish(){
+  $('#play').classList.add('hidden');
+  $('#result').classList.remove('hidden');
+  $('#finalScore').textContent=`${score} / ${QS.length}`;
+  $('#rOk').textContent=score;
+  $('#rBad').textContent=QS.length-score;
+  const pct=Math.round(score/QS.length*100);
+  $('#rPct').textContent=pct+'%';
+  let msg='';
+  if(pct>=90) msg='🌟 太棒了，粤语词汇已经很熟！';
+  else if(pct>=70) msg='👍 不错，再多练几遍就稳了。';
+  else if(pct>=50) msg='💪 中规中矩，重点复习错过的词。';
+  else msg='📖 别急，先看看词汇总表再战！';
+  $('#rMsg').textContent=msg;
+}
+
+/* ============ 塔防游戏（答题赚经验 → 买植物守地保） ============ */
+const cv=$('#cv'), ctx=cv.getContext('2d');
+const CW=600,CH=600,CX=300,CY=300,BASE_R=42;
+const LANES=['up','down','left','right'];
+const SHOOT={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+const ZMOVE={up:[0,1],down:[0,-1],left:[1,0],right:[-1,0]};
+function slotPos(lane,i){const d=[250,180,110];
+  if(lane==='up')return{x:CX,y:d[i]};
+  if(lane==='down')return{x:CX,y:CH-d[i]};
+  if(lane==='left')return{x:d[i],y:CY};
+  return{x:CW-d[i],y:CY};}
+const SLOTS=[];LANES.forEach(l=>{for(let i=0;i<3;i++)SLOTS.push({lane:l,i,pos:slotPos(l,i),plant:null});});
+const PLANTS={
+  pea:{name:'豌豆射手',dmg:1,count:1,interval:1.3,color:'#7bbf4a',emo:'🌱',cost:20},
+  snow:{name:'寒冰射手',dmg:1,count:1,interval:1.5,color:'#5aa9d6',emo:'❄️',slow:true,cost:20},
+  repeater:{name:'双发射手',dmg:1,count:2,interval:1.3,color:'#4f9e3a',emo:'🌿',cost:20},
+  chomper:{name:'大嘴花',dmg:0,count:0,interval:0,color:'#d96fa0',emo:'🌺',cost:40},
+};
+const ZTYPES={
+  normal:{hp:3,speed:22,dmgRate:5,color:'#9aa0a6'},
+  cone:{hp:6,speed:18,dmgRate:7,color:'#c98a3a'},
+  bucket:{hp:11,speed:15,dmgRate:9,color:'#7d8a96'},
+};
+let G=null, loopStarted=false;
+function newGame(){
+  G={xp:40,hp:100,wave:0,zombies:[],bullets:[],star:{active:false,cd:0},
+     on:true,over:false,started:false,grace:0,sel:null,pending:null,
+     spawnT:0,spawnI:3000,last:performance.now(),waveT:0};
+}
+function syncHUD(){ if(!G)return;
+  $('#gXP').textContent=G.xp; $('#gHP').textContent=Math.ceil(G.hp); $('#gWave').textContent=G.wave; }
+function renderGoal(){
+  if(!G){return;}
+  const placed=SLOTS.some(s=>s.plant);
+  let t;
+  if(!placed) t='🎯 目标：买第 1 棵植物（20 经验），守住地保';
+  else if(!G.star.active) t='🎯 目标：攒到 50 经验，激活「流星杨桃」全图防御';
+  else t='🎯 目标：升级植物属性，挑战更高波次！';
+  $('#gGoal').textContent=t;
+}
+function startGameLoop(){
+  function frame(now){
+    const dt=Math.min(0.05,(now-G.last)/1000); G.last=now;
+    if(G.on&&!G.over) update(dt);
+    draw();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+function initGameTab(){
+  if(!G) newGame();
+  if(!loopStarted){loopStarted=true;startGameLoop();}
+  if(!$('#qCard').dataset.init){$('#qCard').dataset.init='1';nextGameQ();}
+  syncHUD(); renderGoal();
+}
+function spawnZombie(){
+  const lane=LANES[Math.floor(Math.random()*4)];
+  let type='normal'; const r=Math.random();
+  if(G.wave>=3&&r<0.30)type='bucket'; else if(r<0.55)type='cone';
+  const t=ZTYPES[type];
+  let x,y;
+  if(lane==='up'){x=CX;y=6;} else if(lane==='down'){x=CX;y=CH-6;}
+  else if(lane==='left'){x=6;y=CY;} else {x=CW-6;y=CY;}
+  const hp=1+G.wave*0.12;
+  G.zombies.push({lane,type,x,y,hp:t.hp*hp,maxhp:t.hp*hp,speed:t.speed,dmgRate:t.dmgRate,color:t.color,slow:0});
+}
+function firePlant(s,p){
+  const base=PLANTS[p.type]; const dmg=base.dmg+p.dmgLv; const count=base.count+p.cntLv;
+  const d=SHOOT[s.lane];
+  for(let k=0;k<count;k++)
+    G.bullets.push({lane:s.lane,x:s.pos.x+d[0]*k*14,y:s.pos.y+d[1]*k*14,dmg,slow:!!base.slow,sp:300});
+}
+function fireStar(){
+  const per=[3,3,2,2];
+  LANES.forEach((lane,li)=>{ const d=SHOOT[lane];
+    for(let k=0;k<per[li];k++)
+      G.bullets.push({lane,x:CX+d[0]*k*14,y:CY+d[1]*k*14,dmg:2,slow:false,sp:320}); });
+}
+function fireAllPlants(){
+  if(!G)return;
+  for(const s of SLOTS){ if(s.plant) firePlant(s,s.plant); }
+  if(G.star.active) fireStar();
+}
+function update(dt){
+  if(!G.started) return;
+  if(G.grace>0){ G.grace-=dt; }
+  else {
+    G.waveT+=dt;
+    if(G.waveT>=18){G.waveT=0;G.wave++;G.spawnI=Math.max(1000,G.spawnI-200);}
+    G.spawnT+=dt*1000;
+    if(G.spawnT>=G.spawnI){G.spawnT=0;spawnZombie();}
+  }
+  for(const z of G.zombies){
+    if(z.slow>0)z.slow-=dt;
+    const sp=z.speed*(z.slow>0?0.5:1); const m=ZMOVE[z.lane];
+    const nx=z.x+m[0]*sp*dt, ny=z.y+m[1]*sp*dt;
+    if(Math.hypot(nx-CX,ny-CY)>BASE_R+4){z.x=nx;z.y=ny;} else {G.hp-=z.dmgRate*dt;}
+  }
+  for(const s of SLOTS){ if(!s.plant)continue; const p=s.plant;
+    if(p.type==='chomper'){
+      p.cd-=dt;
+      if(p.cd<=0){
+        let target=null,best=1e9; const dvec=SHOOT[s.lane];
+        for(const z of G.zombies){ if(z.dead||z.lane!==s.lane)continue;
+          const ahead=(z.x-s.pos.x)*dvec[0]+(z.y-s.pos.y)*dvec[1];
+          const dist=Math.hypot(z.x-s.pos.x,z.y-s.pos.y);
+          if(ahead>0&&dist<70&&dist<best){best=dist;target=z;} }
+        if(target){target.dead=true;G.xp+=2;p.cd=5;}
+      }
+      continue;
+    }
+    p.cd-=dt; if(p.cd<=0){firePlant(s,p);p.cd=p.interval;}
+  }
+  if(G.star.active){G.star.cd-=dt; if(G.star.cd<=0){fireStar();G.star.cd=1.0;}}
+  for(const b of G.bullets){const d=SHOOT[b.lane];b.x+=d[0]*b.sp*dt;b.y+=d[1]*b.sp*dt;}
+  for(const b of G.bullets){ if(b.dead)continue;
+    for(const z of G.zombies){ if(z.dead||z.lane!==b.lane)continue;
+      if(Math.hypot(z.x-b.x,z.y-b.y)<16){ z.hp-=b.dmg; if(b.slow)z.slow=1.2; b.dead=true;
+        if(z.hp<=0&&!z.dead){z.dead=true;G.xp+=2;} break; } } }
+  G.bullets=G.bullets.filter(b=>!b.dead&&b.x>-12&&b.x<CW+12&&b.y>-12&&b.y<CH+12);
+  G.zombies=G.zombies.filter(z=>!z.dead);
+  if(G.hp<=0){G.hp=0;G.over=true;showOver();}
+  syncHUD();
+}
+function draw(){
+  ctx.clearRect(0,0,CW,CH);
+  ctx.fillStyle='#e3efd6';
+  ctx.fillRect(CX-26,0,52,CH); ctx.fillRect(0,CY-26,CW,52);
+  ctx.fillStyle='#b9d49a';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('上',CX,14);ctx.fillText('下',CX,CH-12);ctx.fillText('左',14,CY);ctx.fillText('右',CW-14,CY);
+  for(const s of SLOTS){ ctx.beginPath();ctx.arc(s.pos.x,s.pos.y,20,0,7);ctx.fillStyle='#fff';ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle='#cfe0b8';ctx.stroke(); }
+  ctx.beginPath();ctx.arc(CX,CY,BASE_R,0,7);
+  ctx.fillStyle=(G&&G.star.active)?'#caa6f0':'#f3d9a8';ctx.fill();
+  ctx.lineWidth=3;ctx.strokeStyle='#d9b06f';ctx.stroke();
+  ctx.font='26px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText((G&&G.star.active)?'⭐':'🏠',CX,CY);
+  for(const s of SLOTS){ if(!s.plant)continue; const p=s.plant,base=PLANTS[p.type];
+    ctx.beginPath();ctx.arc(s.pos.x,s.pos.y,18,0,7);ctx.fillStyle=base.color;ctx.fill();
+    ctx.font='16px serif';ctx.fillText(base.emo,s.pos.x,s.pos.y);
+    if(G&&G.sel===s){ctx.lineWidth=3;ctx.strokeStyle='#d97742';ctx.beginPath();ctx.arc(s.pos.x,s.pos.y,22,0,7);ctx.stroke();} }
+  for(const z of G.zombies){ ctx.beginPath();ctx.arc(z.x,z.y,15,0,7);ctx.fillStyle=z.color;ctx.fill();
+    ctx.font='16px serif';ctx.fillText('🧟',z.x,z.y);
+    ctx.fillStyle='#e7c7c7';ctx.fillRect(z.x-15,z.y-22,30,4);
+    ctx.fillStyle='#c8503e';ctx.fillRect(z.x-15,z.y-22,30*Math.max(0,z.hp/z.maxhp),4); }
+  for(const b of G.bullets){ ctx.beginPath();ctx.arc(b.x,b.y,5,0,7);ctx.fillStyle=(b.dmg>=2)?'#b07be0':'#8fd14f';ctx.fill(); }
+  if(G){
+    ctx.fillStyle='#3a2f25';ctx.font='12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('地保 '+Math.ceil(G.hp),CX,CY+BASE_R+14);
+    if(!G.started){
+      ctx.fillStyle='rgba(40,28,18,.55)';ctx.font='bold 20px sans-serif';
+      ctx.fillText('准备就绪 · 点「开始守卫」',CX,CY-70);
+    } else if(G.grace>0){
+      ctx.fillStyle='#b85c2c';ctx.font='bold 18px sans-serif';
+      ctx.fillText('防御准备 '+Math.ceil(G.grace)+'s',CX,CY-70);
+    }
+  }
+}
+/* 答题赚经验 + 答对即攻击 */
+function nextGameQ(){
+  const card=$('#qCard'); card.dataset.done=''; card.innerHTML='';
+  const it=DATA[Math.floor(Math.random()*DATA.length)];
+  const ans=it.c[0]; const pool=allC.filter(x=>!it.c.includes(x));
+  const opts=shuffle([ans,...sample(pool,3)]);
+  const q=document.createElement('div'); q.style.cssText='font-size:16px;margin-bottom:6px';
+  q.textContent='普通话「'+it.m+'」的粤语是？'; card.appendChild(q);
+  opts.forEach(o=>{ const b=document.createElement('div'); b.className='qcard-opt'; b.textContent=o;
+    b.onclick=()=>{ if(card.dataset.done)return; card.dataset.done='1';
+      speakCantonese(o);
+      const ok=(o===ans); b.classList.add(ok?'correct':'wrong');
+      if(ok){
+        G.xp+=10;
+        if(G.started && !G.over){ fireAllPlants(); G.hp=Math.min(100,G.hp+3); }
+        syncHUD(); renderGoal();
+      } else {
+        if(G.started && !G.over){ G.hp=Math.max(0,G.hp-2); if(G.hp<=0){G.hp=0;G.over=true;showOver();} syncHUD(); }
+      }
+      card.querySelectorAll('.qcard-opt').forEach(x=>{if(x.textContent===ans)x.classList.add('correct');});
+      const fb=document.createElement('div'); fb.style.cssText='font-size:13px;margin-top:6px;color:'+(ok?'#3f8f5b':'#c8503e');
+      fb.textContent=ok?'✅ +10 经验！植物齐射 + 地保回血':'❌ 正确：'+ans+'（地保 -2）'; card.appendChild(fb);
+      $('#qNext').disabled=false; };
+    card.appendChild(b); });
+  $('#qNext').disabled=true;
+}
+$('#qNext').onclick=()=>nextGameQ();
+/* 商店与放置 */
+document.querySelectorAll('.shopbtn').forEach(b=>{
+  b.onclick=()=>{
+    if(G.pending===b.dataset.buy){G.pending=null;b.classList.remove('sel');$('#gHint').textContent='已取消选择';return;}
+    G.pending=b.dataset.buy;
+    document.querySelectorAll('.shopbtn').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+    $('#gHint').textContent='已选「'+PLANTS[b.dataset.buy].name+'」，点击场上空位放置（'+PLANTS[b.dataset.buy].cost+'经验）';
+  };
+});
+cv.addEventListener('click',e=>{
+  if(!G||G.over)return;
+  const r=cv.getBoundingClientRect();
+  const x=(e.clientX-r.left)*(CW/r.width), y=(e.clientY-r.top)*(CH/r.height);
+  let slot=null;
+  for(const s of SLOTS){ if(Math.hypot(s.pos.x-x,s.pos.y-y)<22){slot=s;break;} }
+  if(slot){
+    if(G.pending){
+      if(slot.plant){$('#gHint').textContent='该位置已有植物';return;}
+      const cost=PLANTS[G.pending].cost;
+      if(G.xp<cost){$('#gHint').textContent='经验不足（需'+cost+'）';return;}
+      G.xp-=cost; slot.plant={type:G.pending,dmgLv:0,cntLv:0,spdLv:0,interval:PLANTS[G.pending].interval,cd:0};
+      const pb=document.querySelector('.shopbtn[data-buy="'+G.pending+'"]'); if(pb)pb.classList.remove('sel');
+      G.pending=null; syncHUD(); renderGoal(); $('#gHint').textContent='放置成功！点击植物可升级。'; return;
+    }
+    G.sel = slot.plant? slot : null; renderUp();
+  } else { G.sel=null; renderUp(); }
+});
+function renderUp(){
+  const box=$('#upPanel');
+  if(!G.sel||!G.sel.plant){box.innerHTML='';box.classList.add('hidden');return;}
+  const s=G.sel,p=s.plant,base=PLANTS[p.type]; box.classList.remove('hidden');
+  box.innerHTML='<div class="panel-title">🔧 升级 '+base.name+'</div>'+
+    '<div class="ub">伤害 Lv'+p.dmgLv+'（'+(base.dmg+p.dmgLv)+'） <button data-u="dmg">+1（10经验）</button></div>'+
+    '<div class="ub">子弹数 Lv'+p.cntLv+'（'+(base.count+p.cntLv)+'） <button data-u="cnt">+1（10经验）</button></div>'+
+    (base.type==='chomper'?'':('<div class="ub">射速 Lv'+p.spdLv+' <button data-u="spd">+1（10经验）</button></div>'));
+  box.querySelectorAll('button').forEach(btn=>{ btn.onclick=()=>{
+    if(G.xp<10){$('#gHint').textContent='经验不足（需10）';return;}
+    G.xp-=10; const u=btn.dataset.u;
+    if(u==='dmg')p.dmgLv++; else if(u==='cnt')p.cntLv++; else {p.spdLv++;p.interval=base.interval*Math.pow(0.85,p.spdLv);}
+    syncHUD(); renderUp(); }; });
+}
+$('#starBtn').onclick=()=>{
+  if(G.star.active)return;
+  if(G.xp<50){$('#gHint').textContent='经验不足（需50）';return;}
+  G.xp-=50; G.star.active=true; syncHUD(); renderGoal();
+  $('#starBtn').disabled=true; $('#starBtn').textContent='✨ 流星杨桃已激活';
+  $('#gHint').textContent='流星杨桃已激活！每次发射 10 发子弹，伤害翻倍。';
+};
+$('#gPause').onclick=()=>{ if(G.over||!G.started)return; G.on=!G.on; $('#gPause').textContent=G.on?'暂停':'继续'; };
+$('#gRestart').onclick=()=>{ newGame(); resetGameUI(); nextGameQ(); };
+function resetGameUI(){
+  $('#startOverlay').classList.remove('hidden');
+  $('#starBtn').disabled=false; $('#starBtn').textContent='✨ 激活流星杨桃（50经验）';
+  $('#gPause').textContent='暂停'; $('#upPanel').innerHTML=''; $('#upPanel').classList.add('hidden');
+  G.sel=null; $('#gHint').textContent='先用经验买植物，再点「开始守卫」。答对粤语题会让植物齐射并回复地保！';
+  syncHUD(); renderGoal();
+}
+$('#startBtnGame').onclick=()=>{
+  $('#startOverlay').classList.add('hidden');
+  G.started=true; G.grace=8; syncHUD();
+};
+function showOver(){
+  $('#over').classList.remove('hidden');
+  $('#overScore').textContent='坚持到第 '+G.wave+' 波 · 剩余地保 '+Math.ceil(G.hp);
+}
+</script>
+</body>
+</html>
